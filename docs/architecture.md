@@ -58,6 +58,7 @@ APIs.
 
 For the XMB work, keep scanner and launcher data unchanged and introduce UI
 changes in carefully bounded helpers. Avoid a wholesale rewrite of this file.
+The detailed compatibility map is in `docs/ui-boundaries.md`.
 
 ## Build and package workflow
 

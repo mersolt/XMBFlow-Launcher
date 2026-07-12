@@ -2586,6 +2586,8 @@ if not System.doesFileExist(cur_dir .. "/favorites.dat") then
     System.closeFile(file_favorites)
 end
 
+-- LEGACY UI BOUNDARY: cover models and shared render assets.
+-- Keep asset loading separate from library data and launch behavior when replacing the UI.
 imgBox = nil
 imgBoxPSP = nil
 imgBoxPSX = nil
@@ -3020,6 +3022,8 @@ end
     end
 
 
+-- LEGACY UI BOUNDARY: shared navigation and screen state.
+-- The compatibility contract for these values is documented in docs/ui-boundaries.md.
 local menuX = 0
 local menuY = 0
 local showMenu = 0
@@ -12471,6 +12475,8 @@ function DownloadArtwork(missing_artwork_table)
 end
 
 
+-- LEGACY UI BOUNDARY: cover measurement, layout, and draw helpers begin here.
+-- These helpers consume existing game records; they must not change those records' format.
 function get_cover_scale(icon)
 
     cover_height = Graphics.getImageHeight(icon)
@@ -13682,6 +13688,8 @@ function DownloadSingleSnap()
     gettingBackgrounds = false
 end
 
+-- LEGACY UI BOUNDARY: category and selected-game presentation begins here.
+-- The table passed in is owned by the library/cache layer and is read as UI input.
 function drawCategory_icons (def)
 
     local icon_x = 685 - time24_offset + pstv_offset + wifi_offset
@@ -14350,6 +14358,8 @@ end
 -- Capture function load time before main loop starts (major performance optimization)
 functionTime = Timer.getTime(oneLoopTimer)
 
+-- LEGACY UI BOUNDARY: frame orchestration begins here.
+-- Preserve the phase order documented in docs/ui-boundaries.md during UI work.
 -- Main loop
 while true do
 
@@ -15035,6 +15045,7 @@ while true do
         end
 
 
+    -- LEGACY UI BOUNDARY: frame rendering phase.
     -- Graphics
     if setBackground >= 1 then
         Render.drawModel(modBackground, 0, 0, -5, 0, 0, 0)-- Draw Background as model
@@ -21612,7 +21623,8 @@ while true do
 
     end
 
-    --Controls Start
+    -- LEGACY UI BOUNDARY: navigation and action input phase.
+    -- Controls Start
     if showMenu == 0 then
         
         -- Game list view
