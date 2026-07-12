@@ -69,6 +69,9 @@ VPK, locate or document the matching runtime/package project and create a
 repeatable, separate packaging procedure. Do not treat the VPKs in `Tools/` as
 the XMBFlow application package.
 
+The known packaging inputs, licence gate, and safe future workflow are recorded
+in `docs/build-and-package.md`.
+
 ## Fragile or high-risk areas
 
 - Startup code can install a VPK, copy Adrenaline Bubble Booter assets, and
