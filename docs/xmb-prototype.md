@@ -13,9 +13,8 @@ It is intentionally a presentation prototype, not a launcher rewrite.
 - The prototype is disabled by default through `xmbPrototypeEnabled` in
   `src/index.lua`.
 - When disabled, the legacy RetroFlow UI draws exactly as before.
-- When enabled in a reviewed test build, the existing code still owns input,
-  category changes, search, favourites, recents, collections, scans, cache,
-  settings, and launches.
+- When enabled in a reviewed test build, the prototype owns only its temporary
+  category and folder selection state; it does not invoke a legacy action.
 - It adds no files, installs nothing, and does not enable AutoBoot.
 
 ## Design choices
@@ -35,11 +34,13 @@ translations or icons.
 ## Important limitation
 
 The prototype now has its first navigation state: D-pad Left/Right moves the
-highlight across the six top-level categories and wraps at either end. Games
-continues to use existing RetroFlow controls and actions. The other five
-columns are deliberately non-interactive placeholders, so they cannot launch a
-game, alter settings, or access a guessed Vita app. Up/Down folder navigation
-and working category actions are a later, separately tested step.
+highlight across the six top-level categories and wraps at either end. In
+Games, D-pad Up/Down moves through a read-only folder list mapped to the
+existing RetroFlow categories. Cross, Circle, Triangle, Square, Start, Select,
+analog, and touch actions are deliberately inert while the prototype is
+enabled. The other five columns remain non-interactive placeholders, so they
+cannot launch a game, alter settings, or access a guessed Vita app. Opening a
+folder and working category actions are later, separately tested steps.
 
 ## Future hardware test
 

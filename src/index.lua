@@ -3034,6 +3034,7 @@ local showView = 0
 -- explicitly opts in; this flag is intentionally not saved to user settings.
 local xmbPrototypeEnabled = false
 local xmbPrototypeColumn = 5 -- GAMES
+local xmbPrototypeGamesFolder = 1
 
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
@@ -14201,6 +14202,21 @@ local xmb_prototype_columns = {
     "SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "APPS"
 }
 
+-- These folder records are read-only pointers to existing RetroFlow data.
+-- They do not create a second library or save any new configuration.
+local xmb_prototype_games_folders = {
+    {label = "ALL GAMES", category = 0},
+    {label = "PS VITA", category = 1},
+    {label = "PSP", category = 3},
+    {label = "PLAYSTATION", category = 4},
+    {label = "PLAYSTATION MOBILE", category = 5},
+    {label = "HOMEBREW", category = 2},
+    {label = "RETRO SYSTEMS", kind = "retro"},
+    {label = "FAVOURITES", category = 47},
+    {label = "RECENTLY PLAYED", category = 48},
+    {label = "COLLECTIONS", kind = "collections"}
+}
+
 local function xmb_prototype_active_column()
     return xmbPrototypeColumn
 end
@@ -14215,21 +14231,39 @@ local function xmb_prototype_move_column(direction)
     end
 end
 
-local function draw_xmb_prototype()
-    local category = xCatLookup(showCat) or {}
-    local active_column = xmb_prototype_active_column()
-    local selected_game = nil
-    local showing_games = active_column == 5
+local function xmb_prototype_move_games_folder(direction)
+    xmbPrototypeGamesFolder = xmbPrototypeGamesFolder + direction
 
-    if showing_games and p >= 1 and p <= #category then
-        selected_game = category[p]
+    if xmbPrototypeGamesFolder < 1 then
+        xmbPrototypeGamesFolder = #xmb_prototype_games_folders
+    elseif xmbPrototypeGamesFolder > #xmb_prototype_games_folders then
+        xmbPrototypeGamesFolder = 1
     end
+end
+
+local function xmb_prototype_games_folder_detail(folder)
+    if folder.category ~= nil then
+        local entries = xCatLookup(folder.category) or {}
+        return tostring(#entries) .. " items"
+    elseif folder.kind == "retro" then
+        return "Systems"
+    elseif folder.kind == "collections" then
+        local collection_count = collection_files and #collection_files or 0
+        return tostring(collection_count) .. " folders"
+    end
+
+    return ""
+end
+
+local function draw_xmb_prototype()
+    local active_column = xmb_prototype_active_column()
+    local showing_games = active_column == 5
 
     -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
     Graphics.fillRect(0, 960, 0, 544, Color.new(8, 18, 38, 235))
     Graphics.fillRect(0, 960, 0, 82, Color.new(18, 43, 78, 245))
     Font.print(fnt25, 34, 28, "XMBFlow", white)
-    Font.print(fnt20, 34, 57, "Library prototype", Color.new(210, 225, 245, 220))
+    Font.print(fnt20, 34, 57, "XMB prototype", Color.new(210, 225, 245, 220))
 
     -- Horizontal columns are the XMB-style category axis. This is visual-only;
     -- existing category controls still own showCat during the first prototype.
@@ -14247,40 +14281,39 @@ local function draw_xmb_prototype()
 
     Font.print(fnt22, 110, 150, xmb_prototype_columns[active_column], white)
     if showing_games then
-        Font.print(fnt20, 110, 179, tostring(#category) .. " items", Color.new(200, 215, 235, 190))
+        Font.print(fnt20, 110, 179, "Game folders", Color.new(200, 215, 235, 190))
     else
         Font.print(fnt20, 110, 179, "Preview column", Color.new(200, 215, 235, 190))
     end
 
-    if selected_game then
-        -- Vertical items are the XMB-style item axis. The focused game remains
-        -- tied to the existing p selection, so legacy launch handling is reused.
-        local first_item = math.max(1, p - 3)
-        local last_item = math.min(#category, p + 3)
+    if showing_games then
+        -- The vertical Games list is a read-only folder view over existing
+        -- RetroFlow tables. Opening a folder is intentionally a later step.
+        local first_item = math.max(1, xmbPrototypeGamesFolder - 3)
+        local last_item = math.min(#xmb_prototype_games_folders, xmbPrototypeGamesFolder + 3)
 
         for index = first_item, last_item do
-            local game = category[index]
-            local y = 278 + (index - p) * 42
-            local is_selected = index == p
-            local title = game.apptitle or game.title or game.name or "Untitled"
+            local folder = xmb_prototype_games_folders[index]
+            local y = 278 + (index - xmbPrototypeGamesFolder) * 42
+            local is_selected = index == xmbPrototypeGamesFolder
+            local detail = xmb_prototype_games_folder_detail(folder)
 
             if is_selected then
                 Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, 210))
-                Font.print(fnt25, 112, y, title, white)
+                Font.print(fnt25, 112, y, folder.label, white)
+                Font.print(fnt20, 730, y + 4, detail, Color.new(225, 235, 250, 210))
             else
-                Font.print(fnt22, 112, y + 2, title, Color.new(210, 222, 240, 165))
+                Font.print(fnt22, 112, y + 2, folder.label, Color.new(210, 222, 240, 165))
             end
         end
-    elseif showing_games then
-        Font.print(fnt22, 112, 282, "No items in this category", Color.new(210, 222, 240, 180))
     else
         Font.print(fnt22, 112, 282, "Not connected in this prototype", Color.new(210, 222, 240, 180))
     end
 
     Graphics.fillRect(0, 960, 496, 544, Color.new(10, 26, 48, 245))
     if showing_games then
-        Font.print(fnt20, 34, 508, tostring(p) .. " / " .. tostring(#category), Color.new(210, 225, 245, 210))
-        Font.print(fnt20, 564, 508, lang_lines.Launch .. "   " .. lang_lines.Details .. "   " .. lang_lines.Category, Color.new(210, 225, 245, 210))
+        Font.print(fnt20, 34, 508, tostring(xmbPrototypeGamesFolder) .. " / " .. tostring(#xmb_prototype_games_folders), Color.new(210, 225, 245, 210))
+        Font.print(fnt20, 564, 508, "Up / Down: Game folders   Preview only", Color.new(210, 225, 245, 210))
     else
         Font.print(fnt20, 34, 508, "Left / Right: XMB categories", Color.new(210, 225, 245, 210))
     end
@@ -21732,12 +21765,16 @@ while true do
                 xmb_prototype_move_column(-1)
             elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
                 xmb_prototype_move_column(1)
+            elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
+                xmb_prototype_move_games_folder(-1)
+            elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
+                xmb_prototype_move_games_folder(1)
             end
         end
 
-        -- Non-Games XMB columns are intentionally navigation-only placeholders
-        -- until their folders and verified actions are implemented.
-        if xmbPrototypeEnabled == false or xmbPrototypeColumn == 5 then
+        -- The enabled prototype owns all input while its folders are read-only.
+        -- Legacy controls remain unchanged whenever the prototype is disabled.
+        if xmbPrototypeEnabled == false then
         
         -- Game list view
         if showView == 6 and xmbPrototypeEnabled == false then
