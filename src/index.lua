@@ -14197,25 +14197,18 @@ end
 -- selection state, then draws an original text-and-shape XMB-style overlay.
 -- Input, scanning, caching, settings, and launch actions remain legacy code.
 local xmb_prototype_columns = {
-    "ALL", "VITA", "PSP", "PS1", "PSM", "RETRO", "FAV", "RECENT", "LISTS"
+    "SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "APPS"
 }
 
-local function xmb_prototype_active_column(category_number)
-    if category_number == 0 then return 1 end
-    if category_number == 1 or category_number == 2 then return 2 end
-    if category_number == 3 then return 3 end
-    if category_number == 4 then return 4 end
-    if category_number == 5 then return 5 end
-    if category_number >= 6 and category_number <= 46 then return 6 end
-    if category_number == 47 then return 7 end
-    if category_number == 48 then return 8 end
-    if category_number >= 50 then return 9 end
-    return 1
+local function xmb_prototype_active_column()
+    -- The first prototype only overlays RetroFlow's existing library screen.
+    -- The later navigation adapter will select the other XMB categories.
+    return 5 -- GAMES
 end
 
 local function draw_xmb_prototype()
     local category = xCatLookup(showCat) or {}
-    local active_column = xmb_prototype_active_column(showCat)
+    local active_column = xmb_prototype_active_column()
     local selected_game = nil
 
     if p >= 1 and p <= #category then
@@ -14231,12 +14224,12 @@ local function draw_xmb_prototype()
     -- Horizontal columns are the XMB-style category axis. This is visual-only;
     -- existing category controls still own showCat during the first prototype.
     for index, label in ipairs(xmb_prototype_columns) do
-        local x = 54 + (index - 1) * 106
+        local x = 80 + (index - 1) * 160
         local is_active = index == active_column
         local label_color = is_active and white or Color.new(190, 205, 225, 145)
 
         if is_active then
-            Graphics.fillRect(x - 8, x + 80, 104, 107, white)
+            Graphics.fillRect(x - 8, x + 112, 104, 107, white)
         end
 
         Font.print(fnt20, x, 82, label, label_color)

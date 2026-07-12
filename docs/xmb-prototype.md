@@ -20,7 +20,7 @@ It is intentionally a presentation prototype, not a launcher rewrite.
 
 ## Design choices
 
-- **Left/right axis:** shown as the top row of library groups.
+- **Left/right axis:** shown as the top row of PSP-style media categories.
 - **Up/down axis:** shown as a short vertical list around the selected game.
 - **Focus:** the selected existing game record is the bright central item.
 - **Assets:** only text and rectangles are used. No Sony-derived visual or
@@ -28,8 +28,9 @@ It is intentionally a presentation prototype, not a launcher rewrite.
 - **Fallback:** the legacy renderer remains in place underneath the prototype.
   Turning the flag off immediately restores the old presentation.
 
-The top labels are deliberately short, English placeholders. They are visual
-markers for the first layout pass, not final user-facing translations or icons.
+The top labels now match the planned PSP-style category names. They are still
+English visual markers for the first layout pass, not final user-facing
+translations or icons.
 
 ## Important limitation
 
