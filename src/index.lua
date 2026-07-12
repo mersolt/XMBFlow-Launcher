@@ -3034,7 +3034,11 @@ local showView = 0
 -- explicitly opts in; this flag is intentionally not saved to user settings.
 local xmbPrototypeEnabled = false
 local xmbPrototypeColumn = 5 -- GAMES
-local xmbPrototypeGamesFolder = 1
+local xmbPrototypeGamesMode = "folders"
+local xmbPrototypeGamesSelection = 1
+local xmbPrototypeGamesCategory = nil
+local xmbPrototypeGamesParentMode = nil
+local xmbPrototypeGamesTitle = "GAMES"
 
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
@@ -14217,6 +14221,18 @@ local xmb_prototype_games_folders = {
     {label = "COLLECTIONS", kind = "collections"}
 }
 
+local xmb_prototype_retro_systems = {}
+for category_number = 6, 45 do
+    local system = SystemsToScan[category_number]
+    local table_name = system and system.table or "system"
+    local label = string.upper(table_name:gsub("_table$", ""):gsub("_", " "))
+
+    table.insert(xmb_prototype_retro_systems, {
+        category = category_number,
+        label = label
+    })
+end
+
 local function xmb_prototype_active_column()
     return xmbPrototypeColumn
 end
@@ -14231,13 +14247,34 @@ local function xmb_prototype_move_column(direction)
     end
 end
 
-local function xmb_prototype_move_games_folder(direction)
-    xmbPrototypeGamesFolder = xmbPrototypeGamesFolder + direction
+local function xmb_prototype_current_games_list()
+    if xmbPrototypeGamesMode == "folders" then
+        return xmb_prototype_games_folders
+    elseif xmbPrototypeGamesMode == "retro_systems" then
+        return xmb_prototype_retro_systems
+    elseif xmbPrototypeGamesMode == "collections" then
+        return collection_files or {}
+    elseif xmbPrototypeGamesMode == "entries" then
+        return xCatLookup(xmbPrototypeGamesCategory) or {}
+    end
 
-    if xmbPrototypeGamesFolder < 1 then
-        xmbPrototypeGamesFolder = #xmb_prototype_games_folders
-    elseif xmbPrototypeGamesFolder > #xmb_prototype_games_folders then
-        xmbPrototypeGamesFolder = 1
+    return {}
+end
+
+local function xmb_prototype_move_games_selection(direction)
+    local list = xmb_prototype_current_games_list()
+
+    if #list == 0 then
+        xmbPrototypeGamesSelection = 0
+        return
+    end
+
+    xmbPrototypeGamesSelection = xmbPrototypeGamesSelection + direction
+
+    if xmbPrototypeGamesSelection < 1 then
+        xmbPrototypeGamesSelection = #list
+    elseif xmbPrototypeGamesSelection > #list then
+        xmbPrototypeGamesSelection = 1
     end
 end
 
@@ -14255,9 +14292,90 @@ local function xmb_prototype_games_folder_detail(folder)
     return ""
 end
 
+local function xmb_prototype_open_entries(category, title, parent_mode)
+    xmbPrototypeGamesMode = "entries"
+    xmbPrototypeGamesCategory = category
+    xmbPrototypeGamesTitle = title
+    xmbPrototypeGamesParentMode = parent_mode
+    xmbPrototypeGamesSelection = 1
+end
+
+local function xmb_prototype_open_games_selection()
+    local list = xmb_prototype_current_games_list()
+    local selected = list[xmbPrototypeGamesSelection]
+
+    if not selected then
+        return
+    end
+
+    if xmbPrototypeGamesMode == "folders" then
+        if selected.category ~= nil then
+            xmb_prototype_open_entries(selected.category, selected.label, "folders")
+        elseif selected.kind == "retro" then
+            xmbPrototypeGamesMode = "retro_systems"
+            xmbPrototypeGamesTitle = "RETRO SYSTEMS"
+            xmbPrototypeGamesSelection = 1
+        elseif selected.kind == "collections" then
+            xmbPrototypeGamesMode = "collections"
+            xmbPrototypeGamesTitle = "COLLECTIONS"
+            xmbPrototypeGamesSelection = 1
+        end
+    elseif xmbPrototypeGamesMode == "retro_systems" then
+        xmb_prototype_open_entries(selected.category, selected.label, "retro_systems")
+    elseif xmbPrototypeGamesMode == "collections" then
+        xmb_prototype_open_entries(49 + xmbPrototypeGamesSelection, selected.display_name or selected.table_name or "COLLECTION", "collections")
+    end
+end
+
+local function xmb_prototype_go_back()
+    if xmbPrototypeGamesMode == "entries" then
+        xmbPrototypeGamesMode = xmbPrototypeGamesParentMode or "folders"
+        xmbPrototypeGamesCategory = nil
+        xmbPrototypeGamesParentMode = nil
+        xmbPrototypeGamesSelection = 1
+
+        if xmbPrototypeGamesMode == "folders" then
+            xmbPrototypeGamesTitle = "GAMES"
+        elseif xmbPrototypeGamesMode == "retro_systems" then
+            xmbPrototypeGamesTitle = "RETRO SYSTEMS"
+        else
+            xmbPrototypeGamesTitle = "COLLECTIONS"
+        end
+    elseif xmbPrototypeGamesMode == "retro_systems" or xmbPrototypeGamesMode == "collections" then
+        xmbPrototypeGamesMode = "folders"
+        xmbPrototypeGamesTitle = "GAMES"
+        xmbPrototypeGamesSelection = 1
+    end
+end
+
+local function xmb_prototype_games_item_label(item)
+    if xmbPrototypeGamesMode == "entries" then
+        return item.apptitle or item.title or item.name or "Untitled"
+    elseif xmbPrototypeGamesMode == "collections" then
+        return item.display_name or item.table_name or "Collection"
+    end
+
+    return item.label or "Untitled"
+end
+
+local function xmb_prototype_games_item_detail(item, index)
+    if xmbPrototypeGamesMode == "folders" then
+        return xmb_prototype_games_folder_detail(item)
+    elseif xmbPrototypeGamesMode == "retro_systems" then
+        local entries = xCatLookup(item.category) or {}
+        return tostring(#entries) .. " items"
+    elseif xmbPrototypeGamesMode == "collections" then
+        local entries = xCatLookup(49 + index) or {}
+        return tostring(#entries) .. " items"
+    end
+
+    return "Preview only"
+end
+
 local function draw_xmb_prototype()
     local active_column = xmb_prototype_active_column()
     local showing_games = active_column == 5
+    local games_list = xmb_prototype_current_games_list()
 
     -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
     Graphics.fillRect(0, 960, 0, 544, Color.new(8, 18, 38, 235))
@@ -14281,29 +14399,32 @@ local function draw_xmb_prototype()
 
     Font.print(fnt22, 110, 150, xmb_prototype_columns[active_column], white)
     if showing_games then
-        Font.print(fnt20, 110, 179, "Game folders", Color.new(200, 215, 235, 190))
+        Font.print(fnt20, 110, 179, xmbPrototypeGamesTitle, Color.new(200, 215, 235, 190))
     else
         Font.print(fnt20, 110, 179, "Preview column", Color.new(200, 215, 235, 190))
     end
 
     if showing_games then
-        -- The vertical Games list is a read-only folder view over existing
-        -- RetroFlow tables. Opening a folder is intentionally a later step.
-        local first_item = math.max(1, xmbPrototypeGamesFolder - 3)
-        local last_item = math.min(#xmb_prototype_games_folders, xmbPrototypeGamesFolder + 3)
+        if #games_list == 0 then
+            Font.print(fnt22, 112, 282, "No items in this folder", Color.new(210, 222, 240, 180))
+        else
+            local first_item = math.max(1, xmbPrototypeGamesSelection - 3)
+            local last_item = math.min(#games_list, xmbPrototypeGamesSelection + 3)
 
-        for index = first_item, last_item do
-            local folder = xmb_prototype_games_folders[index]
-            local y = 278 + (index - xmbPrototypeGamesFolder) * 42
-            local is_selected = index == xmbPrototypeGamesFolder
-            local detail = xmb_prototype_games_folder_detail(folder)
+            for index = first_item, last_item do
+                local item = games_list[index]
+                local y = 278 + (index - xmbPrototypeGamesSelection) * 42
+                local is_selected = index == xmbPrototypeGamesSelection
+                local label = xmb_prototype_games_item_label(item)
+                local detail = xmb_prototype_games_item_detail(item, index)
 
-            if is_selected then
-                Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, 210))
-                Font.print(fnt25, 112, y, folder.label, white)
-                Font.print(fnt20, 730, y + 4, detail, Color.new(225, 235, 250, 210))
-            else
-                Font.print(fnt22, 112, y + 2, folder.label, Color.new(210, 222, 240, 165))
+                if is_selected then
+                    Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, 210))
+                    Font.print(fnt25, 112, y, label, white)
+                    Font.print(fnt20, 730, y + 4, detail, Color.new(225, 235, 250, 210))
+                else
+                    Font.print(fnt22, 112, y + 2, label, Color.new(210, 222, 240, 165))
+                end
             end
         end
     else
@@ -14312,8 +14433,14 @@ local function draw_xmb_prototype()
 
     Graphics.fillRect(0, 960, 496, 544, Color.new(10, 26, 48, 245))
     if showing_games then
-        Font.print(fnt20, 34, 508, tostring(xmbPrototypeGamesFolder) .. " / " .. tostring(#xmb_prototype_games_folders), Color.new(210, 225, 245, 210))
-        Font.print(fnt20, 564, 508, "Up / Down: Game folders   Preview only", Color.new(210, 225, 245, 210))
+        Font.print(fnt20, 34, 508, tostring(xmbPrototypeGamesSelection) .. " / " .. tostring(#games_list), Color.new(210, 225, 245, 210))
+        if xmbPrototypeGamesMode == "entries" then
+            Font.print(fnt20, 564, 508, "Circle: Back   Preview only", Color.new(210, 225, 245, 210))
+        elseif xmbPrototypeGamesMode == "folders" then
+            Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open", Color.new(210, 225, 245, 210))
+        else
+            Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open   Circle: Back", Color.new(210, 225, 245, 210))
+        end
     else
         Font.print(fnt20, 34, 508, "Left / Right: XMB categories", Color.new(210, 225, 245, 210))
     end
@@ -21766,9 +21893,13 @@ while true do
             elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
                 xmb_prototype_move_column(1)
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
-                xmb_prototype_move_games_folder(-1)
+                xmb_prototype_move_games_selection(-1)
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
-                xmb_prototype_move_games_folder(1)
+                xmb_prototype_move_games_selection(1)
+            elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+                xmb_prototype_open_games_selection()
+            elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
+                xmb_prototype_go_back()
             end
         end
 

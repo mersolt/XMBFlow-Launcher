@@ -36,11 +36,13 @@ translations or icons.
 The prototype now has its first navigation state: D-pad Left/Right moves the
 highlight across the six top-level categories and wraps at either end. In
 Games, D-pad Up/Down moves through a read-only folder list mapped to the
-existing RetroFlow categories. Cross, Circle, Triangle, Square, Start, Select,
-analog, and touch actions are deliberately inert while the prototype is
-enabled. The other five columns remain non-interactive placeholders, so they
-cannot launch a game, alter settings, or access a guessed Vita app. Opening a
-folder and working category actions are later, separately tested steps.
+existing RetroFlow categories. Cross opens read-only folders and Circle returns
+to the previous prototype folder. This includes Retro Systems, Collections,
+and the existing game entries within a selected folder. Selecting an actual
+game is still a no-op. Triangle, Square, Start, Select, analog, and touch
+actions are deliberately inert while the prototype is enabled. The other five
+columns remain non-interactive placeholders, so they cannot launch a game,
+alter settings, or access a guessed Vita app.
 
 ## Future hardware test
 
