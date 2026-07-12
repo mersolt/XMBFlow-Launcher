@@ -3033,6 +3033,7 @@ local showView = 0
 -- Experimental XMB presentation. Keep disabled until a reviewed test build
 -- explicitly opts in; this flag is intentionally not saved to user settings.
 local xmbPrototypeEnabled = false
+local xmbPrototypeColumn = 5 -- GAMES
 
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
@@ -14201,17 +14202,26 @@ local xmb_prototype_columns = {
 }
 
 local function xmb_prototype_active_column()
-    -- The first prototype only overlays RetroFlow's existing library screen.
-    -- The later navigation adapter will select the other XMB categories.
-    return 5 -- GAMES
+    return xmbPrototypeColumn
+end
+
+local function xmb_prototype_move_column(direction)
+    xmbPrototypeColumn = xmbPrototypeColumn + direction
+
+    if xmbPrototypeColumn < 1 then
+        xmbPrototypeColumn = #xmb_prototype_columns
+    elseif xmbPrototypeColumn > #xmb_prototype_columns then
+        xmbPrototypeColumn = 1
+    end
 end
 
 local function draw_xmb_prototype()
     local category = xCatLookup(showCat) or {}
     local active_column = xmb_prototype_active_column()
     local selected_game = nil
+    local showing_games = active_column == 5
 
-    if p >= 1 and p <= #category then
+    if showing_games and p >= 1 and p <= #category then
         selected_game = category[p]
     end
 
@@ -14236,7 +14246,11 @@ local function draw_xmb_prototype()
     end
 
     Font.print(fnt22, 110, 150, xmb_prototype_columns[active_column], white)
-    Font.print(fnt20, 110, 179, tostring(#category) .. " items", Color.new(200, 215, 235, 190))
+    if showing_games then
+        Font.print(fnt20, 110, 179, tostring(#category) .. " items", Color.new(200, 215, 235, 190))
+    else
+        Font.print(fnt20, 110, 179, "Preview column", Color.new(200, 215, 235, 190))
+    end
 
     if selected_game then
         -- Vertical items are the XMB-style item axis. The focused game remains
@@ -14257,13 +14271,19 @@ local function draw_xmb_prototype()
                 Font.print(fnt22, 112, y + 2, title, Color.new(210, 222, 240, 165))
             end
         end
-    else
+    elseif showing_games then
         Font.print(fnt22, 112, 282, "No items in this category", Color.new(210, 222, 240, 180))
+    else
+        Font.print(fnt22, 112, 282, "Not connected in this prototype", Color.new(210, 222, 240, 180))
     end
 
     Graphics.fillRect(0, 960, 496, 544, Color.new(10, 26, 48, 245))
-    Font.print(fnt20, 34, 508, tostring(p) .. " / " .. tostring(#category), Color.new(210, 225, 245, 210))
-    Font.print(fnt20, 564, 508, lang_lines.Launch .. "   " .. lang_lines.Details .. "   " .. lang_lines.Category, Color.new(210, 225, 245, 210))
+    if showing_games then
+        Font.print(fnt20, 34, 508, tostring(p) .. " / " .. tostring(#category), Color.new(210, 225, 245, 210))
+        Font.print(fnt20, 564, 508, lang_lines.Launch .. "   " .. lang_lines.Details .. "   " .. lang_lines.Category, Color.new(210, 225, 245, 210))
+    else
+        Font.print(fnt20, 34, 508, "Left / Right: XMB categories", Color.new(210, 225, 245, 210))
+    end
 end
 
 -- Function to detect inserted Vita cartridge
@@ -21707,9 +21727,20 @@ while true do
     -- LEGACY UI BOUNDARY: navigation and action input phase.
     -- Controls Start
     if showMenu == 0 then
+        if xmbPrototypeEnabled then
+            if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then
+                xmb_prototype_move_column(-1)
+            elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
+                xmb_prototype_move_column(1)
+            end
+        end
+
+        -- Non-Games XMB columns are intentionally navigation-only placeholders
+        -- until their folders and verified actions are implemented.
+        if xmbPrototypeEnabled == false or xmbPrototypeColumn == 5 then
         
         -- Game list view
-        if showView == 6 then
+        if showView == 6 and xmbPrototypeEnabled == false then
             if my < 64 then
                 if delayButton < 0.5 then
                     delayButton = 1
@@ -21727,7 +21758,7 @@ while true do
                     p = p + 1
                 end
             end
-        else
+        elseif xmbPrototypeEnabled == false then
 
             --Navigation Left Analog
             if mx < 64 then
@@ -22412,7 +22443,7 @@ while true do
             else
             end
 
-        elseif (Controls.check(pad, SCE_CTRL_LEFT)) and not (Controls.check(oldpad, SCE_CTRL_LEFT)) then
+        elseif (xmbPrototypeEnabled == false) and (Controls.check(pad, SCE_CTRL_LEFT)) and not (Controls.check(oldpad, SCE_CTRL_LEFT)) then
             if showView ~= 6 then
                 state = Keyboard.getState()
                 if state ~= RUNNING then
@@ -22430,7 +22461,7 @@ while true do
                     end
                 end
             end
-        elseif (Controls.check(pad, SCE_CTRL_LEFT)) then
+        elseif (xmbPrototypeEnabled == false) and (Controls.check(pad, SCE_CTRL_LEFT)) then
             if showView ~= 6 then
                 -- Initialize and increment held counter for continuous scrolling
                 dpadHeldLeft = (dpadHeldLeft or 0) + 0.05
@@ -22455,7 +22486,7 @@ while true do
                     end
                 end
             end
-        elseif (Controls.check(pad, SCE_CTRL_RIGHT)) and not (Controls.check(oldpad, SCE_CTRL_RIGHT)) then
+        elseif (xmbPrototypeEnabled == false) and (Controls.check(pad, SCE_CTRL_RIGHT)) and not (Controls.check(oldpad, SCE_CTRL_RIGHT)) then
             if showView ~= 6 then
                 state = Keyboard.getState()
                 if state ~= RUNNING then
@@ -22486,7 +22517,7 @@ while true do
                     end
                 end
             end
-        elseif (Controls.check(pad, SCE_CTRL_RIGHT)) then
+        elseif (xmbPrototypeEnabled == false) and (Controls.check(pad, SCE_CTRL_RIGHT)) then
             if showView ~= 6 then
                 -- Initialize and increment held counter for continuous scrolling
                 dpadHeldRight = (dpadHeldRight or 0) + 0.05
@@ -22756,6 +22787,7 @@ while true do
                     end
                 end
             end
+        end
         end
         
     elseif showMenu > 0 then

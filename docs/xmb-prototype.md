@@ -34,11 +34,12 @@ translations or icons.
 
 ## Important limitation
 
-The first prototype does not yet change control behaviour to full XMB
-navigation. Existing RetroFlow controls continue to work, which prevents a UI
-experiment from changing launch and library behaviour. A later, separately
-tested step can add XMB-style left/right category navigation behind the same
-opt-in boundary.
+The prototype now has its first navigation state: D-pad Left/Right moves the
+highlight across the six top-level categories and wraps at either end. Games
+continues to use existing RetroFlow controls and actions. The other five
+columns are deliberately non-interactive placeholders, so they cannot launch a
+game, alter settings, or access a guessed Vita app. Up/Down folder navigation
+and working category actions are a later, separately tested step.
 
 ## Future hardware test
 
