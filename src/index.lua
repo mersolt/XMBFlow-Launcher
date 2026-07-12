@@ -3030,6 +3030,10 @@ local showMenu = 0
 local showCat = 1 -- Category: 0 = all, 1 = games, 2 = homebrews, 3 = psp, 4 = psx, 5 = N64, 6 = SNES, 7 = NES, 8 = GBA, 9 = GBC, 10 = GB, 11 = MD, 12 = SMS, 13 = GG, 14 = MAME, 15 = AMIGA, 16 = TG16, 17 = TG CD, 18 = PCE, 19 = PCE CD, 20 = NGPC, 21 = Favorites
 local showView = 0
 
+-- Experimental XMB presentation. Keep disabled until a reviewed test build
+-- explicitly opts in; this flag is intentionally not saved to user settings.
+local xmbPrototypeEnabled = false
+
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
 local cartridge_state_initialized = false
@@ -14189,6 +14193,86 @@ function drawCategory (def)
     end
 end
 
+-- XMB PROTOTYPE: presentation only. It reads the existing category table and
+-- selection state, then draws an original text-and-shape XMB-style overlay.
+-- Input, scanning, caching, settings, and launch actions remain legacy code.
+local xmb_prototype_columns = {
+    "ALL", "VITA", "PSP", "PS1", "PSM", "RETRO", "FAV", "RECENT", "LISTS"
+}
+
+local function xmb_prototype_active_column(category_number)
+    if category_number == 0 then return 1 end
+    if category_number == 1 or category_number == 2 then return 2 end
+    if category_number == 3 then return 3 end
+    if category_number == 4 then return 4 end
+    if category_number == 5 then return 5 end
+    if category_number >= 6 and category_number <= 46 then return 6 end
+    if category_number == 47 then return 7 end
+    if category_number == 48 then return 8 end
+    if category_number >= 50 then return 9 end
+    return 1
+end
+
+local function draw_xmb_prototype()
+    local category = xCatLookup(showCat) or {}
+    local active_column = xmb_prototype_active_column(showCat)
+    local selected_game = nil
+
+    if p >= 1 and p <= #category then
+        selected_game = category[p]
+    end
+
+    -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
+    Graphics.fillRect(0, 960, 0, 544, Color.new(8, 18, 38, 235))
+    Graphics.fillRect(0, 960, 0, 82, Color.new(18, 43, 78, 245))
+    Font.print(fnt25, 34, 28, "XMBFlow", white)
+    Font.print(fnt20, 34, 57, "Library prototype", Color.new(210, 225, 245, 220))
+
+    -- Horizontal columns are the XMB-style category axis. This is visual-only;
+    -- existing category controls still own showCat during the first prototype.
+    for index, label in ipairs(xmb_prototype_columns) do
+        local x = 54 + (index - 1) * 106
+        local is_active = index == active_column
+        local label_color = is_active and white or Color.new(190, 205, 225, 145)
+
+        if is_active then
+            Graphics.fillRect(x - 8, x + 80, 104, 107, white)
+        end
+
+        Font.print(fnt20, x, 82, label, label_color)
+    end
+
+    Font.print(fnt22, 110, 150, xmb_prototype_columns[active_column], white)
+    Font.print(fnt20, 110, 179, tostring(#category) .. " items", Color.new(200, 215, 235, 190))
+
+    if selected_game then
+        -- Vertical items are the XMB-style item axis. The focused game remains
+        -- tied to the existing p selection, so legacy launch handling is reused.
+        local first_item = math.max(1, p - 3)
+        local last_item = math.min(#category, p + 3)
+
+        for index = first_item, last_item do
+            local game = category[index]
+            local y = 278 + (index - p) * 42
+            local is_selected = index == p
+            local title = game.apptitle or game.title or game.name or "Untitled"
+
+            if is_selected then
+                Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, 210))
+                Font.print(fnt25, 112, y, title, white)
+            else
+                Font.print(fnt22, 112, y + 2, title, Color.new(210, 222, 240, 165))
+            end
+        end
+    else
+        Font.print(fnt22, 112, 282, "No items in this category", Color.new(210, 222, 240, 180))
+    end
+
+    Graphics.fillRect(0, 960, 496, 544, Color.new(10, 26, 48, 245))
+    Font.print(fnt20, 34, 508, tostring(p) .. " / " .. tostring(#category), Color.new(210, 225, 245, 210))
+    Font.print(fnt20, 564, 508, lang_lines.Launch .. "   " .. lang_lines.Details .. "   " .. lang_lines.Category, Color.new(210, 225, 245, 210))
+end
+
 -- Function to detect inserted Vita cartridge
 function get_inserted_cartridge_titleid()
     local app_dir = "gro0:/app"
@@ -15328,6 +15412,10 @@ while true do
         prevZ = 0
         prevRot = 0
         inPreview = false
+
+        if xmbPrototypeEnabled then
+            draw_xmb_prototype()
+        end
 
 -- MENU 1 - GET INFO
     elseif showMenu == 1 then

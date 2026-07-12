@@ -101,9 +101,9 @@ the presentation layer. UI work must not move, broaden, or call them earlier.
 
 ## Safest implementation seam
 
-The first functional XMB change should be an opt-in renderer that receives the
-active category table, selected position, and read-only presentation settings.
-It should draw only; existing input and actions should remain in control. Keep
+The first functional XMB change is now an opt-in renderer documented in
+`docs/xmb-prototype.md`. It receives the active category table and selected
+position, then draws only; existing input and actions remain in control. Keep
 the legacy renderer as the default and fallback until the new renderer can be
 packaged and tested. Do not add AutoBoot, Vita installation, or new file
 operations as part of that work.
