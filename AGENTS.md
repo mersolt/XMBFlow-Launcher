@@ -27,3 +27,10 @@ changing code.
 - Review `git diff` and `git status` before committing. Do not include
   generated caches, VPKs, proprietary content, secrets, or unrelated files.
 - Use descriptive, conventional commit messages. Ask before pushing.
+
+## Task completion handoff
+
+When a task's stated outcome is genuinely complete, say so clearly and propose
+finishing the current task tab. Include a concise copyable prompt for the next
+task tab, with its objective and any safety boundaries. Do not treat an
+unfinished, blocked, or merely partially tested task as complete.
