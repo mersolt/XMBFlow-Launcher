@@ -14439,6 +14439,7 @@ local function draw_xmb_prototype()
     Graphics.fillRect(0, 960, 496, 544, Color.new(10, 26, 48, 245))
     if showing_games then
         Font.print(fnt20, 34, 508, tostring(xmbPrototypeGamesSelection) .. " / " .. tostring(#games_list), Color.new(210, 225, 245, 210))
+        Font.print(fnt20, 214, 508, "Left / Right: Categories", Color.new(210, 225, 245, 210))
         if xmbPrototypeGamesMode == "entries" then
             Font.print(fnt20, 564, 508, "Circle: Back   Preview only", Color.new(210, 225, 245, 210))
         elseif xmbPrototypeGamesMode == "folders" then
