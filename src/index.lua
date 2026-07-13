@@ -14518,6 +14518,13 @@ local function draw_xmb_prototype()
         else
             Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open   Circle: Back", Color.new(210, 225, 245, 210))
         end
+    elseif showing_apps then
+        Font.print(fnt20, 34, 508, tostring(xmbPrototypeAppsSelection) .. " / " .. tostring(#xmb_prototype_current_apps_list()), Color.new(210, 225, 245, 210))
+        if xmbPrototypeAppsMode == "entries" then
+            Font.print(fnt20, 420, 508, "Circle: Back   Preview only", Color.new(210, 225, 245, 210))
+        else
+            Font.print(fnt20, 420, 508, "Up / Down: Browse   Cross: Open", Color.new(210, 225, 245, 210))
+        end
     else
         Font.print(fnt20, 34, 508, "Left / Right: XMB categories", Color.new(210, 225, 245, 210))
     end
