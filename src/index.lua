@@ -14491,12 +14491,17 @@ local function draw_xmb_prototype()
         end
     elseif active_column == 6 then
         local apps_list = xmb_prototype_current_apps_list()
-        for index, item in ipairs(apps_list) do
-            if index <= 7 then
-                local selected = index == xmbPrototypeAppsSelection
-                local label = xmbPrototypeAppsMode == "entries" and (item.apptitle or item.title or item.name or "Untitled") or item.label
-                Font.print(selected and fnt25 or fnt22, 112, 240 + index * 36, label, selected and white or Color.new(210, 222, 240, 165))
+        local first_item = math.max(1, xmbPrototypeAppsSelection - 3)
+        local last_item = math.min(#apps_list, xmbPrototypeAppsSelection + 3)
+        for index = first_item, last_item do
+            local item = apps_list[index]
+            local selected = index == xmbPrototypeAppsSelection
+            local label = xmbPrototypeAppsMode == "entries" and (item.apptitle or item.title or item.name or "Untitled") or item.label
+            local y = 278 + (index - xmbPrototypeAppsSelection) * 42
+            if selected then
+                Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, 210))
             end
+            Font.print(selected and fnt25 or fnt22, 112, y, label, selected and white or Color.new(210, 222, 240, 165))
         end
     else
         Font.print(fnt22, 112, 282, "Not connected in this prototype", Color.new(210, 222, 240, 180))
