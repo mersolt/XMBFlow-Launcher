@@ -22,6 +22,48 @@ change Vita files while following the desktop checks below.
    it must not instruct code to enable or run them.
 4. Commit only after those checks pass. Keep the commit small and descriptive.
 
+## Future XMB prototype test-package profile (PC-only)
+
+This is a design gate, not authorisation to build a VPK. It applies only after
+`docs/package-recipe.md` is complete and its reproducibility gates pass.
+
+The package must be a distinct, clearly labelled XMB prototype build. It may
+set `xmbPrototypeEnabled` to `true`, but it must retain the legacy RetroFlow
+renderer and make the legacy renderer the immediate fallback when that flag is
+false. The prototype remains presentation-only: selecting a game is a no-op,
+and the non-Games columns remain inert.
+
+The test manifest must include only the reviewed runtime, Lua source,
+translations, lookup databases, original/licensed `DATA` assets, original
+`sce_sys` assets, licence notices, and the minimal files proven necessary to
+start the app. It must exclude all of the following:
+
+- `payloads/**`, helper-launcher VPKs, Adrenaline Bubble Booter files, and any
+  helper-installation material;
+- AutoBoot configuration or boot files;
+- personal caches, ROMs, artwork libraries, saved settings, logs, secrets,
+  Vita system/app files, and Sony-derived assets.
+
+Before creating a VPK, run these PC-only checks against both the staged tree
+and the eventual archive file list:
+
+1. Compare every file and SHA-256 against the approved manifest; reject extras
+   and omissions.
+2. Reject paths or content referring to helper installation, `System.installVpk`,
+   `System.reboot`, AutoBoot, `System.deleteFile`, `System.deleteDirectory`, or
+   writes/copies into Vita system or application locations. An allowlist may
+   describe existing legacy source only when the test build has demonstrably
+   removed or made those paths unreachable; it cannot waive the exclusion.
+3. Confirm `payloads/`, `boot.bin`, `boot.inf`, and helper VPK names are absent.
+4. Confirm `sce_sys` and every asset has a manifest source and licence entry;
+   reject Sony/Vita-extracted material.
+5. Record the XMBFlow source revision, runtime revision, tool versions,
+   manifest revision, archive SHA-256, and check results.
+
+If a safe test variant cannot remove those capabilities without changing legacy
+RetroFlow behaviour, stop at static review. Do not weaken the profile by
+including the legacy helper or destructive paths.
+
 ## Later: Vita test procedure (only after explicit approval)
 
 Never use your only working setup as the first tester. Back up VitaShell-accessible
