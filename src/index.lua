@@ -3039,6 +3039,10 @@ local xmbPrototypeGamesSelection = 1
 local xmbPrototypeGamesCategory = nil
 local xmbPrototypeGamesParentMode = nil
 local xmbPrototypeGamesTitle = "GAMES"
+local xmbPrototypeAppsMode = "folders"
+local xmbPrototypeAppsSelection = 1
+local xmbPrototypeAppsCategory = nil
+local xmbPrototypeAppsTitle = "APPS"
 
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
@@ -14221,6 +14225,14 @@ local xmb_prototype_games_folders = {
     {label = "COLLECTIONS", kind = "collections"}
 }
 
+-- Apps is a separate, read-only view over existing scanned tables. It does
+-- not infer installed titles, write app folders, or invoke any launch path.
+local xmb_prototype_apps_folders = {
+    {label = "PS VITA", category = 1},
+    {label = "HOMEBREW", category = 2},
+    {label = "SYSTEM APPS", category = 42}
+}
+
 local xmb_prototype_retro_systems = {}
 for category_number = 5, 46 do
     local system = SystemsToScan[category_number]
@@ -14279,6 +14291,44 @@ local function xmb_prototype_move_games_selection(direction)
         xmbPrototypeGamesSelection = #list
     elseif xmbPrototypeGamesSelection > #list then
         xmbPrototypeGamesSelection = 1
+    end
+end
+
+local function xmb_prototype_current_apps_list()
+    if xmbPrototypeAppsMode == "entries" then
+        return xCatLookup(xmbPrototypeAppsCategory) or {}
+    end
+    return xmb_prototype_apps_folders
+end
+
+local function xmb_prototype_move_apps_selection(direction)
+    local list = xmb_prototype_current_apps_list()
+    if #list == 0 then xmbPrototypeAppsSelection = 0 return end
+    xmbPrototypeAppsSelection = xmbPrototypeAppsSelection + direction
+    if xmbPrototypeAppsSelection < 1 then
+        xmbPrototypeAppsSelection = #list
+    elseif xmbPrototypeAppsSelection > #list then
+        xmbPrototypeAppsSelection = 1
+    end
+end
+
+local function xmb_prototype_open_apps_selection()
+    if xmbPrototypeAppsMode ~= "folders" then return end
+    local selected = xmb_prototype_apps_folders[xmbPrototypeAppsSelection]
+    if selected then
+        xmbPrototypeAppsMode = "entries"
+        xmbPrototypeAppsCategory = selected.category
+        xmbPrototypeAppsTitle = selected.label
+        xmbPrototypeAppsSelection = 1
+    end
+end
+
+local function xmb_prototype_apps_go_back()
+    if xmbPrototypeAppsMode == "entries" then
+        xmbPrototypeAppsMode = "folders"
+        xmbPrototypeAppsCategory = nil
+        xmbPrototypeAppsTitle = "APPS"
+        xmbPrototypeAppsSelection = 1
     end
 end
 
@@ -14379,6 +14429,7 @@ end
 local function draw_xmb_prototype()
     local active_column = xmb_prototype_active_column()
     local showing_games = active_column == 5
+    local showing_apps = active_column == 6
     local games_list = xmb_prototype_current_games_list()
 
     -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
@@ -14409,6 +14460,8 @@ local function draw_xmb_prototype()
     Font.print(fnt22, 110, 150, xmb_prototype_columns[active_column], white)
     if showing_games then
         Font.print(fnt20, 110, 179, xmbPrototypeGamesTitle, Color.new(200, 215, 235, 190))
+    elseif showing_apps then
+        Font.print(fnt20, 110, 179, xmbPrototypeAppsTitle, Color.new(200, 215, 235, 190))
     else
         Font.print(fnt20, 110, 179, "Preview column", Color.new(200, 215, 235, 190))
     end
@@ -14434,6 +14487,15 @@ local function draw_xmb_prototype()
                 else
                     Font.print(fnt22, 112, y + 2, label, Color.new(210, 222, 240, 165))
                 end
+            end
+        end
+    elseif active_column == 6 then
+        local apps_list = xmb_prototype_current_apps_list()
+        for index, item in ipairs(apps_list) do
+            if index <= 7 then
+                local selected = index == xmbPrototypeAppsSelection
+                local label = xmbPrototypeAppsMode == "entries" and (item.apptitle or item.title or item.name or "Untitled") or item.label
+                Font.print(selected and fnt25 or fnt22, 112, 240 + index * 36, label, selected and white or Color.new(210, 222, 240, 165))
             end
         end
     else
@@ -21910,6 +21972,14 @@ while true do
                 xmb_prototype_open_games_selection()
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                 xmb_prototype_go_back()
+            elseif xmbPrototypeColumn == 6 and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
+                xmb_prototype_move_apps_selection(-1)
+            elseif xmbPrototypeColumn == 6 and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
+                xmb_prototype_move_apps_selection(1)
+            elseif xmbPrototypeColumn == 6 and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+                xmb_prototype_open_apps_selection()
+            elseif xmbPrototypeColumn == 6 and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
+                xmb_prototype_apps_go_back()
             end
         end
 
