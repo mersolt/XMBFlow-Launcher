@@ -14385,13 +14385,18 @@ local function draw_xmb_prototype()
 
     -- Horizontal columns are the XMB-style category axis. This is visual-only;
     -- existing category controls still own showCat during the first prototype.
+    -- Keep all six labels inside the 960-pixel display. The previous spacing
+    -- placed the APPS column at the right edge, where its highlight could be
+    -- clipped. This only changes the prototype's presentation geometry.
+    local column_left = 48
+    local column_step = 150
     for index, label in ipairs(xmb_prototype_columns) do
-        local x = 80 + (index - 1) * 160
+        local x = column_left + (index - 1) * column_step
         local is_active = index == active_column
         local label_color = is_active and white or Color.new(190, 205, 225, 145)
 
         if is_active then
-            Graphics.fillRect(x - 8, x + 112, 104, 107, white)
+            Graphics.fillRect(x - 8, x + 128, 104, 107, white)
         end
 
         Font.print(fnt20, x, 82, label, label_color)
