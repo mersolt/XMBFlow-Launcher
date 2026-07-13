@@ -1,0 +1,20 @@
+param([string]$Source = (Join-Path $PSScriptRoot '..\src\index.lua'))
+
+$text = Get-Content -Raw $Source
+$required = @(
+    'local xmbPrototypeEnabled = false',
+    '{label = "PLAYSTATION MOBILE", category = 39}',
+    '{label = "SYSTEM APPS", category = 42}',
+    'local function xmb_prototype_current_apps_list()',
+    'local function xmb_prototype_open_apps_selection()'
+)
+
+foreach ($entry in $required) {
+    if (-not $text.Contains($entry)) { throw "Missing XMB prototype invariant: $entry" }
+}
+
+if ($text -match 'xmb_prototype_open_apps_selection\(\).*launch_') {
+    throw 'Apps prototype must not activate a launch adapter.'
+}
+
+Write-Host 'XMB prototype structural checks passed.'

@@ -14313,7 +14313,11 @@ local function xmb_prototype_move_apps_selection(direction)
 end
 
 local function xmb_prototype_open_apps_selection()
-    if xmbPrototypeAppsMode ~= "folders" then return end
+    if xmbPrototypeAppsMode ~= "folders" then
+        -- Entry activation remains deliberately disconnected until a reviewed
+        -- adapter can be tested with the packaged Lua runtime.
+        return
+    end
     local selected = xmb_prototype_apps_folders[xmbPrototypeAppsSelection]
     if selected then
         xmbPrototypeAppsMode = "entries"
@@ -14517,13 +14521,6 @@ local function draw_xmb_prototype()
             Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open", Color.new(210, 225, 245, 210))
         else
             Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open   Circle: Back", Color.new(210, 225, 245, 210))
-        end
-    elseif showing_apps then
-        Font.print(fnt20, 34, 508, tostring(xmbPrototypeAppsSelection) .. " / " .. tostring(#xmb_prototype_current_apps_list()), Color.new(210, 225, 245, 210))
-        if xmbPrototypeAppsMode == "entries" then
-            Font.print(fnt20, 420, 508, "Circle: Back   Preview only", Color.new(210, 225, 245, 210))
-        else
-            Font.print(fnt20, 420, 508, "Up / Down: Browse   Cross: Open", Color.new(210, 225, 245, 210))
         end
     else
         Font.print(fnt20, 34, 508, "Left / Right: XMB categories", Color.new(210, 225, 245, 210))
