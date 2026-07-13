@@ -14213,7 +14213,7 @@ local xmb_prototype_games_folders = {
     {label = "PS VITA", category = 1},
     {label = "PSP", category = 3},
     {label = "PLAYSTATION", category = 4},
-    {label = "PLAYSTATION MOBILE", category = 5},
+    {label = "PLAYSTATION MOBILE", category = 39},
     {label = "HOMEBREW", category = 2},
     {label = "RETRO SYSTEMS", kind = "retro"},
     {label = "FAVOURITES", category = 47},
@@ -14222,15 +14222,19 @@ local xmb_prototype_games_folders = {
 }
 
 local xmb_prototype_retro_systems = {}
-for category_number = 6, 45 do
+for category_number = 5, 46 do
     local system = SystemsToScan[category_number]
-    local table_name = system and system.table or "system"
-    local label = string.upper(table_name:gsub("_table$", ""):gsub("_", " "))
+    -- PSM has its own Games folder and system apps belong to the future Apps
+    -- column. Every other existing emulator category remains read-only here.
+    if system and category_number ~= 39 and category_number ~= 42 then
+        local table_name = system.table or "system"
+        local label = string.upper(table_name:gsub("_table$", ""):gsub("_", " "))
 
-    table.insert(xmb_prototype_retro_systems, {
-        category = category_number,
-        label = label
-    })
+        table.insert(xmb_prototype_retro_systems, {
+            category = category_number,
+            label = label
+        })
+    end
 end
 
 local function xmb_prototype_active_column()
