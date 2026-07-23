@@ -109,6 +109,10 @@ display an extended-permissions warning. The active candidate is now
 `packaging/candidate-sce_sys-standard-manifest.json`: it retains the indexed
 LiveArea PNGs and uses `ATTRIBUTE=0`.
 
+After repeated installer-promotion failures, the current test metadata uses a
+fresh non-distribution title ID, `XMBF00001`, rather than attempting to remove
+or overwrite any possible partial `XMBFLOW01` registration on a Vita.
+
 ## Licence and source record required before distribution
 
 For every packaged file, create a machine-readable manifest entry with:
