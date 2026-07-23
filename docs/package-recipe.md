@@ -68,6 +68,12 @@ unresolved. A new XMBFlow manifest must use an original title ID and only newly
 created or explicitly licensed metadata and LiveArea assets. It must never copy
 `sce_sys` from a commercial title, a Vita, or an untraceable VPK.
 
+When the local VitaSDK runtime is available, `Tools/New-XmbFlowSceSys.ps1`
+creates the complete candidate `sce_sys` tree from the original visual source
+and `packaging/metadata.json`. It invokes only `vita-mksfoex` with
+`PARENTAL_LEVEL=1`, `APP_VER`, and the proposed title ID. It does not create a
+VPK, install anything, or perform a Vita-side action.
+
 ## Licence and source record required before distribution
 
 For every packaged file, create a machine-readable manifest entry with:
