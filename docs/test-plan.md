@@ -39,6 +39,13 @@ renderer and make the legacy renderer the immediate fallback when that flag is
 false. The prototype remains presentation-only: selecting a game is a no-op,
 and the non-Games columns remain inert.
 
+Before that integrated prototype can start, a smaller package smoke test may
+stage `src/xmb-test.lua` as the package entry script. It is a separate,
+presentation-only script: it uses no `DATA` assets, scans nothing, reads no
+Vita paths, and has no launch, install, reboot, delete, copy, or AutoBoot
+capability. Run `Tools/Test-XmbMinimalProfile.ps1` before considering it for a
+package tree. This does not alter the normal `src/index.lua` entry point.
+
 The test manifest must include only the reviewed runtime, Lua source,
 translations, lookup databases, original/licensed `DATA` assets, original
 `sce_sys` assets, licence notices, and the minimal files proven necessary to
