@@ -33,7 +33,7 @@ mkdir -p "$build_dir"
 
 arm-vita-eabi-gcc -Wall -Wextra -Werror -Wl,-q \
     "$root_dir/src/xmb-native-installer-probe.c" \
-    -lSceKernel_stub -o "$build_dir/probe.elf"
+    -lSceLibKernel_stub -o "$build_dir/probe.elf"
 vita-elf-create "$build_dir/probe.elf" "$build_dir/probe.velf"
 # -s marks the FSELF safe: it cannot use unrestricted VSH APIs.
 vita-make-fself -s "$build_dir/probe.velf" "$build_dir/eboot.bin"
