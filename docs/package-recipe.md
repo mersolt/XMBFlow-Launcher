@@ -74,6 +74,13 @@ and `packaging/metadata.json`. It invokes only `vita-mksfoex` with
 `PARENTAL_LEVEL=1`, `APP_VER`, and the proposed title ID. It does not create a
 VPK, install anything, or perform a Vita-side action.
 
+The first candidate `param.sfo` was generated locally on 2026-07-23 using that
+command. Its SHA-256 is
+`552f0780c12ba72f5564fc7560768270f3748e0838a41598be1f4137b6b6a51d`.
+The exact complete candidate file list, sizes, and hashes are recorded in
+`packaging/candidate-sce_sys-manifest.json`. It remains an unapproved candidate
+until the proposed title ID is checked and the full package manifest is reviewed.
+
 ## Licence and source record required before distribution
 
 For every packaged file, create a machine-readable manifest entry with:

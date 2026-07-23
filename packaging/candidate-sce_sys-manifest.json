@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "status": "candidate-only",
+  "purpose": "PC-side evidence for original XMBFlow sce_sys generation; not a package manifest and not authorisation to build a VPK.",
+  "generated_on": "2026-07-23",
+  "metadata": {
+    "title_id": "XMBFLOW01",
+    "title": "XMBFlow Launcher",
+    "app_version": "00.01",
+    "parental_level": 1
+  },
+  "source": {
+    "livearea_image": "packaging/livearea-source/xmbflow-wave-source.png",
+    "livearea_image_sha256": "4828fa8466dc81d85cbca437827c986dcc933a49d6db4f6d8b171095569a93dd",
+    "visual_generator": "Tools/New-XmbFlowLiveAreaAssets.ps1",
+    "param_generator": "vita-mksfoex -d PARENTAL_LEVEL=1 -s APP_VER=00.01 -s TITLE_ID=XMBFLOW01 \"XMBFlow Launcher\" sce_sys/param.sfo"
+  },
+  "files": [
+    {"path": "sce_sys/icon0.png", "sha256": "67bb60abbefbe86359468d487743e8044dacea1f7f02982611b1e26bfe8aa080", "bytes": 2197},
+    {"path": "sce_sys/param.sfo", "sha256": "552f0780c12ba72f5564fc7560768270f3748e0838a41598be1f4137b6b6a51d", "bytes": 912},
+    {"path": "sce_sys/livearea/contents/bg.png", "sha256": "4390b20ac5f7bac82fdd626de69cb747a80f602b98a1b2616005c4f3e5495b4b", "bytes": 543845},
+    {"path": "sce_sys/livearea/contents/startup.png", "sha256": "0f7f5ae283573b752309004136fe2045c4b2c164ad0ece5febdbf32bd665d85d", "bytes": 58218},
+    {"path": "sce_sys/livearea/contents/template.xml", "sha256": "d7c121f1c4432e24972f57afe57408403ed7ffebe6cd4711b874ebe3311df634", "bytes": 265}
+  ],
+  "exclusions": ["eboot.bin", "DATA/**", "payloads/**", "boot.bin", "boot.inf", "*.vpk"]
+}
