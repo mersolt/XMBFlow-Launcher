@@ -22,6 +22,12 @@ change Vita files while following the desktop checks below.
    it must not instruct code to enable or run them.
 4. Commit only after those checks pass. Keep the commit small and descriptive.
 
+For the original LiveArea visuals, run the following with a per-process script
+policy bypass if Windows blocks local scripts; it does not change the machine
+policy and writes its check output only to the PC temporary directory:
+
+`powershell -NoProfile -ExecutionPolicy Bypass -File Tools/Test-XmbFlowLiveAreaAssets.ps1`
+
 ## Future XMB prototype test-package profile (PC-only)
 
 This is a design gate, not authorisation to build a VPK. It applies only after

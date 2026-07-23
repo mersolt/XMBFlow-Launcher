@@ -52,14 +52,21 @@ source by inference.
 | `addons/*.lua`, `addons/*.db` | Helpers and built-in lookup data | This repository at the source commit above; verify original authorship/redistribution for each database before release | Needs per-file licence review |
 | `translations/*.lua` | UI translations | This repository at the source commit above; retain contributor attributions from the README history | Needs attribution manifest |
 | `DATA/**` | Fonts, images, models, sounds and wallpapers referenced at `app0:` | Absent from the source tag and this checkout | Blocked |
-| `sce_sys/**` | Vita metadata and LiveArea assets, including `param.sfo` | Absent from the source tag and this checkout | Blocked |
+| `sce_sys/**` | Vita metadata and LiveArea assets, including `param.sfo` | Original candidate visuals are generated from the tracked source image; `param.sfo` still needs reviewed VitaSDK generation | Candidate; blocked from packaging |
 | `payloads/**` | Legacy Adrenaline helper setup files | Absent from the source tag and this checkout; excluded from the XMB test profile | Must not be included |
 
-The exact `sce_sys` title ID, `param.sfo` fields, LiveArea files, and their
-licences are therefore **not recovered**. A new XMBFlow manifest must use an
-original title ID and only newly created or explicitly licensed metadata and
-LiveArea assets. It must never copy `sce_sys` from a commercial title, a Vita,
-or an untraceable VPK.
+The original XMBFlow LiveArea visual source now lives at
+`packaging/livearea-source/xmbflow-wave-source.png` (SHA-256
+`4828FA8466DC81D85CBCA437827C986DCC933A49D6DB4F6D8B171095569A93DD`). It is
+an XMB-inspired blue wave made for this project, not a copied Sony asset.
+`Tools/New-XmbFlowLiveAreaAssets.ps1` deterministically creates its icon,
+background, startup image, and minimal LiveArea template. This is a candidate
+input only; it has not been added to a package and does not include `param.sfo`.
+
+The exact `sce_sys` `param.sfo` fields and their final package approval remain
+unresolved. A new XMBFlow manifest must use an original title ID and only newly
+created or explicitly licensed metadata and LiveArea assets. It must never copy
+`sce_sys` from a commercial title, a Vita, or an untraceable VPK.
 
 ## Licence and source record required before distribution
 
