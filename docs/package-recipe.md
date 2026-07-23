@@ -102,7 +102,12 @@ The first VPK installation attempt rejected the original true-colour LiveArea
 PNGs at final package validation. The `pngquant`-generated indexed 8-bit
 replacement hashes are recorded separately in
 `packaging/candidate-sce_sys-indexed-manifest.json`; that is the active
-candidate for the next local VPK build.
+intermediate candidate for the next local VPK build.
+
+The initial SFO also used `ATTRIBUTE=0x8000`, which causes the installer to
+display an extended-permissions warning. The active candidate is now
+`packaging/candidate-sce_sys-standard-manifest.json`: it retains the indexed
+LiveArea PNGs and uses `ATTRIBUTE=0`.
 
 ## Licence and source record required before distribution
 
