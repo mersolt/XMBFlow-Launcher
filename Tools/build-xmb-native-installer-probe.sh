@@ -4,16 +4,13 @@
 set -eu
 
 root_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+vitasdk=${VITASDK:-/usr/local/vitasdk}
+bin_dir="$vitasdk/bin"
 sce_sys_root=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-scesys-fresh/sce_sys}
 build_dir=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-native-installer-probe-build}
 output_vpk=${3:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-native-installer-probe.vpk}
 
-for tool in arm-vita-eabi-gcc vita-elf-create vita-make-fself vita-mksfoex vita-pack-vpk; do
-    command -v "$tool" >/dev/null 2>&1 || {
-        echo "$tool is not on PATH; expose /usr/local/vitasdk/bin first." >&2
-        exit 1
-    }
-done
+sh "$root_dir/Tools/Inspect-VitaSdkToolchain.sh"
 
 if [ -e "$build_dir" ] || [ -e "$output_vpk" ]; then
     echo "Refusing to overwrite an existing build directory or VPK." >&2
@@ -31,17 +28,17 @@ done
 
 mkdir -p "$build_dir"
 
-arm-vita-eabi-gcc -Wall -Wextra -Werror -Wl,-q \
+"$bin_dir/arm-vita-eabi-gcc" -Wall -Wextra -Werror -Wl,-q \
     "$root_dir/src/xmb-native-installer-probe.c" \
     -lSceLibKernel_stub -o "$build_dir/probe.elf"
-vita-elf-create "$build_dir/probe.elf" "$build_dir/probe.velf"
+"$bin_dir/vita-elf-create" "$build_dir/probe.elf" "$build_dir/probe.velf"
 # -s marks the FSELF safe: it cannot use unrestricted VSH APIs.
-vita-make-fself -s "$build_dir/probe.velf" "$build_dir/eboot.bin"
-vita-mksfoex -d ATTRIBUTE=0 -d PARENTAL_LEVEL=1 \
+"$bin_dir/vita-make-fself" -s "$build_dir/probe.velf" "$build_dir/eboot.bin"
+"$bin_dir/vita-mksfoex" -d ATTRIBUTE=0 -d PARENTAL_LEVEL=1 \
     -s APP_VER=00.01 -s TITLE_ID=XMBF00002 \
     'XMBFlow Native Installer Probe' "$build_dir/param.sfo"
 
-vita-pack-vpk \
+"$bin_dir/vita-pack-vpk" \
     -s "$build_dir/param.sfo" \
     -b "$build_dir/eboot.bin" \
     -a "$sce_sys_root/icon0.png=sce_sys/icon0.png" \
