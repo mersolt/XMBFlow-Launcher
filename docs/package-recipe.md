@@ -161,3 +161,9 @@ The resulting `eboot_unsafe.bin` has SHA-256
 Its pinned source revision, output path, licence, and known local build changes
 are recorded in `packaging/candidate-runtime-manifest.json`. This is a candidate
 runtime evidence record, not a compatibility conclusion or packaging approval.
+
+For the minimal XMB smoke test, the safe sibling output is preferred because
+the entry script has no need for extended permissions. `eboot_safe.bin` has
+SHA-256 `448e827a69b19da9c4f5f59de148f4d3b6c2f82ada1c023ce683e475fa9c75a5`;
+its separate candidate record is
+`packaging/candidate-runtime-safe-manifest.json`.

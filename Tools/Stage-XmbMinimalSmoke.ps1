@@ -1,12 +1,16 @@
 [CmdletBinding()]
 param(
-    [string]$RuntimePath = (Join-Path $env:TEMP 'xmbflow-runtime\eboot.bin'),
+    [string]$RuntimePath = (Join-Path $env:TEMP 'xmbflow-runtime-safe\eboot.bin'),
+    [string]$RuntimeManifest,
     [string]$SceSysRoot = (Join-Path $env:TEMP 'xmbflow-scesys-indexed\sce_sys'),
     [string]$SceSysManifest,
-    [string]$OutputDirectory = (Join-Path $env:TEMP 'xmbflow-minimal-stage-indexed')
+    [string]$OutputDirectory = (Join-Path $env:TEMP 'xmbflow-minimal-stage-safe')
 )
 
 $ErrorActionPreference = 'Stop'
+if ([string]::IsNullOrWhiteSpace($RuntimeManifest)) {
+    $RuntimeManifest = Join-Path $PSScriptRoot '..\packaging\candidate-runtime-safe-manifest.json'
+}
 if ([string]::IsNullOrWhiteSpace($SceSysManifest)) {
     $SceSysManifest = Join-Path $PSScriptRoot '..\packaging\candidate-sce_sys-indexed-manifest.json'
 }
@@ -20,7 +24,7 @@ foreach ($path in @($RuntimePath, $SceSysRoot)) {
 
 & (Join-Path $PSScriptRoot 'Test-XmbMinimalProfile.ps1')
 
-$runtime = Get-Content -Raw (Join-Path $PSScriptRoot '..\packaging\candidate-runtime-manifest.json') | ConvertFrom-Json
+$runtime = Get-Content -Raw $RuntimeManifest | ConvertFrom-Json
 $actualRuntimeHash = (Get-FileHash -LiteralPath $RuntimePath -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($actualRuntimeHash -ne $runtime.output.sha256) {
     throw "Runtime SHA-256 does not match recorded candidate: $actualRuntimeHash"

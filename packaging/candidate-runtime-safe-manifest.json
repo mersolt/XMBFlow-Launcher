@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "status": "candidate-only",
+  "purpose": "PC-side evidence for the safe Lua Player Plus Vita runtime candidate used by the minimal XMB test.",
+  "source": {
+    "repository": "https://github.com/jimbob4000/lpp-vita.git",
+    "revision": "f797059c9f1403d417d81351e26303d1702577d6",
+    "tag": "v1.1",
+    "license": "GPL-3.0-only"
+  },
+  "output": {
+    "source_path": "/home/hound/lpp-vita/eboot_safe.bin",
+    "package_path": "eboot.bin",
+    "sha256": "448e827a69b19da9c4f5f59de148f4d3b6c2f82ada1c023ce683e475fa9c75a5"
+  },
+  "known_build_changes": [
+    "source/include/ftp/ftp.c: include psp2/io/stat.h",
+    "source/include/unzip.c: include psp2/kernel/clib.h",
+    "Makefile: link -lmp3lame immediately after -lsndfile"
+  ],
+  "unresolved": [
+    "No auditable RetroFlow v8.1.1 release record proves this runtime revision and build flags are compatible.",
+    "The temporary build changes need a reviewed, versioned patch and dependency lock record before distribution."
+  ]
+}

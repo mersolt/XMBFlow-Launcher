@@ -3,8 +3,8 @@
 # This script does not install, transfer, or otherwise interact with a Vita.
 set -eu
 
-stage_dir=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-stage-indexed}
-output_vpk=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-minimal-smoke-indexed.vpk}
+stage_dir=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-stage-safe}
+output_vpk=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-minimal-smoke-safe.vpk}
 
 if ! command -v vita-pack-vpk >/dev/null 2>&1; then
     echo "vita-pack-vpk is not on PATH; expose /usr/local/vitasdk/bin first." >&2
@@ -19,7 +19,7 @@ if [ -e "$output_vpk" ]; then
     exit 1
 fi
 
-expected_runtime_hash=c4e95a1dabce4abe97a066263cfb55c482abc3fb137582ad12bbd82efe23decd
+expected_runtime_hash=448e827a69b19da9c4f5f59de148f4d3b6c2f82ada1c023ce683e475fa9c75a5
 actual_runtime_hash=$(sha256sum "$stage_dir/eboot.bin" | awk '{print $1}')
 if [ "$actual_runtime_hash" != "$expected_runtime_hash" ]; then
     echo "Runtime hash does not match the recorded candidate." >&2
