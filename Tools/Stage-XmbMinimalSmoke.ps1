@@ -2,9 +2,9 @@
 param(
     [string]$RuntimePath = (Join-Path $env:TEMP 'xmbflow-runtime-safe\eboot.bin'),
     [string]$RuntimeManifest,
-    [string]$SceSysRoot = (Join-Path $env:TEMP 'xmbflow-scesys-standard\sce_sys'),
+    [string]$SceSysRoot = (Join-Path $env:TEMP 'xmbflow-scesys-fresh\sce_sys'),
     [string]$SceSysManifest,
-    [string]$OutputDirectory = (Join-Path $env:TEMP 'xmbflow-minimal-stage-standard')
+    [string]$OutputDirectory = (Join-Path $env:TEMP 'xmbflow-minimal-stage-fresh')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,7 +12,7 @@ if ([string]::IsNullOrWhiteSpace($RuntimeManifest)) {
     $RuntimeManifest = Join-Path $PSScriptRoot '..\packaging\candidate-runtime-safe-manifest.json'
 }
 if ([string]::IsNullOrWhiteSpace($SceSysManifest)) {
-    $SceSysManifest = Join-Path $PSScriptRoot '..\packaging\candidate-sce_sys-standard-manifest.json'
+    $SceSysManifest = Join-Path $PSScriptRoot '..\packaging\candidate-sce_sys-fresh-manifest.json'
 }
 
 if (Test-Path -LiteralPath $OutputDirectory) {

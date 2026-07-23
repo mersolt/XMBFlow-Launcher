@@ -5,7 +5,7 @@
   "inputs": [
     {"path": "eboot.bin", "status": "candidate", "source": "packaging/candidate-runtime-safe-manifest.json", "license": "GPL-3.0-only candidate; compatibility review required."},
     {"path": "index.lua", "status": "approved", "source": "src/xmb-test.lua at this repository revision, staged under the runtime-required entry name.", "license": "MIT; retain repository LICENSE and attributions."},
-    {"path": "sce_sys/**", "status": "candidate", "source": "packaging/candidate-sce_sys-standard-manifest.json", "license": "Original project asset with indexed LiveArea PNGs and standard SFO permissions; title-ID and package approval still required."},
+    {"path": "sce_sys/**", "status": "candidate", "source": "packaging/candidate-sce_sys-fresh-manifest.json", "license": "Original project asset with indexed LiveArea PNGs, standard SFO permissions, and the fresh test-only title ID."},
     {"path": "LICENSE", "status": "approved", "source": "Repository root LICENSE.", "license": "MIT."}
   ],
   "exclusions": ["DATA/**", "addons/**", "translations/**", "payloads/**", "boot.bin", "boot.inf", "*.vpk", "src/index.lua"]

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "status": "candidate-only",
+  "purpose": "PC-side evidence for the fresh-title standard-permission XMBFlow sce_sys candidate.",
+  "generated_on": "2026-07-23",
+  "source_manifest": "packaging/candidate-sce_sys-standard-manifest.json",
+  "metadata": {"title_id": "XMBF00001", "attribute": 0},
+  "files": [
+    {"path": "sce_sys/icon0.png", "sha256": "38d67afc9a2129517920c23757f64f47a95f8c4908d84ea784174313344b13f7", "bytes": 1219, "png_format": "indexed-8-bit"},
+    {"path": "sce_sys/param.sfo", "sha256": "9b27c7abe1cea2817bd77481da14941d849b3a46c03dd4342e2e9cd4a4a009ac", "bytes": 912, "attribute": 0},
+    {"path": "sce_sys/livearea/contents/bg.png", "sha256": "c266e48690f2e7e03dc7b7fc94d9f1bdd58be6d7b48498023387145bce60117b", "bytes": 219208, "png_format": "indexed-8-bit"},
+    {"path": "sce_sys/livearea/contents/startup.png", "sha256": "81c7fa53d6334f13058a6b15c9dbd65f3aa482835d1d5bd697879ec55781b0a4", "bytes": 25452, "png_format": "indexed-8-bit"},
+    {"path": "sce_sys/livearea/contents/template.xml", "sha256": "d7c121f1c4432e24972f57afe57408403ed7ffebe6cd4711b874ebe3311df634", "bytes": 265}
+  ]
+}
