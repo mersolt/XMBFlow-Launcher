@@ -63,6 +63,11 @@ runtime hash, refuses overwrite, and packages only the minimal entry script,
 licence, and original `sce_sys` files. It contains no Vita installation or
 transfer command.
 
+Run `Tools/Test-XmbMinimalSmokeVpk.ps1` against the resulting archive before
+any Vita-side decision. It verifies the exact archive file set and rejects a
+minimal entry script containing Vita paths, legacy loading, installer, reboot,
+copy, or delete calls.
+
 The test manifest must include only the reviewed runtime, Lua source,
 translations, lookup databases, original/licensed `DATA` assets, original
 `sce_sys` assets, licence notices, and the minimal files proven necessary to
