@@ -3,7 +3,7 @@
   "purpose": "XMBFlow PC-only prototype staging gate; this is not a VPK recipe.",
   "inputs": [
     {"path": "eboot.bin", "status": "missing", "source": "Pin the RetroFlow-compatible lpp-vita revision and build record.", "license": "GPL-3.0-only candidate; compatibility review required."},
-    {"path": "sce_sys/**", "status": "missing", "source": "Create original XMBFlow metadata and LiveArea assets.", "license": "Original/licensed assets only."},
+    {"path": "sce_sys/**", "status": "missing", "source": "Original XMBFlow metadata identity: packaging/metadata.json (pending VitaSDK generation and original LiveArea assets).", "license": "Original/licensed assets only."},
     {"path": "DATA/**", "status": "missing", "source": "Trace or replace every runtime asset.", "license": "Original/licensed assets only."}
   ],
   "exclusions": ["payloads/**", "boot.bin", "boot.inf", "*.vpk"]

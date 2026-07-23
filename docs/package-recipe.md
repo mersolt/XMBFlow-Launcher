@@ -93,3 +93,24 @@ No VPK may be built or distributed until all conditions below are true:
 5. The test profile below passes its static safety checks.
 
 Until then, documentation and source review are the only approved package work.
+
+## Local toolchain build record (2026-07-23)
+
+The candidate runtime revision was built on the development PC in Ubuntu WSL2
+with VitaSDK installed at `/usr/local/vitasdk`. The build produced
+`eboot_safe.bin` and `eboot_unsafe.bin` in the temporary runtime checkout only.
+No XMBFlow tree, VPK, or Vita-side action was created.
+
+Two minimal compatibility changes were needed for the current VitaSDK:
+
+- add `#include <psp2/io/stat.h>` to `source/include/ftp/ftp.c`;
+- add `#include <psp2/kernel/clib.h>` to `source/include/unzip.c`.
+
+The current VitaSDK `libsndfile` also requires `libmp3lame.a`; the upstream LPP
+Makefile was locally amended to link `-lmp3lame` immediately after `-lsndfile`.
+The official VitaSDK LAME archive was checked and extracted after its package
+manager recorded success without placing its files.
+
+These are uncommitted changes in a temporary runtime clone, not changes to
+XMBFlow or upstream LPP. They are build evidence only; before distribution,
+turn them into a reviewed, versioned patch with source and checksum records.

@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "title_id": "XMBFLOW01",
+  "title": "XMBFlow Launcher",
+  "status": "proposed",
+  "provenance": "Original XMBFlow project metadata; not copied from RetroFlow, HexFlow, a Vita, or a VPK.",
+  "notes": "Verify title-ID availability before any distribution. Generate sce_sys/param.sfo only with a reviewed VitaSDK toolchain."
+}
