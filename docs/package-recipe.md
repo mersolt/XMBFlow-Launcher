@@ -68,6 +68,21 @@ unresolved. A new XMBFlow manifest must use an original title ID and only newly
 created or explicitly licensed metadata and LiveArea assets. It must never copy
 `sce_sys` from a commercial title, a Vita, or an untraceable VPK.
 
+## DATA replacement route
+
+The upstream source release does not provide a provenance record for its
+runtime `DATA` folder. XMBFlow therefore cannot use an extracted RetroFlow,
+Vita, or Sony asset set as a substitute. The practical route is a new original
+replacement pack. `Tools/New-XmbFlowDataInventory.ps1` reads the Lua source and
+writes `packaging/data-asset-inventory.json`, recording every directly named
+asset that needs a source, licence, and hash before packaging.
+
+The replacement work falls into four bounded groups: application images,
+original 3D cover models, an original sound effect, and fonts with explicit
+redistribution licences. The first safe test profile can deliberately omit
+nonessential display modes only after its source path no longer loads their
+assets; it cannot silently substitute untraced originals.
+
 When the local VitaSDK runtime is available, `Tools/New-XmbFlowSceSys.ps1`
 creates the complete candidate `sce_sys` tree from the original visual source
 and `packaging/metadata.json`. It invokes only `vita-mksfoex` with
