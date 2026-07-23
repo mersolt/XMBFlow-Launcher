@@ -46,6 +46,12 @@ Vita paths, and has no launch, install, reboot, delete, copy, or AutoBoot
 capability. Run `Tools/Test-XmbMinimalProfile.ps1` before considering it for a
 package tree. This does not alter the normal `src/index.lua` entry point.
 
+`packaging/minimal-smoke-inputs.json` is a separate manifest for that smoke
+test. It deliberately excludes `DATA`, the normal RetroFlow entry script,
+addons, translations, payloads, boot files, and VPKs. Its own gate is
+`Tools/Test-XmbMinimalSmokeInputs.ps1`; it remains closed until the runtime and
+`sce_sys` candidates are formally approved.
+
 The test manifest must include only the reviewed runtime, Lua source,
 translations, lookup databases, original/licensed `DATA` assets, original
 `sce_sys` assets, licence notices, and the minimal files proven necessary to
