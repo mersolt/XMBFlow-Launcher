@@ -3,8 +3,8 @@
 # This script does not install, transfer, or otherwise interact with a Vita.
 set -eu
 
-stage_dir=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-stage}
-output_vpk=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-minimal-smoke.vpk}
+stage_dir=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-stage-indexed}
+output_vpk=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-minimal-smoke-indexed.vpk}
 
 if ! command -v vita-pack-vpk >/dev/null 2>&1; then
     echo "vita-pack-vpk is not on PATH; expose /usr/local/vitasdk/bin first." >&2

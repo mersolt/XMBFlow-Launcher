@@ -96,6 +96,12 @@ The exact complete candidate file list, sizes, and hashes are recorded in
 `packaging/candidate-sce_sys-manifest.json`. It remains an unapproved candidate
 until the proposed title ID is checked and the full package manifest is reviewed.
 
+The first VPK installation attempt rejected the original true-colour LiveArea
+PNGs at final package validation. The `pngquant`-generated indexed 8-bit
+replacement hashes are recorded separately in
+`packaging/candidate-sce_sys-indexed-manifest.json`; that is the active
+candidate for the next local VPK build.
+
 ## Licence and source record required before distribution
 
 For every packaged file, create a machine-readable manifest entry with:

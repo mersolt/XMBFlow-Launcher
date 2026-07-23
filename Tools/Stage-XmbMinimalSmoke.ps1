@@ -1,11 +1,15 @@
 [CmdletBinding()]
 param(
     [string]$RuntimePath = (Join-Path $env:TEMP 'xmbflow-runtime\eboot.bin'),
-    [string]$SceSysRoot = (Join-Path $env:TEMP 'xmbflow-scesys\sce_sys'),
-    [string]$OutputDirectory = (Join-Path $env:TEMP 'xmbflow-minimal-stage')
+    [string]$SceSysRoot = (Join-Path $env:TEMP 'xmbflow-scesys-indexed\sce_sys'),
+    [string]$SceSysManifest,
+    [string]$OutputDirectory = (Join-Path $env:TEMP 'xmbflow-minimal-stage-indexed')
 )
 
 $ErrorActionPreference = 'Stop'
+if ([string]::IsNullOrWhiteSpace($SceSysManifest)) {
+    $SceSysManifest = Join-Path $PSScriptRoot '..\packaging\candidate-sce_sys-indexed-manifest.json'
+}
 
 if (Test-Path -LiteralPath $OutputDirectory) {
     throw "Refusing to overwrite an existing staging directory: $OutputDirectory"
@@ -22,7 +26,7 @@ if ($actualRuntimeHash -ne $runtime.output.sha256) {
     throw "Runtime SHA-256 does not match recorded candidate: $actualRuntimeHash"
 }
 
-$sceManifest = Get-Content -Raw (Join-Path $PSScriptRoot '..\packaging\candidate-sce_sys-manifest.json') | ConvertFrom-Json
+$sceManifest = Get-Content -Raw $SceSysManifest | ConvertFrom-Json
 foreach ($item in $sceManifest.files) {
     $source = Join-Path $SceSysRoot ($item.path.Substring('sce_sys/'.Length).Replace('/', '\'))
     if (-not (Test-Path -LiteralPath $source -PathType Leaf)) { throw "Missing sce_sys candidate file: $($item.path)" }
