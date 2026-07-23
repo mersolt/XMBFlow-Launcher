@@ -47,7 +47,7 @@ source by inference.
 
 | Package item | Expected purpose | Provenance / licence record | Release status |
 | --- | --- | --- | --- |
-| `eboot.bin` | Lua Player Plus Vita executable | Candidate source above is GPL-3.0-only, but the v8.1.1 revision and build flags are unproven | Blocked |
+| `eboot.bin` | Lua Player Plus Vita executable | Candidate build hash and source revision recorded in `packaging/candidate-runtime-manifest.json`; v8.1.1 compatibility and build flags remain unproven | Candidate; blocked from packaging |
 | `index.lua` | Application entry script | This repository at the source commit above; MIT `LICENSE` retained | Traceable |
 | `addons/*.lua`, `addons/*.db` | Helpers and built-in lookup data | This repository at the source commit above; verify original authorship/redistribution for each database before release | Needs per-file licence review |
 | `translations/*.lua` | UI translations | This repository at the source commit above; retain contributor attributions from the README history | Needs attribution manifest |
@@ -149,3 +149,9 @@ manager recorded success without placing its files.
 These are uncommitted changes in a temporary runtime clone, not changes to
 XMBFlow or upstream LPP. They are build evidence only; before distribution,
 turn them into a reviewed, versioned patch with source and checksum records.
+
+The resulting `eboot_unsafe.bin` has SHA-256
+`c4e95a1dabce4abe97a066263cfb55c482abc3fb137582ad12bbd82efe23decd`.
+Its pinned source revision, output path, licence, and known local build changes
+are recorded in `packaging/candidate-runtime-manifest.json`. This is a candidate
+runtime evidence record, not a compatibility conclusion or packaging approval.

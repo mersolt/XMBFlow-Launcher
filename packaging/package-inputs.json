@@ -2,7 +2,7 @@
   "schema": 1,
   "purpose": "XMBFlow PC-only prototype staging gate; this is not a VPK recipe.",
   "inputs": [
-    {"path": "eboot.bin", "status": "missing", "source": "Pin the RetroFlow-compatible lpp-vita revision and build record.", "license": "GPL-3.0-only candidate; compatibility review required."},
+    {"path": "eboot.bin", "status": "candidate", "source": "Candidate build hash and pinned lpp-vita source revision are recorded in packaging/candidate-runtime-manifest.json.", "license": "GPL-3.0-only candidate; compatibility review required."},
     {"path": "sce_sys/**", "status": "candidate", "source": "Original XMBFlow LiveArea source image and candidate output hashes recorded in packaging/candidate-sce_sys-manifest.json; param.sfo generated with the local VitaSDK vita-mksfoex tool.", "license": "Original project asset; package approval still required."},
     {"path": "DATA/**", "status": "missing", "source": "Trace or replace every runtime asset.", "license": "Original/licensed assets only."}
   ],
