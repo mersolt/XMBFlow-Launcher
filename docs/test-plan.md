@@ -57,6 +57,12 @@ candidate tree from the recorded runtime and `sce_sys` hashes. It refuses a
 mismatched input, an unexpected file set, or an existing output directory. It
 does not create a VPK and is not authorisation to install or test on a Vita.
 
+When explicitly authorised, `Tools/new-xmb-minimal-smoke-vpk.sh` creates a
+local candidate VPK from that verified staging tree. It checks the recorded
+runtime hash, refuses overwrite, and packages only the minimal entry script,
+licence, and original `sce_sys` files. It contains no Vita installation or
+transfer command.
+
 The test manifest must include only the reviewed runtime, Lua source,
 translations, lookup databases, original/licensed `DATA` assets, original
 `sce_sys` assets, licence notices, and the minimal files proven necessary to
