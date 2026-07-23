@@ -8,7 +8,7 @@ sce_sys_root=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-scesys-fresh/sce
 build_dir=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-native-installer-probe-build}
 output_vpk=${3:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-native-installer-probe.vpk}
 
-for tool in vita-clang vita-elf-create vita-make-fself vita-mksfoex vita-pack-vpk; do
+for tool in arm-vita-eabi-gcc vita-elf-create vita-make-fself vita-mksfoex vita-pack-vpk; do
     command -v "$tool" >/dev/null 2>&1 || {
         echo "$tool is not on PATH; expose /usr/local/vitasdk/bin first." >&2
         exit 1
@@ -31,7 +31,7 @@ done
 
 mkdir -p "$build_dir"
 
-vita-clang -Wall -Wextra -Werror -Wl,-q \
+arm-vita-eabi-gcc -Wall -Wextra -Werror -Wl,-q \
     "$root_dir/src/xmb-native-installer-probe.c" \
     -lSceKernel_stub -o "$build_dir/probe.elf"
 vita-elf-create "$build_dir/probe.elf" "$build_dir/probe.velf"
