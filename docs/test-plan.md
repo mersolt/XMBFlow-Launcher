@@ -68,6 +68,12 @@ any Vita-side decision. It verifies the exact archive file set and rejects a
 minimal entry script containing Vita paths, legacy loading, installer, reboot,
 copy, or delete calls.
 
+Vita validates the encoding of LiveArea PNGs at installation time. Before
+building a VPK, use `Tools/quantize-xmb-livearea-pngs.sh` to create a separate
+indexed-PNG `sce_sys` tree and confirm it with
+`Tools/Test-XmbLiveAreaPngFormat.ps1`. The converter does not modify its source
+tree and refuses an existing output directory.
+
 The test manifest must include only the reviewed runtime, Lua source,
 translations, lookup databases, original/licensed `DATA` assets, original
 `sce_sys` assets, licence notices, and the minimal files proven necessary to
