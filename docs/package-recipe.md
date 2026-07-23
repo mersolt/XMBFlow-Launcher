@@ -86,8 +86,10 @@ assets; it cannot silently substitute untraced originals.
 When the local VitaSDK runtime is available, `Tools/New-XmbFlowSceSys.ps1`
 creates the complete candidate `sce_sys` tree from the original visual source
 and `packaging/metadata.json`. It invokes only `vita-mksfoex` with
-`PARENTAL_LEVEL=1`, `APP_VER`, and the proposed title ID. It does not create a
-VPK, install anything, or perform a Vita-side action.
+`ATTRIBUTE=0`, `PARENTAL_LEVEL=1`, `APP_VER`, and the proposed title ID. The
+zero attribute prevents the minimal smoke test from requesting extended
+permissions. It does not create a VPK, install anything, or perform a
+Vita-side action.
 
 The first candidate `param.sfo` was generated locally on 2026-07-23 using that
 command. Its SHA-256 is

@@ -39,7 +39,7 @@ $background = Join-Path $PSScriptRoot '..\packaging\livearea-source\xmbflow-wave
 & (Join-Path $PSScriptRoot 'New-XmbFlowLiveAreaAssets.ps1') -OutputDirectory $OutputDirectory -BackgroundSource $background
 
 $paramSfo = Join-Path $OutputDirectory 'sce_sys\param.sfo'
-& $VitaMksfoex -d 'PARENTAL_LEVEL=1' -s "APP_VER=$AppVersion" -s "TITLE_ID=$TitleId" $Title $paramSfo
+& $VitaMksfoex -d 'ATTRIBUTE=0' -d 'PARENTAL_LEVEL=1' -s "APP_VER=$AppVersion" -s "TITLE_ID=$TitleId" $Title $paramSfo
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $paramSfo -PathType Leaf)) {
     throw 'vita-mksfoex did not produce sce_sys/param.sfo.'
 }
