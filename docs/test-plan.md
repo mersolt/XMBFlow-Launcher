@@ -52,6 +52,11 @@ addons, translations, payloads, boot files, and VPKs. Its own gate is
 `Tools/Test-XmbMinimalSmokeInputs.ps1`; it remains closed until the runtime and
 `sce_sys` candidates are formally approved.
 
+For PC-only assembly evidence, `Tools/Stage-XmbMinimalSmoke.ps1` may create a
+candidate tree from the recorded runtime and `sce_sys` hashes. It refuses a
+mismatched input, an unexpected file set, or an existing output directory. It
+does not create a VPK and is not authorisation to install or test on a Vita.
+
 The test manifest must include only the reviewed runtime, Lua source,
 translations, lookup databases, original/licensed `DATA` assets, original
 `sce_sys` assets, licence notices, and the minimal files proven necessary to
