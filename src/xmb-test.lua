@@ -14,6 +14,8 @@ local pending_column = 5
 local vertical_alpha = 1
 local vertical_fade_direction = 0
 local glow_phase = 0
+local held_direction = 0
+local navigation_repeat = 0
 local column_count = 7
 local category_anchor_x = 480
 local option_counts = {4, 3, 4, 3, 5, 3, 3}
@@ -62,19 +64,19 @@ local function draw_vertical_options(column, alpha)
             local focus = math.max(0, 1 - math.abs(relative))
             local scale = 0.42 + 0.20 * focus
             local color = Color.new(math.floor(120 + 135 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor((145 + 110 * focus) * alpha))
+            local pulse = 0.65 + 0.35 * ((math.sin(glow_phase / 18) + 1) * 0.5)
+            local text_color = Color.new(math.floor(175 + 80 * focus * pulse), math.floor(185 + 70 * focus * pulse), math.floor(205 + 50 * focus * pulse), math.floor((145 + 110 * focus) * alpha))
             local x = category_anchor_x
             local y = 296 + relative * 66
             if relative < 0 then
                 y = 296 + relative * 234
             end
             if focus > 0.02 then
-                local pulse = 0.65 + 0.35 * ((math.sin(glow_phase / 18) + 1) * 0.5)
-                local glow_scale = scale + 0.18 * focus * pulse
-                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(95, 220, 255, math.floor(100 * focus * alpha * pulse)))
-                Font.print(font, x + 39, y - 11, object_labels[column][option], Color.new(95, 220, 255, math.floor(135 * focus * alpha * pulse)))
+                local glow_scale = scale + 0.10 * focus
+                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255, math.floor(40 + 45 * focus * alpha * pulse)))
             end
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[column], scale, scale, color)
-            Font.print(font, x + 40, y - 10, object_labels[column][option], color)
+            Font.print(font, x + 40, y - 10, object_labels[column][option], text_color)
         end
     end
 end
@@ -122,34 +124,56 @@ while running do
         local x = category_anchor_x + relative * 130
         local focus = math.max(0, 1 - math.abs(relative))
         local color = Color.new(math.floor(120 - 15 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(150 + 105 * focus))
+        local pulse = 0.65 + 0.35 * ((math.sin(glow_phase / 18) + 1) * 0.5)
+        local text_color = Color.new(math.floor(175 + 80 * focus * pulse), math.floor(185 + 70 * focus * pulse), math.floor(205 + 50 * focus * pulse), math.floor(150 + 105 * focus))
         local scale = 0.82 + 0.33 * focus
         if focus > 0.02 then
-            local pulse = 0.65 + 0.35 * ((math.sin(glow_phase / 18) + 1) * 0.5)
-            Graphics.drawScaleImage(x - 48 * (scale + 0.18 * focus * pulse), 166 - 48 * (scale + 0.18 * focus * pulse), category_icons[column], scale + 0.18 * focus * pulse, scale + 0.18 * focus * pulse, Color.new(95, 220, 255, math.floor(100 * focus * pulse)))
-            Font.print(font, x - 31, 225, category_labels[column], Color.new(95, 220, 255, math.floor(135 * focus * pulse)))
+            Graphics.drawScaleImage(x - 48 * (scale + 0.10 * focus), 166 - 48 * (scale + 0.10 * focus), category_icons[column], scale + 0.10 * focus, scale + 0.10 * focus, Color.new(255, 255, 255, math.floor(40 + 45 * focus * pulse)))
         end
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
-        Font.print(font, x - 30, 226, category_labels[column], color)
+        Font.print(font, x - 30, 226, category_labels[column], text_color)
     end
 
     local pad = Controls.read()
-    if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then
-        selected_column = selected_column - 1
-        if selected_column < 1 then selected_column = column_count end
-        pending_column = selected_column
-        if pending_column ~= vertical_column then vertical_fade_direction = -1 end
-    elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
-        selected_column = selected_column + 1
-        if selected_column > column_count then selected_column = 1 end
-        pending_column = selected_column
-        if pending_column ~= vertical_column then vertical_fade_direction = -1 end
-    elseif Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
-        selected_options[selected_column] = selected_options[selected_column] - 1
-        if selected_options[selected_column] < 1 then selected_options[selected_column] = option_counts[selected_column] end
-    elseif Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
-        selected_options[selected_column] = selected_options[selected_column] + 1
-        if selected_options[selected_column] > option_counts[selected_column] then selected_options[selected_column] = 1 end
-    elseif Controls.check(pad, SCE_CTRL_CIRCLE) and not Controls.check(oldpad, SCE_CTRL_CIRCLE) then
+    local analog_x, analog_y = Controls.readLeftAnalog()
+    local direction = 0
+    if Controls.check(pad, SCE_CTRL_LEFT) or analog_x < 96 then
+        direction = -1
+    elseif Controls.check(pad, SCE_CTRL_RIGHT) or analog_x > 160 then
+        direction = 1
+    elseif Controls.check(pad, SCE_CTRL_UP) or analog_y < 96 then
+        direction = -2
+    elseif Controls.check(pad, SCE_CTRL_DOWN) or analog_y > 160 then
+        direction = 2
+    end
+    if direction == 0 then
+        held_direction = 0
+        navigation_repeat = 0
+    elseif direction ~= held_direction or navigation_repeat <= 0 then
+        local is_new_direction = direction ~= held_direction
+        held_direction = direction
+        navigation_repeat = is_new_direction and 18 or 5
+        if direction == -1 then
+            selected_column = selected_column - 1
+            if selected_column < 1 then selected_column = column_count end
+            pending_column = selected_column
+            if pending_column ~= vertical_column then vertical_fade_direction = -1 end
+        elseif direction == 1 then
+            selected_column = selected_column + 1
+            if selected_column > column_count then selected_column = 1 end
+            pending_column = selected_column
+            if pending_column ~= vertical_column then vertical_fade_direction = -1 end
+        elseif direction == -2 then
+            selected_options[selected_column] = selected_options[selected_column] - 1
+            if selected_options[selected_column] < 1 then selected_options[selected_column] = option_counts[selected_column] end
+        elseif direction == 2 then
+            selected_options[selected_column] = selected_options[selected_column] + 1
+            if selected_options[selected_column] > option_counts[selected_column] then selected_options[selected_column] = 1 end
+        end
+    else
+        navigation_repeat = navigation_repeat - 1
+    end
+    if Controls.check(pad, SCE_CTRL_CIRCLE) and not Controls.check(oldpad, SCE_CTRL_CIRCLE) then
         running = false
     end
 
