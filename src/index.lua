@@ -14449,6 +14449,27 @@ local function xmb_prototype_go_back()
     end
 end
 
+-- The XMB entry view does not implement a second launcher. It selects the
+-- same category row in the legacy renderer, then returns to that renderer.
+-- A subsequent legacy Cross press follows RetroFlow's existing launch path.
+local function xmb_prototype_focus_legacy_selection()
+    if xmbPrototypeGamesMode ~= "entries" or xmbPrototypeGamesCategory == nil or xmbPrototypeGamesSelection < 1 then
+        return false
+    end
+
+    local entries = xmb_prototype_current_games_list()
+    if entries[xmbPrototypeGamesSelection] == nil then
+        return false
+    end
+
+    showCat = xmbPrototypeGamesCategory
+    p = xmbPrototypeGamesSelection
+    master_index = p
+    GetNameAndAppTypeSelected()
+    xmbPrototypeEnabled = false
+    return true
+end
+
 local function xmb_prototype_games_item_label(item)
     if xmbPrototypeGamesMode == "entries" then
         return item.apptitle or item.title or item.name or "Untitled"
@@ -14590,7 +14611,7 @@ local function draw_xmb_prototype()
         Font.print(fnt20, 34, 508, tostring(xmbPrototypeGamesSelection) .. " / " .. tostring(#games_list), Color.new(210, 225, 245, 210))
         Font.print(fnt20, 214, 508, "Left / Right: Categories", Color.new(210, 225, 245, 210))
         if xmbPrototypeGamesMode == "entries" then
-            Font.print(fnt20, 564, 508, "Circle: Back   Preview only", Color.new(210, 225, 245, 210))
+            Font.print(fnt20, 564, 508, "Cross: Legacy launch view   Circle: Back", Color.new(210, 225, 245, 210))
         elseif xmbPrototypeGamesMode == "folders" then
             Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open", Color.new(210, 225, 245, 210))
         else
@@ -22065,7 +22086,11 @@ while true do
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
                 xmb_prototype_move_games_selection(1)
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
-                xmb_prototype_open_games_selection()
+                if xmbPrototypeGamesMode == "entries" then
+                    xmb_prototype_focus_legacy_selection()
+                else
+                    xmb_prototype_open_games_selection()
+                end
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                 xmb_prototype_go_back()
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
@@ -22138,7 +22163,7 @@ while true do
         end
         
         -- Navigation Buttons
-        if (Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP)) then
+        if xmbPrototypeEnabled == false and (Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP)) then
             state = Keyboard.getState()
             messagestate = System.getMessageState() -- Check if message active - RetroFlow Adrenaline Launcher needs to be installed
 
@@ -22349,7 +22374,7 @@ while true do
                 end
             else
             end
-        elseif (Controls.check(pad, SCE_CTRL_TRIANGLE) and not Controls.check(oldpad, SCE_CTRL_TRIANGLE)) then
+        elseif xmbPrototypeEnabled == false and (Controls.check(pad, SCE_CTRL_TRIANGLE) and not Controls.check(oldpad, SCE_CTRL_TRIANGLE)) then
             state = Keyboard.getState()
             if state ~= RUNNING then
 
@@ -22361,7 +22386,7 @@ while true do
                 end
             else
             end
-        elseif (Controls.check(pad, SCE_CTRL_START) and not Controls.check(oldpad, SCE_CTRL_START)) then
+        elseif xmbPrototypeEnabled == false and (Controls.check(pad, SCE_CTRL_START) and not Controls.check(oldpad, SCE_CTRL_START)) then
             state = Keyboard.getState()
             if state ~= RUNNING then
                 if showMenu == 0 then
@@ -22371,7 +22396,7 @@ while true do
             else
             end
         -- Select button - Games screen
-        elseif (Controls.check(pad, SCE_CTRL_SELECT) and not Controls.check(oldpad, SCE_CTRL_SELECT)) then
+        elseif xmbPrototypeEnabled == false and (Controls.check(pad, SCE_CTRL_SELECT) and not Controls.check(oldpad, SCE_CTRL_SELECT)) then
             state = Keyboard.getState()
             messagestate = System.getMessageState() -- Check if message active - RetroFlow Adrenaline Launcher needs to be installed
 
@@ -22384,7 +22409,7 @@ while true do
                 end
             else
             end
-        elseif (Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE)) then
+        elseif xmbPrototypeEnabled == false and (Controls.check(pad, SCE_CTRL_SQUARE) and not Controls.check(oldpad, SCE_CTRL_SQUARE)) then
             state = Keyboard.getState()
             if state ~= RUNNING then
                 

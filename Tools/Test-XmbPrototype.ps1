@@ -19,6 +19,7 @@ $required = @(
     'local function xmb_prototype_category_icon(column)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
+    'local function xmb_prototype_focus_legacy_selection()',
     'local function xmb_prototype_existing_game_icon(item)',
     'local function xmb_prototype_update_transition()',
     'local function xmb_prototype_reset_navigation()',
@@ -49,6 +50,17 @@ if ($gameIconHelper.Contains('Graphics.loadImage') -or $gameIconHelper.Contains(
 }
 if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {
     throw 'XMB prototype selection must remain session-only.'
+}
+if (-not $text.Contains('if xmbPrototypeEnabled == false and (Controls.check(pad, SCE_CTRL_CROSS_MAP)')) {
+    throw 'The legacy Cross launch handler must be disabled while the XMB prototype owns input.'
+}
+foreach ($button in @('SCE_CTRL_TRIANGLE', 'SCE_CTRL_START', 'SCE_CTRL_SELECT', 'SCE_CTRL_SQUARE')) {
+    if (-not $text.Contains("elseif xmbPrototypeEnabled == false and (Controls.check(pad, $button")) {
+        throw "The legacy $button handler must be disabled while the XMB prototype owns input."
+    }
+}
+if (-not $prototypeRenderer.Contains('showCat = xmbPrototypeGamesCategory') -or -not $prototypeRenderer.Contains('xmbPrototypeEnabled = false')) {
+    throw 'The XMB entry handoff must select the existing legacy category and return to the legacy renderer.'
 }
 if ($text.Contains('draw_xmb_prototype_placeholder_column') -or $text.Contains('xmb_prototype_placeholder_columns')) { throw 'Prototype must not render obsolete category cards.' }
 
