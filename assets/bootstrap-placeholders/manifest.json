@@ -1,0 +1,115 @@
+﻿{
+    "schema":  1,
+    "source":  {
+                   "path":  "packaging/bootstrap-source/xmbflow-wave-v1.png",
+                   "sha256":  "8f7efb3fb7e56d956a8aed9018e7aa4b3da2edbb5c9729581c22263258f708bb",
+                   "provenance":  "Original project artwork generated with OpenAI image generation for XMBFlow; no reference image was used."
+               },
+    "generated_files":  [
+                            {
+                                "path":  "DATA/bat.png",
+                                "sha256":  "5ed8745360158f0701df398de94393c14075eb0f58818a4431b809894ccd5630",
+                                "bytes":  219
+                            },
+                            {
+                                "path":  "DATA/bat_ch.png",
+                                "sha256":  "b2eea167da0e8e8ccb063a4487d45e18753955ec5c243c420243df32efca2613",
+                                "bytes":  385
+                            },
+                            {
+                                "path":  "DATA/BG_Default.png",
+                                "sha256":  "45e4322c5b552d5290c3e0c276b2cb5c25dc923d1416e57c2a82be3f57bdef6c",
+                                "bytes":  695123
+                            },
+                            {
+                                "path":  "DATA/fav-large-off.png",
+                                "sha256":  "40ef69ddcc9cdb5ae6f386de34b55e227750ce4ce1d3715d78c93b96b908b648",
+                                "bytes":  516
+                            },
+                            {
+                                "path":  "DATA/fav-large-on.png",
+                                "sha256":  "e5364e0a3ee7cb4eea998dd886e996e9f6705adb8b49f6b140d741f093c5b614",
+                                "bytes":  375
+                            },
+                            {
+                                "path":  "DATA/fav-small-on.png",
+                                "sha256":  "e5364e0a3ee7cb4eea998dd886e996e9f6705adb8b49f6b140d741f093c5b614",
+                                "bytes":  375
+                            },
+                            {
+                                "path":  "DATA/floor.png",
+                                "sha256":  "b9cb029954729ca55c6382b37bc7922b65753d0b60879b6d626438e554fe8098",
+                                "bytes":  11131
+                            },
+                            {
+                                "path":  "DATA/footer_gradient.png",
+                                "sha256":  "5660fa8b27a4b025224dd1f21b32866baaaba35034955d6e2bf2d7237bf894aa",
+                                "bytes":  966
+                            },
+                            {
+                                "path":  "DATA/hidden-large-on.png",
+                                "sha256":  "312bae097f7d14e11180689e3df900199b7c3e1f98fe9c82e4f4c5ff986d2532",
+                                "bytes":  443
+                            },
+                            {
+                                "path":  "DATA/hidden-small-on.png",
+                                "sha256":  "312bae097f7d14e11180689e3df900199b7c3e1f98fe9c82e4f4c5ff986d2532",
+                                "bytes":  443
+                            },
+                            {
+                                "path":  "DATA/icon-cart.png",
+                                "sha256":  "a634af7187b53a066fc34f925ef3fb49498e9aa692eab00df4099994f13a0bb2",
+                                "bytes":  231
+                            },
+                            {
+                                "path":  "DATA/icon-cart-inserted.png",
+                                "sha256":  "4edef913f72328421c7b568cc0ca445007c14feaa0ab9b0db1fc6d3432ed092c",
+                                "bytes":  299
+                            },
+                            {
+                                "path":  "DATA/loading.png",
+                                "sha256":  "45e4322c5b552d5290c3e0c276b2cb5c25dc923d1416e57c2a82be3f57bdef6c",
+                                "bytes":  695123
+                            },
+                            {
+                                "path":  "DATA/noimg.png",
+                                "sha256":  "79f0df6138a8cdc332f7003437484064e2971db323651b4bebc62c481ddc2acb",
+                                "bytes":  2478
+                            },
+                            {
+                                "path":  "DATA/o.png",
+                                "sha256":  "a80bab029d428f105c38ac0b84ffcc428f0dc037fffcf1c46b56411c56ed3fdf",
+                                "bytes":  464
+                            },
+                            {
+                                "path":  "DATA/planebg.obj",
+                                "sha256":  "083921af882bd7c33be1432f589d13122e82105f19dc0a63e92313815cf4d595",
+                                "bytes":  205
+                            },
+                            {
+                                "path":  "DATA/planefloor.obj",
+                                "sha256":  "4ca3a0a326b1c48270b7d8aa69989ca835de86a0e22fe342d97c46af42372bae",
+                                "bytes":  211
+                            },
+                            {
+                                "path":  "DATA/s.png",
+                                "sha256":  "b7b039b6490f60620299cff84c6f9114d8851eebfb8c00bae7607c6b49c685ab",
+                                "bytes":  237
+                            },
+                            {
+                                "path":  "DATA/t.png",
+                                "sha256":  "e7c0f6bef3e88dd42743b1990512d88a828c0144ad75adc573ba78d674033b20",
+                                "bytes":  386
+                            },
+                            {
+                                "path":  "DATA/wifi.png",
+                                "sha256":  "c5a2a350409ed82b8bbd08db265ff567ae3b1be824421fe7518a189e0dd9982e",
+                                "bytes":  419
+                            },
+                            {
+                                "path":  "DATA/x.png",
+                                "sha256":  "2731b7788571d25ec2c29e582bca3553dcbda73f8ccf3a75d90e82a650370c50",
+                                "bytes":  328
+                            }
+                        ]
+}

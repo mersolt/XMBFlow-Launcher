@@ -29,9 +29,16 @@ $actualDefault = @($manifest.files | Where-Object boot_class -eq 'boot-required-
 if ($actualDefault -ne (@($requiredDefault | Sort-Object) -join "`n")) { throw 'Unexpected default boot profile DATA set.' }
 
 foreach ($file in $manifest.files) {
-    if ($file.status -ne 'unresolved-source-and-license') { throw "Unexpected manifest status: $($file.package_path)" }
-    if ($null -ne $file.source -or $null -ne $file.license -or $null -ne $file.sha256) {
-        throw "Untraced asset has source, licence, or hash evidence: $($file.package_path)"
+    if ($file.status -eq 'unresolved-source-and-license') {
+        if ($null -ne $file.source -or $null -ne $file.license -or $null -ne $file.sha256) {
+            throw "Untraced asset has source, licence, or hash evidence: $($file.package_path)"
+        }
+    } elseif ($file.status -eq 'original-placeholder-traced') {
+        if ($file.source -notmatch '^assets/bootstrap-placeholders/DATA/' -or $file.license -ne 'LicenseRef-XMBFlow-Original' -or $file.sha256 -notmatch '^[a-f0-9]{64}$') {
+            throw "Original placeholder record is incomplete: $($file.package_path)"
+        }
+    } else {
+        throw "Unexpected manifest status: $($file.package_path)"
     }
 }
 

@@ -3,9 +3,11 @@
 ## Status: blocked by source and licence evidence
 
 `packaging/full-app-data-manifest.json` is a one-to-one manifest seed for all
-DATA paths named by the Lua source. It intentionally records no source,
-licence, checksum, or package approval for any asset. A missing field means
-unknown, not implicitly permitted.
+DATA paths named by the Lua source. A missing field means unknown, not
+implicitly permitted. Original project placeholders generated in
+`assets/bootstrap-placeholders/` are recorded with their hashes and
+`LicenseRef-XMBFlow-Original`; this traces their provenance but does not make
+the full manifest package-ready.
 
 ## Smallest normal-start profile
 
@@ -24,6 +26,11 @@ The three Noto CJK fonts are conditional boot requirements when a saved
 language selects Korean, Simplified Chinese, or Traditional Chinese. The other
 151 tracked assets are deferred, lazy, or view-dependent; excluding them does
 not prove they may be omitted from a later full-feature package.
+
+The current placeholder generator supplies 21 of the 23 default boot files:
+19 original PNGs and the two original plane models. The remaining default
+inputs are the font and click sound, both deliberately unresolved pending
+separate source and licence records.
 
 ## Package gate
 

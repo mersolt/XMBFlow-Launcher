@@ -1,13 +1,21 @@
 [CmdletBinding()]
 param(
     [string]$InventoryPath,
-    [string]$OutputPath
+    [string]$OutputPath,
+    [string]$BootstrapAssetDirectory
 )
 
 $ErrorActionPreference = 'Stop'
 if ([string]::IsNullOrWhiteSpace($InventoryPath)) { $InventoryPath = Join-Path $PSScriptRoot '..\packaging\data-asset-inventory.json' }
 if ([string]::IsNullOrWhiteSpace($OutputPath)) { $OutputPath = Join-Path $PSScriptRoot '..\packaging\full-app-data-manifest.json' }
+if ([string]::IsNullOrWhiteSpace($BootstrapAssetDirectory)) { $BootstrapAssetDirectory = Join-Path $PSScriptRoot '..\assets\bootstrap-placeholders' }
 $inventory = Get-Content -Raw -LiteralPath $InventoryPath | ConvertFrom-Json
+$bootstrapManifestPath = Join-Path $BootstrapAssetDirectory 'manifest.json'
+$bootstrapAssets = @{}
+if (Test-Path -LiteralPath $bootstrapManifestPath -PathType Leaf) {
+    $bootstrapManifest = Get-Content -Raw -LiteralPath $bootstrapManifestPath | ConvertFrom-Json
+    foreach ($file in $bootstrapManifest.generated_files) { $bootstrapAssets[$file.path] = $file }
+}
 
 # These assets are loaded unconditionally by the normal, English/default
 # startup path before the library renderer can reach the XMB overlay.
@@ -42,16 +50,19 @@ $files = foreach ($asset in $inventory.assets | Sort-Object path) {
         'deferred-lazy-or-view-dependent'
     }
 
+    $bootstrap = $bootstrapAssets[$asset.path]
+    $isOriginalPlaceholder = $null -ne $bootstrap
     [ordered]@{
         package_path = $asset.path
         kind = $asset.kind
         source_references = @($asset.source_references)
         boot_class = $bootClass
-        source = $null
-        license = $null
-        sha256 = $null
-        transformation = $null
-        status = 'unresolved-source-and-license'
+        source = if ($isOriginalPlaceholder) { "assets/bootstrap-placeholders/$($asset.path)" } else { $null }
+        copyright = if ($isOriginalPlaceholder) { 'Copyright XMBFlow contributors' } else { $null }
+        license = if ($isOriginalPlaceholder) { 'LicenseRef-XMBFlow-Original' } else { $null }
+        sha256 = if ($isOriginalPlaceholder) { $bootstrap.sha256 } else { $null }
+        transformation = if ($isOriginalPlaceholder) { 'Tools/New-XmbFlowBootstrapPlaceholders.ps1' } else { $null }
+        status = if ($isOriginalPlaceholder) { 'original-placeholder-traced' } else { 'unresolved-source-and-license' }
     }
 }
 
@@ -65,7 +76,8 @@ $files = foreach ($asset in $inventory.assets | Sort-Object path) {
         notes = @(
             'These assets are loaded before the normal library renderer reaches the integrated XMB overlay.',
             'A non-default CJK language requires its matching conditional font before the renderer starts.',
-            'No asset becomes package-eligible until source, SPDX-compatible licence, SHA-256, and transformation fields are complete.'
+            'No asset becomes package-eligible until source, SPDX-compatible licence, SHA-256, and transformation fields are complete.',
+            'Original project placeholders may be traced without making the full package eligible; unresolved entries keep this manifest blocked.'
         )
     }
     files = @($files)
