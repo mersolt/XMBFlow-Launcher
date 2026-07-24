@@ -58,11 +58,10 @@ while running do
     -- Static mock status presentation, modelled on the compact top-right
     -- arrangement in the supplied reference video.
     Font.print(font, 770, 18, "7/4  0:14", Color.new(245, 250, 255, 230))
-    Graphics.fillRect(914, 930, 21, 31, Color.new(245, 250, 255, 230))
-    Graphics.fillRect(931, 934, 24, 28, Color.new(245, 250, 255, 230))
-    Graphics.fillRect(917, 927, 23, 29, Color.new(4, 10, 28, 255))
-    Graphics.fillRect(920, 929, 22, 27, Color.new(245, 250, 255, 230))
-    Graphics.fillRect(944, 933, 23, 27, Color.new(245, 250, 255, 230))
+    Graphics.fillRect(914, 940, 20, 34, Color.new(245, 250, 255, 230))
+    Graphics.fillRect(940, 945, 24, 30, Color.new(245, 250, 255, 230))
+    Graphics.fillRect(917, 937, 23, 31, Color.new(4, 10, 28, 255))
+    Graphics.fillRect(919, 934, 25, 29, Color.new(245, 250, 255, 230))
 
     -- XMB keeps a fixed category anchor. The current object occupies the
     -- first slot below it; the immediately previous object appears above it
@@ -71,13 +70,18 @@ while running do
     visual_options[selected_column] = visual_options[selected_column] + (selected_option - visual_options[selected_column]) * 0.18
     local visual_option = visual_options[selected_column]
     for option = 1, option_counts[selected_column] do
-        local offset = option - visual_option
-        if offset >= -1 and offset <= 2 then
-            local selected = math.abs(offset) < 0.18
-            local scale = selected and 0.62 or 0.42
-            local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 145)
+        local is_previous = option == selected_option - 1
+        local is_visible_below = option >= selected_option and option <= selected_option + 2
+        if is_previous or is_visible_below then
+            local focus = math.max(0, 1 - math.abs(option - visual_option))
+            local scale = 0.42 + 0.20 * focus
+            local color = Color.new(math.floor(120 + 135 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(145 + 110 * focus))
             local x = 90 + (selected_column - 1) * 130
-            local y = offset == -1 and 62 or 296 + offset * 66
+            local y = is_previous and 62 or 296 + (option - selected_option) * 66
+            if focus > 0.02 then
+                local glow_scale = scale + 0.10 * focus
+                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[selected_column], glow_scale, glow_scale, Color.new(95, 220, 255, math.floor(35 * focus)))
+            end
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[selected_column], scale, scale, color)
             Font.print(font, x + 40, y - 10, object_labels[selected_column][option], color)
         end
@@ -88,6 +92,7 @@ while running do
         local selected = column == selected_column
         local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 150)
         local scale = selected and 1.15 or 0.82
+        if selected then Graphics.drawScaleImage(x - 48 * (scale + 0.10), 166 - 48 * (scale + 0.10), category_icons[column], scale + 0.10, scale + 0.10, Color.new(95, 220, 255, 35)) end
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
         Font.print(font, x - 30, 226, category_labels[column], color)
     end
