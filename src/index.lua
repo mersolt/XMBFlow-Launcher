@@ -3,11 +3,12 @@
 -- https://www.patreon.com/vitahex
 
 local oneLoopTimer = Timer.new()
+local xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true
 
 -- Open recovery mode if selected from the livearea
 local bootparam = System.getBootParams() or ""
 
-if string.match(bootparam, "recovery") then
+if not xmbSafeProfile and string.match(bootparam, "recovery") then
     dofile("app0:addons/recovery.lua")
     System.exit()
 end
@@ -20,6 +21,11 @@ dofile("app0:addons/xmb-navigation.lua")
 dofile("app0:addons/xmb-layout.lua")
 dofile("app0:addons/xmb-transition.lua")
 dofile("app0:addons/xmb-render.lua")
+dofile("app0:addons/xmb-safe-profile.lua")
+
+if xmbSafeProfile then
+    XmbSafeProfile.enable()
+end
 
 -- Speed related settings - MOVED EARLY for maximum performance impact
 local cpu_speed = 444 -- Was 333
@@ -54,8 +60,10 @@ iconDir = "ux0:/data/RetroFlow/ICONS/"
 local lang_lines = {}
 
 -- Tidy up legacy COVER folder structure to a more standard naming convention
-if System.doesDirExist("ux0:/data/RetroFlow/COVERS/MAME") then System.rename("ux0:/data/RetroFlow/COVERS/MAME", "ux0:/data/RetroFlow/COVERS/MAME 2000") end
-if System.doesDirExist("ux0:/data/RetroFlow/ROMS/MAME 2000") then System.rename("ux0:/data/RetroFlow/ROMS/MAME 2000", "ux0:/data/RetroFlow/ROMS/MAME 2000") end
+if not xmbSafeProfile then
+    if System.doesDirExist("ux0:/data/RetroFlow/COVERS/MAME") then System.rename("ux0:/data/RetroFlow/COVERS/MAME", "ux0:/data/RetroFlow/COVERS/MAME 2000") end
+    if System.doesDirExist("ux0:/data/RetroFlow/ROMS/MAME 2000") then System.rename("ux0:/data/RetroFlow/ROMS/MAME 2000", "ux0:/data/RetroFlow/ROMS/MAME 2000") end
+end
 
 -- Default system rom folders
 romDir_Default =
@@ -165,7 +173,7 @@ function importLuaFile(filename, tableToAssign)
 end
 
 -- Save a copy of the default locations to an lua file so it can be customised later
-if not System.doesFileExist("ux0:/data/RetroFlow/rom_directories.lua") then
+if not xmbSafeProfile and not System.doesFileExist("ux0:/data/RetroFlow/rom_directories.lua") then
     print_table_rom_dirs(romDir_Default)
 end
 
@@ -3037,7 +3045,7 @@ local showView = 0
 
 -- Experimental XMB presentation. Keep disabled until a reviewed test build
 -- explicitly opts in; this flag is intentionally not saved to user settings.
-local xmbPrototypeEnabled = false
+local xmbPrototypeEnabled = xmbSafeProfile
 local xmbPrototypeColumn = 5 -- GAMES
 local xmbPrototypeVisualColumn = 5
 local xmbPrototypeDisplayColumn = 5
@@ -3214,6 +3222,9 @@ crc_results_table = {}
 user_crc_table = {}
 
 function SaveSettings()
+    if xmbSafeProfile then
+        return false
+    end
 
     local file_config = assert(io.open(cur_dir .. "/config.dat", "w"), "Failed to open config.dat")
 
@@ -11072,7 +11083,17 @@ end
 
 -- CHECK IF STARTUP SCAN IS ON
 -- 0 Off, 1 On
-if startupScan == 1 then
+if xmbSafeProfile then
+    -- The safe profile never creates, rebuilds, or repairs a library. It only
+    -- imports an already-complete RetroFlow cache and otherwise starts empty.
+    if System.doesDirExist(db_Cache_Folder) and cache_files_complete() then
+        files_table = import_cached_DB()
+        import_collections()
+    else
+        files_table = {}
+        import_collections()
+    end
+elseif startupScan == 1 then
     -- Startup scan is ON
 
     -- Scan folders and games
