@@ -14621,6 +14621,7 @@ end
 
 local function xmb_prototype_go_back()
     if xmbPrototypeGamesParentList ~= nil then
+        local returning_to_nested_parent = xmbPrototypeGamesGrandparentList ~= nil
         xmbPrototypeGamesMode = xmbPrototypeGamesParentMode or "folders"
         xmbPrototypeGamesCategory = nil
         xmbPrototypeGamesSelection = xmbPrototypeGamesParentSelection
@@ -14633,6 +14634,9 @@ local function xmb_prototype_go_back()
         xmbPrototypeGamesGrandparentSelection = 1
         xmbPrototypeGamesGrandparentStartOffset = 0
         xmbPrototypeGamesVisualSelection = xmbPrototypeGamesSelection
+        if returning_to_nested_parent then
+            xmbPrototypeChildAxisAlpha = 0
+        end
 
         if xmbPrototypeGamesMode == "folders" then
             xmbPrototypeGamesTitle = "GAMES"
