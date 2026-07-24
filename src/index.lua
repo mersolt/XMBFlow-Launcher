@@ -14263,6 +14263,19 @@ local function xmb_prototype_move_column(direction)
     end
 end
 
+local function xmb_prototype_reset_navigation()
+    xmbPrototypeColumn = 5
+    xmbPrototypeGamesMode = "folders"
+    xmbPrototypeGamesSelection = 1
+    xmbPrototypeGamesCategory = nil
+    xmbPrototypeGamesParentMode = nil
+    xmbPrototypeGamesTitle = "GAMES"
+    xmbPrototypeAppsMode = "folders"
+    xmbPrototypeAppsSelection = 1
+    xmbPrototypeAppsCategory = nil
+    xmbPrototypeAppsTitle = "APPS"
+end
+
 local function xmb_prototype_current_games_list()
     if xmbPrototypeGamesMode == "folders" then
         return xmb_prototype_games_folders
@@ -14523,7 +14536,7 @@ local function draw_xmb_prototype()
             Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open   Circle: Back", Color.new(210, 225, 245, 210))
         end
     else
-        Font.print(fnt20, 34, 508, "Left / Right: XMB categories", Color.new(210, 225, 245, 210))
+        Font.print(fnt20, 34, 508, "Left / Right: XMB categories   Start + Select: Legacy UI", Color.new(210, 225, 245, 210))
     end
 end
 
@@ -21968,7 +21981,18 @@ while true do
     -- LEGACY UI BOUNDARY: navigation and action input phase.
     -- Controls Start
     if showMenu == 0 then
-        if xmbPrototypeEnabled then
+        -- Session-only prototype switch.  The chord is consumed so neither
+        -- legacy Start nor Select behaviour runs on the transition frame.
+        local xmbPrototypeToggleChanged = false
+        if Controls.check(pad, SCE_CTRL_START) and Controls.check(pad, SCE_CTRL_SELECT) and not (Controls.check(oldpad, SCE_CTRL_START) and Controls.check(oldpad, SCE_CTRL_SELECT)) then
+            xmbPrototypeEnabled = not xmbPrototypeEnabled
+            xmbPrototypeToggleChanged = true
+            if xmbPrototypeEnabled then
+                xmb_prototype_reset_navigation()
+            end
+        end
+
+        if xmbPrototypeEnabled and not xmbPrototypeToggleChanged then
             if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then
                 xmb_prototype_move_column(-1)
             elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
@@ -21994,7 +22018,7 @@ while true do
 
         -- The enabled prototype owns all input while its folders are read-only.
         -- Legacy controls remain unchanged whenever the prototype is disabled.
-        if xmbPrototypeEnabled == false then
+        if xmbPrototypeEnabled == false and not xmbPrototypeToggleChanged then
         
         -- Game list view
         if showView == 6 and xmbPrototypeEnabled == false then

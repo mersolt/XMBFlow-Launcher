@@ -6,7 +6,10 @@ $required = @(
     '{label = "PLAYSTATION MOBILE", category = 39}',
     '{label = "SYSTEM APPS", category = 42}',
     'local function xmb_prototype_current_apps_list()',
-    'local function xmb_prototype_open_apps_selection()'
+    'local function xmb_prototype_open_apps_selection()',
+    'local function xmb_prototype_reset_navigation()',
+    'local xmbPrototypeToggleChanged = false',
+    'xmbPrototypeEnabled = not xmbPrototypeEnabled'
 )
 
 foreach ($entry in $required) {
@@ -15,6 +18,9 @@ foreach ($entry in $required) {
 
 if ($text -match 'xmb_prototype_open_apps_selection\(\).*launch_') {
     throw 'Apps prototype must not activate a launch adapter.'
+}
+if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {
+    throw 'XMB prototype selection must remain session-only.'
 }
 
 Write-Host 'XMB prototype structural checks passed.'

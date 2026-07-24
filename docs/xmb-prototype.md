@@ -11,10 +11,13 @@ It is intentionally a presentation prototype, not a launcher rewrite.
 ## What stays the same
 
 - The prototype is disabled by default through `xmbPrototypeEnabled` in
-  `src/index.lua`.
+  `src/index.lua`. From the library screen, **Start + Select** enables it for
+  the current session only; the same chord immediately restores the legacy UI.
 - When disabled, the legacy RetroFlow UI draws exactly as before.
 - When enabled in a reviewed test build, the prototype owns only its temporary
   category and folder selection state; it does not invoke a legacy action.
+- Entering the prototype resets only its temporary navigation state. It does
+  not write a setting, change the selected RetroFlow item, or alter a cache.
 - It adds no files, installs nothing, and does not enable AutoBoot.
 
 ## Design choices
