@@ -14792,10 +14792,6 @@ local function xmb_prototype_information_size(entry)
     local paths = {}
     if type(entry.game_path) == "string" then table.insert(paths, entry.game_path) end
     if type(entry.path) == "string" then table.insert(paths, entry.path) end
-    local titleid = entry.titleid or entry.name
-    if type(titleid) == "string" and string.len(titleid) == 9 and (entry.app_type == 0 or entry.app_type == 1 or entry.app_type_default == 0 or entry.app_type_default == 1) then
-        table.insert(paths, "ux0:/app/" .. titleid)
-    end
     for _, path in ipairs(paths) do
         if type(path) == "string" and path ~= "" then
             if System.doesDirExist(path) then return getAppSize(path) end
@@ -14807,6 +14803,16 @@ local function xmb_prototype_information_size(entry)
                     return formatSize(size)
                 end
             end
+        end
+    end
+    -- Imported title records can omit a usable path even though their Vita
+    -- title ID is present. Installed Vita/homebrew apps live under ux0:/app.
+    local titleids = {}
+    if type(entry.name) == "string" then table.insert(titleids, entry.name) end
+    if type(entry.titleid) == "string" then table.insert(titleids, entry.titleid) end
+    for _, titleid in ipairs(titleids) do
+        if type(titleid) == "string" and string.len(titleid) == 9 then
+            return getAppSize("ux0:/app/" .. titleid)
         end
     end
     return "Not reported"
@@ -15050,7 +15056,14 @@ function xmb_prototype_move_direction(direction)
         end
         return
     end
-    if direction == -1 then
+    if xmbPrototypeColumn == 5 and xmbPrototypeGamesParentList ~= nil and direction == -1 then
+        xmb_prototype_go_back()
+    elseif xmbPrototypeColumn == 5 and xmbPrototypeGamesParentList ~= nil and direction == 1 then
+        local selected = xmb_prototype_current_games_list()[xmbPrototypeGamesSelection]
+        if selected and xmbPrototypeGamesMode ~= "entries" and type(selected.system_app) ~= "string" then
+            xmb_prototype_open_games_selection()
+        end
+    elseif direction == -1 then
         xmb_prototype_move_column(-1)
     elseif direction == 1 then
         xmb_prototype_move_column(1)

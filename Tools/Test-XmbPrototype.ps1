@@ -42,7 +42,7 @@ $required = @(
     'local function xmb_prototype_information_entry(entry)',
     'local function xmb_prototype_information_size(entry)',
     'if type(entry.game_path) == "string" then table.insert(paths, entry.game_path) end',
-    '"ux0:/app/" .. titleid',
+    'return getAppSize("ux0:/app/" .. titleid)',
     'local function xmb_prototype_information_type(entry, source)',
     '"Information", "Change category"',
     'xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(',
@@ -128,6 +128,12 @@ if ($text.Contains('xmbPrototypeAppOptionsOpen or xmbPrototypeAppOptionsAlpha > 
 }
 if ($text.Contains('xmbPrototypeInformationOpen or xmbPrototypeInformationAlpha > 0.01')) {
     throw 'Closing the information card must not block XMB input.'
+}
+if (-not $text.Contains('xmbPrototypeColumn == 5 and xmbPrototypeGamesParentList ~= nil and direction == -1')) {
+    throw 'Nested Games columns must use Left as the same return path as Circle.'
+}
+if (-not $text.Contains('xmbPrototypeColumn == 5 and xmbPrototypeGamesParentList ~= nil and direction == 1')) {
+    throw 'Nested Games columns must not switch the horizontal axis on Right.'
 }
 if ($text.Contains('xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP)')) {
     throw 'Apps navigation must use the shared XMB direction handler exactly once.'
