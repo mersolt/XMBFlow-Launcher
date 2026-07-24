@@ -18,6 +18,7 @@ $required = @(
     'XmbRender.each_category(',
     'XmbRender.each_vertical(',
     'local function xmb_prototype_category_icon(column)',
+    'local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alpha)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
     'local function xmb_prototype_focus_legacy_selection(category, selection)',
@@ -71,6 +72,9 @@ if (-not $text.Contains('xmb_prototype_activate_app_selection(xmbPrototypeColumn
 }
 foreach ($rendererChrome in @('"XMB prototype"', '"Left / Right: Categories"', 'tostring(xmbPrototypeGamesSelection) .. " / "')) {
     if ($prototypeRenderer.Contains($rendererChrome)) { throw "The XMB renderer must not contain prototype chrome: $rendererChrome" }
+}
+foreach ($legacyListSelection in @('Graphics.fillRect(list_x - 20', 'Graphics.fillRect(92, 838')) {
+    if ($prototypeRenderer.Contains($legacyListSelection)) { throw "The XMB renderer must not retain the left-aligned list selection: $legacyListSelection" }
 }
 if ($text.Contains('draw_xmb_prototype_placeholder_column') -or $text.Contains('xmb_prototype_placeholder_columns')) { throw 'Prototype must not render obsolete category cards.' }
 

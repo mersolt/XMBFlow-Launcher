@@ -14366,6 +14366,24 @@ local function xmb_prototype_category_icon(column)
     return xmb_prototype_icons[column] or nil
 end
 
+-- Draw one object on the XMB vertical axis. The active object is positioned
+-- at the cross intersection; the shared layout helper moves its neighbours
+-- above and below it. This only changes presentation, never library data.
+local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alpha)
+    local scale = 0.42 + 0.20 * focus
+    local pulse = 0.50 + 0.50 * ((math.sin(xmbPrototypeGlowPhase / 18) + 1) * 0.5)
+    local icon_alpha = math.floor((145 + 110 * focus) * alpha)
+    local text_brightness = math.floor(145 + 110 * focus * pulse)
+    local text_alpha = math.floor((145 + 110 * focus) * alpha)
+
+    if focus > 0.02 then
+        XmbRender.glowing_icon(icon, x, y, scale, scale + 0.045 * focus, Color.new(255, 255, 255, icon_alpha), Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * alpha)))
+    else
+        XmbRender.icon(icon, x, y, scale, Color.new(255, 255, 255, icon_alpha))
+    end
+    Font.print(focus > 0.50 and fnt22 or fnt20, x + 40, y - 10, label, Color.new(text_brightness, text_brightness, text_brightness, text_alpha))
+end
+
 local function xmb_prototype_move_column(direction)
     xmbPrototypeColumn = XmbNavigation.move(xmbPrototypeColumn, direction, #xmb_prototype_columns)
 
@@ -14607,33 +14625,24 @@ local function draw_xmb_prototype()
     if showing_games and xmbPrototypeVerticalAlpha > 0.01 then
         xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, 0.18)
         local showing_child_axis = xmbPrototypeGamesMode == "entries" and xmbPrototypeGamesParentList ~= nil
+        local vertical_icon = xmb_prototype_category_icon(display_column)
         if showing_child_axis then
             local parent_list = xmbPrototypeGamesParentList
             local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, 234)
-            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, 234, function(parent_index, _, parent_y)
+            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, 234, function(parent_index, _, parent_y, parent_focus)
                 local parent_item = parent_list[parent_index]
-                local parent_selected = parent_index == xmbPrototypeGamesParentSelection
-                Font.print(parent_selected and fnt22 or fnt20, 72, parent_y, xmb_prototype_games_item_label(parent_item), Color.new(190, 205, 225, parent_selected and 150 or 95))
+                xmb_prototype_draw_vertical_object(vertical_icon, 90, parent_y, xmb_prototype_games_item_label(parent_item), parent_focus, xmbPrototypeVerticalAlpha * 0.58)
             end)
         end
         if #games_list == 0 then
-            Font.print(fnt22, 112, 282, "No items in this folder", Color.new(210, 222, 240, 180))
+            Font.print(fnt22, showing_child_axis and 360 or 520, 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 180)))
         else
             local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, 234)
 
-            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, 234, function(index, _, y)
+            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, 234, function(index, _, y, focus)
                 local item = games_list[index]
-                local is_selected = index == xmbPrototypeGamesSelection
                 local label = xmb_prototype_games_item_label(item)
-
-                local alpha = math.floor(xmbPrototypeVerticalAlpha * 210)
-                local list_x = showing_child_axis and 390 or 112
-                if is_selected then
-                    Graphics.fillRect(list_x - 20, 838, y - 7, y + 29, Color.new(75, 135, 205, alpha))
-                    Font.print(fnt25, list_x, y, label, Color.new(255, 255, 255, alpha))
-                else
-                    Font.print(fnt22, list_x, y + 2, label, Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
-                end
+                xmb_prototype_draw_vertical_object(vertical_icon, showing_child_axis and 360 or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
             end)
         end
     elseif showing_read_only_apps then
@@ -14647,14 +14656,11 @@ local function draw_xmb_prototype()
             xmbPrototypeHomebrewAppsVisualSelection = visual_selection
         end
         local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, 66, 234)
-        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, _, y)
+        local vertical_icon = xmb_prototype_category_icon(display_column)
+        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, _, y, focus)
             local item = apps_list[index]
-            local selected = index == selection
             local label = xmb_prototype_read_only_item_label(item)
-            if selected then
-                Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, math.floor(xmbPrototypeVerticalAlpha * 210)))
-            end
-            Font.print(selected and fnt25 or fnt22, 112, y, label, selected and Color.new(255, 255, 255, math.floor(xmbPrototypeVerticalAlpha * 255)) or Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
+            xmb_prototype_draw_vertical_object(vertical_icon, category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
         end)
     end
 
