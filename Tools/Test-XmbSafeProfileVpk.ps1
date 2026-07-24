@@ -25,7 +25,7 @@ try {
     }
     $legacyReader = [IO.StreamReader]::new($zip.GetEntry('legacy-index.lua').Open())
     try { $legacy = $legacyReader.ReadToEnd() } finally { $legacyReader.Dispose() }
-    foreach ($required in @('local xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true', 'XmbSafeProfile.enable()', 'function Setup_Adrenaline()', 'function AutoMakeBootBin(', 'function launch_Adrenaline(')) {
+    foreach ($required in @('xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true', 'XmbSafeProfile.enable()', 'function Setup_Adrenaline()', 'function AutoMakeBootBin(', 'function launch_Adrenaline(')) {
         if (-not $legacy.Contains($required)) { throw "Safe-profile legacy entry is missing guard: $required" }
     }
 } finally { $zip.Dispose() }
