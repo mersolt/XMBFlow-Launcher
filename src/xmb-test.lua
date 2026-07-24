@@ -9,8 +9,10 @@ local width = 960
 local height = 544
 local selected_column = 5
 local visual_column = 5
-local previous_column = 5
-local vertical_fade = 1
+local vertical_column = 5
+local pending_column = 5
+local vertical_alpha = 1
+local vertical_fade_direction = 0
 local glow_phase = 0
 local column_count = 7
 local category_anchor_x = 480
@@ -66,9 +68,10 @@ local function draw_vertical_options(column, alpha)
                 y = 296 + relative * 234
             end
             if focus > 0.02 then
-                local pulse = 0.88 + 0.12 * ((math.sin(glow_phase / 18) + 1) * 0.5)
-                local glow_scale = scale + 0.10 * focus * pulse
-                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(95, 220, 255, math.floor(35 * focus * alpha * pulse)))
+                local pulse = 0.65 + 0.35 * ((math.sin(glow_phase / 18) + 1) * 0.5)
+                local glow_scale = scale + 0.18 * focus * pulse
+                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(95, 220, 255, math.floor(100 * focus * alpha * pulse)))
+                Font.print(font, x + 39, y - 11, object_labels[column][option], Color.new(95, 220, 255, math.floor(135 * focus * alpha * pulse)))
             end
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[column], scale, scale, color)
             Font.print(font, x + 40, y - 10, object_labels[column][option], color)
@@ -98,13 +101,21 @@ while running do
     Graphics.fillRect(917, 937, 23, 31, Color.new(4, 10, 28, 255))
     Graphics.fillRect(919, 934, 25, 29, Color.new(245, 250, 255, 230))
 
-    -- XMB keeps a fixed category anchor. During a horizontal move, both
-    -- object lists share the same vertical path and cross-fade; the category
-    -- axis renders afterwards, so the passing item stays behind it.
+    -- XMB hides the object axis completely before showing the next category.
+    -- Fast horizontal input updates the pending category while the axis is
+    -- hidden, preventing intermediate object lists from flashing onscreen.
     visual_column = visual_column + (selected_column - visual_column) * 0.18
-    vertical_fade = vertical_fade + (1 - vertical_fade) * 0.16
-    if previous_column ~= selected_column then draw_vertical_options(previous_column, 1 - vertical_fade) end
-    draw_vertical_options(selected_column, vertical_fade)
+    if vertical_fade_direction < 0 then
+        vertical_alpha = math.max(0, vertical_alpha - 0.14)
+        if vertical_alpha == 0 then
+            vertical_column = pending_column
+            vertical_fade_direction = 1
+        end
+    elseif vertical_fade_direction > 0 then
+        vertical_alpha = math.min(1, vertical_alpha + 0.09)
+        if vertical_alpha == 1 then vertical_fade_direction = 0 end
+    end
+    draw_vertical_options(vertical_column, vertical_alpha)
 
     for column = 1, column_count do
         local relative = column - visual_column
@@ -113,8 +124,9 @@ while running do
         local color = Color.new(math.floor(120 - 15 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(150 + 105 * focus))
         local scale = 0.82 + 0.33 * focus
         if focus > 0.02 then
-            local pulse = 0.88 + 0.12 * ((math.sin(glow_phase / 18) + 1) * 0.5)
-            Graphics.drawScaleImage(x - 48 * (scale + 0.10 * focus * pulse), 166 - 48 * (scale + 0.10 * focus * pulse), category_icons[column], scale + 0.10 * focus * pulse, scale + 0.10 * focus * pulse, Color.new(95, 220, 255, math.floor(35 * focus * pulse)))
+            local pulse = 0.65 + 0.35 * ((math.sin(glow_phase / 18) + 1) * 0.5)
+            Graphics.drawScaleImage(x - 48 * (scale + 0.18 * focus * pulse), 166 - 48 * (scale + 0.18 * focus * pulse), category_icons[column], scale + 0.18 * focus * pulse, scale + 0.18 * focus * pulse, Color.new(95, 220, 255, math.floor(100 * focus * pulse)))
+            Font.print(font, x - 31, 225, category_labels[column], Color.new(95, 220, 255, math.floor(135 * focus * pulse)))
         end
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
         Font.print(font, x - 30, 226, category_labels[column], color)
@@ -122,15 +134,15 @@ while running do
 
     local pad = Controls.read()
     if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then
-        previous_column = selected_column
         selected_column = selected_column - 1
         if selected_column < 1 then selected_column = column_count end
-        vertical_fade = 0
+        pending_column = selected_column
+        if pending_column ~= vertical_column then vertical_fade_direction = -1 end
     elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
-        previous_column = selected_column
         selected_column = selected_column + 1
         if selected_column > column_count then selected_column = 1 end
-        vertical_fade = 0
+        pending_column = selected_column
+        if pending_column ~= vertical_column then vertical_fade_direction = -1 end
     elseif Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
         selected_options[selected_column] = selected_options[selected_column] - 1
         if selected_options[selected_column] < 1 then selected_options[selected_column] = option_counts[selected_column] end
