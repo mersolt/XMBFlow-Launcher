@@ -9,7 +9,7 @@ foreach ($entry in $required) {
 $forbidden = @(
     'ux0:', 'ur0:', 'vs0:', 'System.installVpk', 'System.reboot',
     'System.deleteFile', 'System.deleteDirectory', 'System.copyFile',
-    'dofile(', 'loadfile(', 'Sound.'
+    'dofile(', 'loadfile('
 )
 foreach ($entry in $forbidden) {
     if ($text.Contains($entry)) { throw "Minimal XMB profile must not contain: $entry" }
@@ -17,10 +17,11 @@ foreach ($entry in $forbidden) {
 if ($text.Contains('SCE_CTRL_CIRCLE_MAP')) { throw 'Standalone XMB test must not rely on the legacy mapping variable.' }
 if ($text.Contains('draw_placeholder_card') -or $text.Contains('Graphics.fillRect(x, x + 52')) { throw 'Standalone XMB test must render icons without obsolete markers or cards.' }
 if ($text.IndexOf('local selected_option = selected_options[selected_column]') -gt $text.IndexOf('for column = 1, column_count do')) { throw 'Vertical objects must render before the fixed category axis.' }
-if (-not $text.Contains('local vertical_column = 5') -or -not $text.Contains('local pending_column = 5') -or -not $text.Contains('local vertical_fade_direction = 0') -or -not $text.Contains('vertical_alpha = math.max(0, vertical_alpha - 0.14)') -or -not $text.Contains('vertical_alpha = math.min(1, vertical_alpha + 0.06)')) { throw 'Horizontal category changes must fully fade out, then gently fade in, the vertical object axis.' }
+if (-not $text.Contains('local vertical_column = 5') -or -not $text.Contains('local pending_column = 5') -or -not $text.Contains('local vertical_fade_direction = 0') -or -not $text.Contains('local vertical_fade_delay = 0') -or -not $text.Contains('vertical_fade_delay = 12') -or -not $text.Contains('vertical_alpha = math.min(1, vertical_alpha + 0.06)')) { throw 'Horizontal category changes must fully fade out, pause, then gently fade in the vertical object axis.' }
 if (-not $text.Contains('y = 296 + relative * 234') -or $text.Contains('local arc = 1 - math.abs(1 + relative * 2)')) { throw 'The preceding object must move behind the fixed category icon without a lateral detour.' }
 if (-not $text.Contains('math.sin(glow_phase / 18)') -or -not $text.Contains('category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255') -or -not $text.Contains('local text_color = Color.new')) { throw 'Focused icons and labels must use the persistent white XMB-style silhouette glow pulse.' }
 if (-not $text.Contains('Controls.readLeftAnalog()') -or -not $text.Contains('local navigation_repeat = 0') -or -not $text.Contains('analog_x < 96') -or -not $text.Contains('analog_y > 160')) { throw 'The standalone mockup must support held D-pad and left-analog navigation.' }
+if (-not $text.Contains('Sound.open("app0:/DATA/click2.ogg")') -or -not $text.Contains('Sound.play(navigation_click, false)') -or -not $text.Contains('Sound.close(navigation_click)')) { throw 'The standalone mockup must use only the reviewed original navigation sound.' }
 if (-not $text.Contains('local x = category_anchor_x + relative * 130')) { throw 'The horizontal category axis must interpolate around the fixed XMB anchor.' }
 foreach ($icon in @('settings','photo','music','video','games','network','apps')) {
     if (-not $text.Contains("app0:/DATA/xmb-icon-$icon.png")) { throw "Missing reviewed category icon: $icon" }

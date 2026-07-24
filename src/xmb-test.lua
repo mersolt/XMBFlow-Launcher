@@ -13,6 +13,7 @@ local vertical_column = 5
 local pending_column = 5
 local vertical_alpha = 1
 local vertical_fade_direction = 0
+local vertical_fade_delay = 0
 local glow_phase = 0
 local held_direction = 0
 local navigation_repeat = 0
@@ -32,6 +33,7 @@ local category_icons = {
     Graphics.loadImage("app0:/DATA/xmb-icon-network.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-apps.png")
 }
+local navigation_click = Sound.open("app0:/DATA/click2.ogg")
 local font_buffer = Extended.loadFontIntoMemory("app0:/DATA/font-SawarabiGothic-Regular.ttf")
 local font = Extended.loadFontFromMemory(font_buffer)
 Font.setPixelSizes(font, 18)
@@ -63,9 +65,10 @@ local function draw_vertical_options(column, alpha)
         if relative >= -1 and relative <= 2 then
             local focus = math.max(0, 1 - math.abs(relative))
             local scale = 0.42 + 0.20 * focus
-            local color = Color.new(math.floor(120 + 135 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor((145 + 110 * focus) * alpha))
+            local color = Color.new(255, 255, 255, math.floor((145 + 110 * focus) * alpha))
             local pulse = 0.50 + 0.50 * ((math.sin(glow_phase / 18) + 1) * 0.5)
-            local text_color = Color.new(math.floor(130 + 125 * focus * pulse), math.floor(145 + 110 * focus * pulse), math.floor(170 + 85 * focus * pulse), math.floor((145 + 110 * focus) * alpha))
+            local text_brightness = math.floor(145 + 110 * focus * pulse)
+            local text_color = Color.new(text_brightness, text_brightness, text_brightness, math.floor((145 + 110 * focus) * alpha))
             local x = category_anchor_x
             local y = 296 + relative * 66
             if relative < 0 then
@@ -112,10 +115,15 @@ while running do
         if vertical_alpha == 0 then
             vertical_column = pending_column
             vertical_fade_direction = 1
+            vertical_fade_delay = 12
         end
     elseif vertical_fade_direction > 0 then
-        vertical_alpha = math.min(1, vertical_alpha + 0.06)
-        if vertical_alpha == 1 then vertical_fade_direction = 0 end
+        if vertical_fade_delay > 0 then
+            vertical_fade_delay = vertical_fade_delay - 1
+        else
+            vertical_alpha = math.min(1, vertical_alpha + 0.06)
+            if vertical_alpha == 1 then vertical_fade_direction = 0 end
+        end
     end
     draw_vertical_options(vertical_column, vertical_alpha)
 
@@ -123,9 +131,10 @@ while running do
         local relative = column - visual_column
         local x = category_anchor_x + relative * 130
         local focus = math.max(0, 1 - math.abs(relative))
-        local color = Color.new(math.floor(120 - 15 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(150 + 105 * focus))
+        local color = Color.new(255, 255, 255, math.floor(150 + 105 * focus))
         local pulse = 0.50 + 0.50 * ((math.sin(glow_phase / 18) + 1) * 0.5)
-        local text_color = Color.new(math.floor(130 + 125 * focus * pulse), math.floor(145 + 110 * focus * pulse), math.floor(170 + 85 * focus * pulse), math.floor(150 + 105 * focus))
+        local text_brightness = math.floor(145 + 110 * focus * pulse)
+        local text_color = Color.new(text_brightness, text_brightness, text_brightness, math.floor(150 + 105 * focus))
         local scale = 0.82 + 0.33 * focus
         if focus > 0.02 then
             local glow_scale = scale + 0.045 * focus
@@ -171,6 +180,7 @@ while running do
             selected_options[selected_column] = selected_options[selected_column] + 1
             if selected_options[selected_column] > option_counts[selected_column] then selected_options[selected_column] = 1 end
         end
+        Sound.play(navigation_click, false)
     else
         navigation_repeat = navigation_repeat - 1
     end
@@ -184,4 +194,5 @@ while running do
     oldpad = pad
 end
 
+Sound.close(navigation_click)
 System.exit()
