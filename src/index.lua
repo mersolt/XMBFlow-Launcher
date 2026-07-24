@@ -3045,6 +3045,8 @@ local xmbPrototypeGamesSelection = 1
 local xmbPrototypeGamesVisualSelection = 1
 local xmbPrototypeGamesCategory = nil
 local xmbPrototypeGamesParentMode = nil
+local xmbPrototypeGamesParentList = nil
+local xmbPrototypeGamesParentSelection = 1
 local xmbPrototypeGamesTitle = "GAMES"
 local xmbPrototypeSystemAppsSelection = 1
 local xmbPrototypeHomebrewAppsSelection = 1
@@ -14300,6 +14302,8 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeGamesVisualSelection = 1
     xmbPrototypeGamesCategory = nil
     xmbPrototypeGamesParentMode = nil
+    xmbPrototypeGamesParentList = nil
+    xmbPrototypeGamesParentSelection = 1
     xmbPrototypeGamesTitle = "GAMES"
     xmbPrototypeSystemAppsSelection = 1
     xmbPrototypeHomebrewAppsSelection = 1
@@ -14382,6 +14386,8 @@ local function xmb_prototype_games_folder_detail(folder)
 end
 
 local function xmb_prototype_open_entries(category, title, parent_mode)
+    xmbPrototypeGamesParentList = xmb_prototype_current_games_list()
+    xmbPrototypeGamesParentSelection = xmbPrototypeGamesSelection
     xmbPrototypeGamesMode = "entries"
     xmbPrototypeGamesCategory = category
     xmbPrototypeGamesTitle = title
@@ -14421,6 +14427,8 @@ local function xmb_prototype_go_back()
         xmbPrototypeGamesMode = xmbPrototypeGamesParentMode or "folders"
         xmbPrototypeGamesCategory = nil
         xmbPrototypeGamesParentMode = nil
+        xmbPrototypeGamesParentList = nil
+        xmbPrototypeGamesParentSelection = 1
         xmbPrototypeGamesSelection = 1
 
         if xmbPrototypeGamesMode == "folders" then
@@ -14532,6 +14540,18 @@ local function draw_xmb_prototype()
 
     if showing_games then
         xmbPrototypeGamesVisualSelection = xmbPrototypeGamesVisualSelection + (xmbPrototypeGamesSelection - xmbPrototypeGamesVisualSelection) * 0.18
+        local showing_child_axis = xmbPrototypeGamesMode == "entries" and xmbPrototypeGamesParentList ~= nil
+        if showing_child_axis then
+            local parent_list = xmbPrototypeGamesParentList
+            local parent_first = math.max(1, xmbPrototypeGamesParentSelection - 3)
+            local parent_last = math.min(#parent_list, xmbPrototypeGamesParentSelection + 3)
+            for parent_index = parent_first, parent_last do
+                local parent_item = parent_list[parent_index]
+                local parent_y = 278 + (parent_index - xmbPrototypeGamesParentSelection) * 42
+                local parent_selected = parent_index == xmbPrototypeGamesParentSelection
+                Font.print(parent_selected and fnt22 or fnt20, 72, parent_y, xmb_prototype_games_item_label(parent_item), Color.new(190, 205, 225, parent_selected and 150 or 95))
+            end
+        end
         if #games_list == 0 then
             Font.print(fnt22, 112, 282, "No items in this folder", Color.new(210, 222, 240, 180))
         else
@@ -14546,9 +14566,10 @@ local function draw_xmb_prototype()
                 local detail = xmb_prototype_games_item_detail(item, index)
 
                 local alpha = math.floor(xmbPrototypeVerticalAlpha * 210)
+                local list_x = showing_child_axis and 390 or 112
                 if is_selected then
-                    Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, alpha))
-                    Font.print(fnt25, 112, y, label, Color.new(255, 255, 255, alpha))
+                    Graphics.fillRect(list_x - 20, 838, y - 7, y + 29, Color.new(75, 135, 205, alpha))
+                    Font.print(fnt25, list_x, y, label, Color.new(255, 255, 255, alpha))
                     Font.print(fnt20, 730, y + 4, detail, Color.new(225, 235, 250, alpha))
                     local icon = xmb_prototype_existing_game_icon(item)
                     if icon then
@@ -14556,7 +14577,7 @@ local function draw_xmb_prototype()
                         Graphics.drawScaleImage(810, 242, icon, 0.34, 0.34, Color.new(255, 255, 255, alpha))
                     end
                 else
-                    Font.print(fnt22, 112, y + 2, label, Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
+                    Font.print(fnt22, list_x, y + 2, label, Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
                 end
             end
         end
