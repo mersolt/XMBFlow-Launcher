@@ -3,7 +3,10 @@
 -- https://www.patreon.com/vitahex
 
 local oneLoopTimer = Timer.new()
-local xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true
+-- Lua Player Plus limits a source chunk to 200 locals.  RetroFlow's entry
+-- chunk is already near that limit, so XMB profile state deliberately lives
+-- in the application global table instead of adding locals to this chunk.
+xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true
 
 -- Open recovery mode if selected from the livearea
 local bootparam = System.getBootParams() or ""
@@ -3045,26 +3048,26 @@ local showView = 0
 
 -- Experimental XMB presentation. Keep disabled until a reviewed test build
 -- explicitly opts in; this flag is intentionally not saved to user settings.
-local xmbPrototypeEnabled = xmbSafeProfile
-local xmbPrototypeColumn = 5 -- GAMES
-local xmbPrototypeVisualColumn = 5
-local xmbPrototypeDisplayColumn = 5
-local xmbPrototypePendingColumn = 5
-local xmbPrototypeVerticalAlpha = 1
-local xmbPrototypeVerticalFadeDirection = 0
-local xmbPrototypeVerticalFadeDelay = 0
-local xmbPrototypeGamesMode = "folders"
-local xmbPrototypeGamesSelection = 1
-local xmbPrototypeGamesVisualSelection = 1
-local xmbPrototypeGamesCategory = nil
-local xmbPrototypeGamesParentMode = nil
-local xmbPrototypeGamesParentList = nil
-local xmbPrototypeGamesParentSelection = 1
-local xmbPrototypeGamesTitle = "GAMES"
-local xmbPrototypeSystemAppsSelection = 1
-local xmbPrototypeHomebrewAppsSelection = 1
-local xmbPrototypeSystemAppsVisualSelection = 1
-local xmbPrototypeHomebrewAppsVisualSelection = 1
+xmbPrototypeEnabled = xmbSafeProfile
+xmbPrototypeColumn = 5 -- GAMES
+xmbPrototypeVisualColumn = 5
+xmbPrototypeDisplayColumn = 5
+xmbPrototypePendingColumn = 5
+xmbPrototypeVerticalAlpha = 1
+xmbPrototypeVerticalFadeDirection = 0
+xmbPrototypeVerticalFadeDelay = 0
+xmbPrototypeGamesMode = "folders"
+xmbPrototypeGamesSelection = 1
+xmbPrototypeGamesVisualSelection = 1
+xmbPrototypeGamesCategory = nil
+xmbPrototypeGamesParentMode = nil
+xmbPrototypeGamesParentList = nil
+xmbPrototypeGamesParentSelection = 1
+xmbPrototypeGamesTitle = "GAMES"
+xmbPrototypeSystemAppsSelection = 1
+xmbPrototypeHomebrewAppsSelection = 1
+xmbPrototypeSystemAppsVisualSelection = 1
+xmbPrototypeHomebrewAppsVisualSelection = 1
 
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
@@ -14251,20 +14254,20 @@ end
 -- XMB PROTOTYPE: presentation only. It reads the existing category table and
 -- selection state, then draws an original text-and-shape XMB-style overlay.
 -- Input, scanning, caching, settings, and launch actions remain legacy code.
-local xmb_prototype_columns = {
+xmb_prototype_columns = {
     "SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "NETWORK", "SYSTEM APPS", "HOMEBREW APPS"
 }
-local xmb_prototype_icon_paths = {
+xmb_prototype_icon_paths = {
     "app0:/DATA/xmb-icon-settings.png", "app0:/DATA/xmb-icon-photo.png",
     "app0:/DATA/xmb-icon-music.png", "app0:/DATA/xmb-icon-video.png",
     "app0:/DATA/xmb-icon-games.png", "app0:/DATA/xmb-icon-apps.png",
     "app0:/DATA/xmb-icon-apps.png", "app0:/DATA/xmb-icon-apps.png"
 }
-local xmb_prototype_icons = {}
+xmb_prototype_icons = {}
 
 -- These folder records are read-only pointers to existing RetroFlow data.
 -- They do not create a second library or save any new configuration.
-local xmb_prototype_games_folders = {
+xmb_prototype_games_folders = {
     {label = "ALL GAMES", category = 0},
     {label = "PS VITA", category = 1},
     {label = "PSP", category = 3},
@@ -14279,10 +14282,10 @@ local xmb_prototype_games_folders = {
 
 -- System and Homebrew Apps stay separate read-only views over the scanned
 -- RetroFlow tables. They neither enumerate Vita locations nor invoke titles.
-local xmb_prototype_system_apps_category = 42
-local xmb_prototype_homebrew_apps_category = 2
+xmb_prototype_system_apps_category = 42
+xmb_prototype_homebrew_apps_category = 2
 
-local xmb_prototype_retro_systems = {}
+xmb_prototype_retro_systems = {}
 for category_number = 5, 46 do
     local system = SystemsToScan[category_number]
     -- PSM has its own Games folder and system apps belong to the future Apps

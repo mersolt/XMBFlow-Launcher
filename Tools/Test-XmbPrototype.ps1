@@ -2,13 +2,13 @@ param([string]$Source = (Join-Path $PSScriptRoot '..\src\index.lua'))
 
 $text = Get-Content -Raw $Source
 $required = @(
-    'local xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true',
-    'local xmbPrototypeEnabled = xmbSafeProfile',
+    'xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true',
+    'xmbPrototypeEnabled = xmbSafeProfile',
     '{label = "PLAYSTATION MOBILE", category = 39}',
     '"SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "NETWORK", "SYSTEM APPS", "HOMEBREW APPS"',
-    'local xmb_prototype_system_apps_category = 42',
-    'local xmb_prototype_homebrew_apps_category = 2',
-    'local xmb_prototype_icon_paths = {',
+    'xmb_prototype_system_apps_category = 42',
+    'xmb_prototype_homebrew_apps_category = 2',
+    'xmb_prototype_icon_paths = {',
     'local function xmb_prototype_read_only_data()',
     'XmbNavigation.move(',
     'XmbNavigation.approach(',

@@ -5,7 +5,7 @@ param(
 
 $sourceText = Get-Content -Raw $Source
 $guardText = Get-Content -Raw $Guard
-foreach ($required in @('local xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true', 'files_table = import_cached_DB()', 'local xmbPrototypeEnabled = xmbSafeProfile')) {
+foreach ($required in @('xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true', 'files_table = import_cached_DB()', 'xmbPrototypeEnabled = xmbSafeProfile')) {
     if (-not $sourceText.Contains($required)) { throw "Missing safe-profile entry invariant: $required" }
 }
 foreach ($required in @('function Setup_Adrenaline()', 'function AutoMakeBootBin(', 'function launch_Adrenaline(')) {
