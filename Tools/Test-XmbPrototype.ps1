@@ -55,6 +55,9 @@ if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig
 if (-not $text.Contains('if xmbPrototypeEnabled == false and (Controls.check(pad, SCE_CTRL_CROSS_MAP)')) {
     throw 'The legacy Cross launch handler must be disabled while the XMB prototype owns input.'
 }
+if ($text -notmatch 'if xmbPrototypeEnabled then\s+draw_xmb_prototype\(\)\s+else\s+if setBackground >= 1 then') {
+    throw 'The safe XMB profile must render directly instead of drawing the legacy UI behind an overlay.'
+}
 foreach ($button in @('SCE_CTRL_TRIANGLE', 'SCE_CTRL_START', 'SCE_CTRL_SELECT', 'SCE_CTRL_SQUARE')) {
     if (-not $text.Contains("elseif xmbPrototypeEnabled == false and (Controls.check(pad, $button")) {
         throw "The legacy $button handler must be disabled while the XMB prototype owns input."

@@ -3069,6 +3069,7 @@ xmbPrototypeSystemAppsSelection = 1
 xmbPrototypeHomebrewAppsSelection = 1
 xmbPrototypeSystemAppsVisualSelection = 1
 xmbPrototypeHomebrewAppsVisualSelection = 1
+xmbPrototypeGlowPhase = 0
 
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
@@ -14390,6 +14391,7 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeHomebrewAppsSelection = 1
     xmbPrototypeSystemAppsVisualSelection = 1
     xmbPrototypeHomebrewAppsVisualSelection = 1
+    xmbPrototypeGlowPhase = 0
 end
 
 local function xmb_prototype_current_games_list()
@@ -14586,24 +14588,36 @@ end
 
 local function draw_xmb_prototype()
     xmb_prototype_update_transition()
+    xmbPrototypeGlowPhase = xmbPrototypeGlowPhase + 1
     local display_column = xmbPrototypeDisplayColumn
     local showing_games = display_column == 5
     local showing_read_only_apps = display_column == 7 or display_column == 8
     local games_list = xmb_prototype_current_games_list()
 
-    -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
-    Graphics.fillRect(0, 960, 0, 544, Color.new(8, 18, 38, 255))
+    -- Original XMB-inspired backdrop and waves.  It deliberately uses no
+    -- Sony-derived art or extracted theme data.
+    Graphics.fillRect(0, 960, 0, 544, Color.new(6, 16, 44, 255))
+    xmb_prototype_draw_wave(346, xmbPrototypeGlowPhase / 38, Color.new(44, 104, 185, 115))
+    xmb_prototype_draw_wave(390, xmbPrototypeGlowPhase / 48 + 1.6, Color.new(25, 70, 145, 80))
+    xmb_prototype_draw_wave(438, xmbPrototypeGlowPhase / 58 + 3.1, Color.new(15, 48, 112, 65))
 
     -- The active category remains fixed while the complete horizontal axis
     -- moves behind it. This state is presentation-only; it never changes
     -- showCat, caches, scanners, settings, or a launch target.
     local category_anchor_x = 480
     XmbRender.each_category(xmb_prototype_columns, xmbPrototypeVisualColumn, category_anchor_x, 130, function(index, label, relative, x, focus)
-        local label_color = Color.new(190 + math.floor(65 * focus), 205 + math.floor(50 * focus), 225 + math.floor(30 * focus), 145 + math.floor(110 * focus))
+        local pulse = 0.50 + 0.50 * ((math.sin(xmbPrototypeGlowPhase / 18) + 1) * 0.5)
+        local category_alpha = math.floor(150 + 105 * focus)
+        local label_brightness = math.floor(145 + 110 * focus * pulse)
+        local label_color = Color.new(label_brightness, label_brightness, label_brightness, category_alpha)
 
         local icon = xmb_prototype_category_icon(index)
         local scale = 0.82 + 0.33 * focus
-        XmbRender.icon(icon, x, 166, scale, label_color)
+        if focus > 0.02 then
+            XmbRender.glowing_icon(icon, x, 166, scale, scale + 0.045 * focus, Color.new(255, 255, 255, category_alpha), Color.new(255, 255, 255, math.floor(40 + 100 * focus * pulse)))
+        else
+            XmbRender.icon(icon, x, 166, scale, Color.new(255, 255, 255, category_alpha))
+        end
         Font.print(fnt20, x - 42, 226, label, label_color)
     end)
 
@@ -14679,10 +14693,18 @@ function xmb_prototype_visible_vertical_range(item_count, visual_selection, anch
     return first, last
 end
 
+function xmb_prototype_draw_wave(base_y, phase, color)
+    for x = 0, 952, 8 do
+        local y = math.floor(base_y + math.sin((x / 92) + phase) * 28)
+        Graphics.fillRect(x, x + 8, y, y + 5, color)
+    end
+end
+
 function xmb_prototype_draw_status()
     local hour, minute = System.getTime()
+    local _, day, month, year = System.getDate()
     local battery = System.getBatteryPercentage()
-    Font.print(fnt20, 726, 34, string.format("%02d:%02d", hour, minute), white)
+    Font.print(fnt20, 696, 34, string.format("%02d/%02d  %02d:%02d", day, month, hour, minute), white)
     Font.print(fnt20, 840, 34, battery .. "%", white)
     if System.isBatteryCharging() then
         Graphics.drawImage(888, 39, imgBatteryCharging)
@@ -15563,6 +15585,9 @@ while true do
 
     -- LEGACY UI BOUNDARY: frame rendering phase.
     -- Graphics
+    if xmbPrototypeEnabled then
+        draw_xmb_prototype()
+    else
     if setBackground >= 1 then
         Render.drawModel(modBackground, 0, 0, -5, 0, 0, 0)-- Draw Background as model
     else
@@ -15844,10 +15869,6 @@ while true do
         prevZ = 0
         prevRot = 0
         inPreview = false
-
-        if xmbPrototypeEnabled then
-            draw_xmb_prototype()
-        end
 
 -- MENU 1 - GET INFO
     elseif showMenu == 1 then
@@ -22037,6 +22058,7 @@ while true do
 
 
 -- END OF MENUS
+    end
     end
 
     
