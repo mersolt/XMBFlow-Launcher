@@ -47,13 +47,17 @@ foreach ($file in $manifest.files) {
         if (-not (Test-Path -LiteralPath $localPath -PathType Leaf)) { throw "Original placeholder is absent: $($file.package_path)" }
         if ((Get-FileHash -LiteralPath $localPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $file.sha256) { throw "Original placeholder hash mismatch: $($file.package_path)" }
     } elseif ($file.status -eq 'third-party-traced') {
-        if ($file.source -notmatch '^https://raw.githubusercontent.com/google/fonts/[a-f0-9]{40}/' -or $file.license -ne 'OFL-1.1' -or $file.sha256 -notmatch '^[a-f0-9]{64}$') {
+        if ($file.source -notmatch '^https://raw.githubusercontent.com/(google/fonts|notofonts/noto-cjk)/[a-f0-9]{40}/' -or $file.license -ne 'OFL-1.1' -or $file.sha256 -notmatch '^[a-f0-9]{64}$') {
             throw "Third-party record is incomplete: $($file.package_path)"
         }
         $localPath = Join-Path $ProjectRoot ('assets\\bootstrap-placeholders\\' + $file.package_path.Replace('/', '\\'))
         if (-not (Test-Path -LiteralPath $localPath -PathType Leaf)) { throw "Third-party boot input is absent: $($file.package_path)" }
         if ((Get-FileHash -LiteralPath $localPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $file.sha256) { throw "Third-party boot input hash mismatch: $($file.package_path)" }
-        if ($file.transformation -notmatch 'assets/third-party-notices/SawarabiGothic-OFL\.txt') { throw "Third-party notice record is incomplete: $($file.package_path)" }
+        $notice = if ($file.package_path -match '^DATA/font-NotoSansCJK') { 'assets/third-party-notices/NotoSansCJK-OFL.txt' } else { 'assets/third-party-notices/SawarabiGothic-OFL.txt' }
+        if ($file.transformation -notmatch [regex]::Escape($notice)) { throw "Third-party notice record is incomplete: $($file.package_path)" }
+        $fontHeader = [IO.File]::ReadAllBytes($localPath)[0..3]
+        $expectedHeader = if ($file.package_path -match '\.otf$') { '4F-54-54-4F' } else { '00-01-00-00' }
+        if (([BitConverter]::ToString($fontHeader)) -ne $expectedHeader) { throw "Third-party font header is invalid: $($file.package_path)" }
     } else {
         throw "Unexpected manifest status: $($file.package_path)"
     }

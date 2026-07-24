@@ -678,12 +678,12 @@
                                                 "dynamic font selection"
                                             ],
                       "boot_class":  "boot-required-language-conditional",
-                      "source":  null,
-                      "copyright":  null,
-                      "license":  null,
-                      "sha256":  null,
-                      "transformation":  null,
-                      "status":  "unresolved-source-and-license"
+                      "source":  "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/OTF/Korean/NotoSansCJKkr-Regular.otf",
+                      "copyright":  "Copyright 2014-2021 Adobe (http://www.adobe.com/). Noto is a trademark of Google Inc.",
+                      "license":  "OFL-1.1",
+                      "sha256":  "6bcb2a0703aa137e874fc2dffa85f6c21ba9a67fa329e81b8c801663af7e992a",
+                      "transformation":  "Downloaded unchanged from pinned Noto CJK revision; renamed only to the legacy package filename. Notice at assets/third-party-notices/NotoSansCJK-OFL.txt",
+                      "status":  "third-party-traced"
                   },
                   {
                       "package_path":  "DATA/font-NotoSansCJKsc-Regular-Slim.otf",
@@ -692,12 +692,12 @@
                                                 "dynamic font selection"
                                             ],
                       "boot_class":  "boot-required-language-conditional",
-                      "source":  null,
-                      "copyright":  null,
-                      "license":  null,
-                      "sha256":  null,
-                      "transformation":  null,
-                      "status":  "unresolved-source-and-license"
+                      "source":  "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/OTF/SimplifiedChinese/NotoSansCJKsc-Regular.otf",
+                      "copyright":  "Copyright 2014-2021 Adobe (http://www.adobe.com/). Noto is a trademark of Google Inc.",
+                      "license":  "OFL-1.1",
+                      "sha256":  "2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b",
+                      "transformation":  "Downloaded unchanged from pinned Noto CJK revision; renamed only to the legacy package filename. Notice at assets/third-party-notices/NotoSansCJK-OFL.txt",
+                      "status":  "third-party-traced"
                   },
                   {
                       "package_path":  "DATA/font-NotoSansCJKtc-Regular.otf",
@@ -706,12 +706,12 @@
                                                 "dynamic font selection"
                                             ],
                       "boot_class":  "boot-required-language-conditional",
-                      "source":  null,
-                      "copyright":  null,
-                      "license":  null,
-                      "sha256":  null,
-                      "transformation":  null,
-                      "status":  "unresolved-source-and-license"
+                      "source":  "https://raw.githubusercontent.com/notofonts/noto-cjk/f8d157532fbfaeda587e826d4cd5b21a49186f7c/Sans/OTF/TraditionalChinese/NotoSansCJKtc-Regular.otf",
+                      "copyright":  "Copyright 2014-2021 Adobe (http://www.adobe.com/). Noto is a trademark of Google Inc.",
+                      "license":  "OFL-1.1",
+                      "sha256":  "dce08bd4fd91aa8aa76ed8fea4b694c2dfb8550f67871e326843212ddbeb88b4",
+                      "transformation":  "Downloaded unchanged from pinned Noto CJK revision. Notice at assets/third-party-notices/NotoSansCJK-OFL.txt",
+                      "status":  "third-party-traced"
                   },
                   {
                       "package_path":  "DATA/font-SawarabiGothic-Regular.ttf",
@@ -724,7 +724,7 @@
                       "copyright":  "Copyright 2016 The Sawarabi Gothic Project Authors",
                       "license":  "OFL-1.1",
                       "sha256":  "04f2f9111bb69cb8d3706c27b44879c2c0fac593a11edf5cfe8cec1efc92c789",
-                      "transformation":  "Downloaded unchanged from pinned Google Fonts revision; notice at assets/third-party-notices/SawarabiGothic-OFL.txt.",
+                      "transformation":  "Downloaded unchanged from pinned Google Fonts revision. Notice at assets/third-party-notices/SawarabiGothic-OFL.txt",
                       "status":  "third-party-traced"
                   },
                   {

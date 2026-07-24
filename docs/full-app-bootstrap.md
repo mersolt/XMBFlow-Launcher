@@ -31,8 +31,11 @@ The current placeholders supply all 23 default boot files: 19 original PNGs,
 two original plane models, and one original synthesized click. The default
 Sawarabi Gothic TTF is sourced unchanged from a pinned Google Fonts revision
 under OFL-1.1; its notice is retained at
-`assets/third-party-notices/SawarabiGothic-OFL.txt`. The CJK fonts remain
-conditional and unresolved.
+`assets/third-party-notices/SawarabiGothic-OFL.txt`. The three conditional
+Noto CJK fonts are unchanged official Regular OTFs under OFL-1.1, pinned to a
+Noto CJK revision and retained under their legacy package filenames (the two
+`-Slim` names do not claim a binary subset). Their notice is retained at
+`assets/third-party-notices/NotoSansCJK-OFL.txt`.
 
 ## Package gate
 
