@@ -1266,6 +1266,7 @@ local click = Sound.open("app0:/DATA/click2.ogg")
 xmbNavigationClick = nil
 if xmbSafeProfile then
     xmbNavigationClick = Sound.open("app0:/DATA/xmb-cursor.ogg")
+    Sound.setVolume(xmbNavigationClick, 30000)
 end
 local sndMusic = click--temp
 local imgCoverTmp = Graphics.loadImage("app0:/DATA/noimg.png")
@@ -3068,6 +3069,9 @@ xmbPrototypeGamesCategory = nil
 xmbPrototypeGamesParentMode = nil
 xmbPrototypeGamesParentList = nil
 xmbPrototypeGamesParentSelection = 1
+xmbPrototypeGamesGrandparentMode = nil
+xmbPrototypeGamesGrandparentList = nil
+xmbPrototypeGamesGrandparentSelection = 1
 xmbPrototypeGamesTitle = "GAMES"
 xmbPrototypeSystemAppsSelection = 1
 xmbPrototypeHomebrewAppsSelection = 1
@@ -14411,6 +14415,9 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeGamesParentMode = nil
     xmbPrototypeGamesParentList = nil
     xmbPrototypeGamesParentSelection = 1
+    xmbPrototypeGamesGrandparentMode = nil
+    xmbPrototypeGamesGrandparentList = nil
+    xmbPrototypeGamesGrandparentSelection = 1
     xmbPrototypeGamesTitle = "GAMES"
     xmbPrototypeSystemAppsSelection = 1
     xmbPrototypeHomebrewAppsSelection = 1
@@ -14491,6 +14498,9 @@ local function xmb_prototype_games_folder_detail(folder)
 end
 
 local function xmb_prototype_open_games_submenu(mode, title, category)
+    xmbPrototypeGamesGrandparentMode = xmbPrototypeGamesParentMode
+    xmbPrototypeGamesGrandparentList = xmbPrototypeGamesParentList
+    xmbPrototypeGamesGrandparentSelection = xmbPrototypeGamesParentSelection
     xmbPrototypeGamesParentList = xmb_prototype_current_games_list()
     xmbPrototypeGamesParentSelection = xmbPrototypeGamesSelection
     xmbPrototypeGamesParentMode = xmbPrototypeGamesMode
@@ -14531,10 +14541,13 @@ local function xmb_prototype_go_back()
     if xmbPrototypeGamesParentList ~= nil then
         xmbPrototypeGamesMode = xmbPrototypeGamesParentMode or "folders"
         xmbPrototypeGamesCategory = nil
-        xmbPrototypeGamesParentMode = nil
-        xmbPrototypeGamesParentList = nil
         xmbPrototypeGamesSelection = xmbPrototypeGamesParentSelection
-        xmbPrototypeGamesParentSelection = 1
+        xmbPrototypeGamesParentMode = xmbPrototypeGamesGrandparentMode
+        xmbPrototypeGamesParentList = xmbPrototypeGamesGrandparentList
+        xmbPrototypeGamesParentSelection = xmbPrototypeGamesGrandparentSelection
+        xmbPrototypeGamesGrandparentMode = nil
+        xmbPrototypeGamesGrandparentList = nil
+        xmbPrototypeGamesGrandparentSelection = 1
 
         if xmbPrototypeGamesMode == "folders" then
             xmbPrototypeGamesTitle = "GAMES"
@@ -14614,7 +14627,8 @@ local function draw_xmb_prototype()
     local category_anchor_x = 480 - 390 * xmbPrototypeSubmenuAlpha
     XmbRender.each_category(xmb_prototype_columns, xmbPrototypeVisualColumn, category_anchor_x, 130, function(index, label, relative, x, focus)
         local pulse = 0.50 + 0.50 * ((math.sin(xmbPrototypeGlowPhase / 18) + 1) * 0.5)
-        local category_alpha = math.floor(150 + 105 * focus)
+        local submenu_visibility = index == display_column and 1 or 1 - xmbPrototypeSubmenuAlpha
+        local category_alpha = math.floor((150 + 105 * focus) * submenu_visibility)
         local label_brightness = math.floor(145 + 110 * focus * pulse)
         local label_color = Color.new(label_brightness, label_brightness, label_brightness, category_alpha)
 
@@ -14637,7 +14651,7 @@ local function draw_xmb_prototype()
             local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, 234)
             XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, 234, function(parent_index, _, parent_y, parent_focus)
                 local parent_item = parent_list[parent_index]
-                xmb_prototype_draw_vertical_object(vertical_icon, category_anchor_x, parent_y, xmb_prototype_games_item_label(parent_item), parent_focus, xmbPrototypeVerticalAlpha * 0.58)
+                xmb_prototype_draw_vertical_object(vertical_icon, category_anchor_x, parent_y, "", parent_focus, xmbPrototypeVerticalAlpha * 0.58)
             end)
         end
         if #games_list == 0 then
@@ -22234,10 +22248,6 @@ while true do
                 if setSounds == 1 and xmbNavigationClick then
                     Sound.play(xmbNavigationClick, NO_LOOP)
                 end
-            elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
-                xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, -1)
-            elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
-                xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, 1)
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 xmb_prototype_activate_app_selection(xmbPrototypeColumn)
             end

@@ -25,6 +25,9 @@ $required = @(
     'function xmb_prototype_read_direction(pad)',
     'Controls.readLeftAnalog()',
     'function xmb_prototype_move_direction(direction)',
+    'xmbPrototypeGamesGrandparentList = nil',
+    'xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha +',
+    'Sound.setVolume(xmbNavigationClick, 30000)',
     'local function xmb_prototype_update_transition()',
     'local function xmb_prototype_reset_navigation()',
     'local xmbPrototypeToggleChanged = false',
@@ -69,6 +72,9 @@ if (-not $prototypeRenderer.Contains('showCat = category') -or -not $prototypeRe
 }
 if (-not $text.Contains('xmb_prototype_activate_app_selection(xmbPrototypeColumn)')) {
     throw 'The System and Homebrew Apps columns must activate their selected entry from XMB.'
+}
+if ($text.Contains('xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP)')) {
+    throw 'Apps navigation must use the shared XMB direction handler exactly once.'
 }
 foreach ($rendererChrome in @('"XMB prototype"', '"Left / Right: Categories"', 'tostring(xmbPrototypeGamesSelection) .. " / "')) {
     if ($prototypeRenderer.Contains($rendererChrome)) { throw "The XMB renderer must not contain prototype chrome: $rendererChrome" }
