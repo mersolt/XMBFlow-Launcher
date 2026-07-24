@@ -42,17 +42,9 @@ while running do
     draw_wave(368, 0.7, Color.new(0, 185, 245, 190))
     draw_wave(380, 1.2, Color.new(70, 220, 255, 230))
 
-    for column = 1, column_count do
-        local x = 90 + (column - 1) * 130
-        local selected = column == selected_column
-        local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 150)
-        local scale = selected and 1.15 or 0.82
-        Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
-    end
-
-    -- The vertical XMB object axis belongs to the selected category. These
-    -- are presentation-only stand-ins: Up/Down changes focus and does not
-    -- invoke an action.
+    -- Draw the vertical axis first. Earlier objects may rise behind the
+    -- category anchor, which is deliberately drawn afterwards in the
+    -- foreground and never shifts or becomes occluded.
     local selected_option = selected_options[selected_column]
     for option = 1, option_counts[selected_column] do
         local offset = option - selected_option
@@ -64,6 +56,14 @@ while running do
             local y = 296 + offset * 66
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[selected_column], scale, scale, color)
         end
+    end
+
+    for column = 1, column_count do
+        local x = 90 + (column - 1) * 130
+        local selected = column == selected_column
+        local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 150)
+        local scale = selected and 1.15 or 0.82
+        Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
     end
 
     local pad = Controls.read()
