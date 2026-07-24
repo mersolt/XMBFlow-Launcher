@@ -16,6 +16,7 @@ end
 
 dofile("app0:addons/threads.lua")
 dofile("app0:addons/xmb-readonly-data.lua")
+dofile("app0:addons/xmb-navigation.lua")
 
 -- Speed related settings - MOVED EARLY for maximum performance impact
 local cpu_speed = 444 -- Was 333
@@ -14291,13 +14292,7 @@ local function xmb_prototype_category_icon(column)
 end
 
 local function xmb_prototype_move_column(direction)
-    xmbPrototypeColumn = xmbPrototypeColumn + direction
-
-    if xmbPrototypeColumn < 1 then
-        xmbPrototypeColumn = #xmb_prototype_columns
-    elseif xmbPrototypeColumn > #xmb_prototype_columns then
-        xmbPrototypeColumn = 1
-    end
+    xmbPrototypeColumn = XmbNavigation.move(xmbPrototypeColumn, direction, #xmb_prototype_columns)
 
     xmbPrototypePendingColumn = xmbPrototypeColumn
     if xmbPrototypePendingColumn ~= xmbPrototypeDisplayColumn then
@@ -14350,13 +14345,7 @@ local function xmb_prototype_move_games_selection(direction)
         return
     end
 
-    xmbPrototypeGamesSelection = xmbPrototypeGamesSelection + direction
-
-    if xmbPrototypeGamesSelection < 1 then
-        xmbPrototypeGamesSelection = #list
-    elseif xmbPrototypeGamesSelection > #list then
-        xmbPrototypeGamesSelection = 1
-    end
+    xmbPrototypeGamesSelection = XmbNavigation.move(xmbPrototypeGamesSelection, direction, #list)
 end
 
 local function xmb_prototype_current_read_only_apps_list(column)
@@ -14375,12 +14364,7 @@ local function xmb_prototype_move_read_only_apps_selection(column, direction)
     if #list == 0 then
         selection = 0
     else
-        selection = selection + direction
-        if selection < 1 then
-            selection = #list
-        elseif selection > #list then
-            selection = 1
-        end
+        selection = XmbNavigation.move(selection, direction, #list)
     end
     if column == 7 then
         xmbPrototypeSystemAppsSelection = selection
@@ -14496,7 +14480,7 @@ local function xmb_prototype_existing_game_icon(item)
 end
 
 local function xmb_prototype_update_transition()
-    xmbPrototypeVisualColumn = xmbPrototypeVisualColumn + (xmbPrototypeColumn - xmbPrototypeVisualColumn) * 0.18
+    xmbPrototypeVisualColumn = XmbNavigation.approach(xmbPrototypeVisualColumn, xmbPrototypeColumn, 0.18)
     if xmbPrototypeVerticalFadeDirection < 0 then
         xmbPrototypeVerticalAlpha = math.max(0, xmbPrototypeVerticalAlpha - 0.14)
         if xmbPrototypeVerticalAlpha == 0 then
@@ -14559,7 +14543,7 @@ local function draw_xmb_prototype()
     end
 
     if showing_games then
-        xmbPrototypeGamesVisualSelection = xmbPrototypeGamesVisualSelection + (xmbPrototypeGamesSelection - xmbPrototypeGamesVisualSelection) * 0.18
+        xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, 0.18)
         local showing_child_axis = xmbPrototypeGamesMode == "entries" and xmbPrototypeGamesParentList ~= nil
         if showing_child_axis then
             local parent_list = xmbPrototypeGamesParentList
@@ -14605,7 +14589,7 @@ local function draw_xmb_prototype()
         local apps_list = xmb_prototype_current_read_only_apps_list(display_column)
         local selection = display_column == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
         local visual_selection = display_column == 7 and xmbPrototypeSystemAppsVisualSelection or xmbPrototypeHomebrewAppsVisualSelection
-        visual_selection = visual_selection + (selection - visual_selection) * 0.18
+        visual_selection = XmbNavigation.approach(visual_selection, selection, 0.18)
         if display_column == 7 then
             xmbPrototypeSystemAppsVisualSelection = visual_selection
         else

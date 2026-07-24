@@ -98,7 +98,7 @@ end
 local function draw_vertical_options(column, alpha, anchor_x)
     if alpha <= 0.01 then return end
     local selected_option = selected_options[column]
-    visual_options[column] = visual_options[column] + (selected_option - visual_options[column]) * 0.18
+    visual_options[column] = XmbNavigation.approach(visual_options[column], selected_option, 0.18)
     local visual_option = visual_options[column]
     for option = 1, option_counts[column] do
         local relative = option - visual_option
@@ -127,7 +127,7 @@ end
 
 local function draw_submenu_options(column, parent_x)
     if submenu_alpha <= 0.01 then return end
-    submenu_visual_selection = submenu_visual_selection + (submenu_selection - submenu_visual_selection) * 0.18
+    submenu_visual_selection = XmbNavigation.approach(submenu_visual_selection, submenu_selection, 0.18)
     for option = 1, #submenu_labels do
         local relative = option - submenu_visual_selection
         local focus = math.max(0, 1 - math.abs(relative))
@@ -170,7 +170,7 @@ while running do
     -- XMB hides the object axis completely before showing the next category.
     -- Fast horizontal input updates the pending category while the axis is
     -- hidden, preventing intermediate object lists from flashing onscreen.
-    visual_column = visual_column + (selected_column - visual_column) * 0.18
+    visual_column = XmbNavigation.approach(visual_column, selected_column, 0.18)
     if vertical_fade_direction < 0 then
         vertical_alpha = math.max(0, vertical_alpha - 0.14)
         if vertical_alpha == 0 then
@@ -233,33 +233,27 @@ while running do
             if submenu_open then
                 submenu_open = false
             else
-                selected_column = selected_column - 1
-                if selected_column < 1 then selected_column = column_count end
+                selected_column = XmbNavigation.move(selected_column, -1, column_count)
                 pending_column = selected_column
                 if pending_column ~= vertical_column then vertical_fade_direction = -1 end
             end
         elseif direction == 1 then
             if not submenu_open then
-                selected_column = selected_column + 1
-                if selected_column > column_count then selected_column = 1 end
+                selected_column = XmbNavigation.move(selected_column, 1, column_count)
                 pending_column = selected_column
                 if pending_column ~= vertical_column then vertical_fade_direction = -1 end
             end
         elseif direction == -2 then
             if submenu_open then
-                submenu_selection = submenu_selection - 1
-                if submenu_selection < 1 then submenu_selection = #submenu_labels end
+                submenu_selection = XmbNavigation.move(submenu_selection, -1, #submenu_labels)
             else
-                selected_options[selected_column] = selected_options[selected_column] - 1
-                if selected_options[selected_column] < 1 then selected_options[selected_column] = option_counts[selected_column] end
+                selected_options[selected_column] = XmbNavigation.move(selected_options[selected_column], -1, option_counts[selected_column])
             end
         elseif direction == 2 then
             if submenu_open then
-                submenu_selection = submenu_selection + 1
-                if submenu_selection > #submenu_labels then submenu_selection = 1 end
+                submenu_selection = XmbNavigation.move(submenu_selection, 1, #submenu_labels)
             else
-                selected_options[selected_column] = selected_options[selected_column] + 1
-                if selected_options[selected_column] > option_counts[selected_column] then selected_options[selected_column] = 1 end
+                selected_options[selected_column] = XmbNavigation.move(selected_options[selected_column], 1, option_counts[selected_column])
             end
         end
         Sound.play(navigation_click, NO_LOOP)

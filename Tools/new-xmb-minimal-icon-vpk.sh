@@ -13,6 +13,7 @@ title_id=${4:-XMBF00009}
 title=${5:-XMBFlow Lua Category Icons}
 lua_entry="$root_dir/src/xmb-test.lua"
 data_contract="$root_dir/src/addons/xmb-readonly-data.lua"
+navigation_contract="$root_dir/src/addons/xmb-navigation.lua"
 
 sh "$root_dir/Tools/Inspect-VitaSdkToolchain.sh"
 
@@ -49,9 +50,10 @@ done
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-cursor.ogg" ] || { echo 'Missing original navigation sound.' >&2; exit 1; }
 [ -f "$lua_entry" ] || { echo "Missing Lua entry source: $lua_entry" >&2; exit 1; }
 [ -f "$data_contract" ] || { echo "Missing XMB data contract: $data_contract" >&2; exit 1; }
+[ -f "$navigation_contract" ] || { echo "Missing XMB navigation contract: $navigation_contract" >&2; exit 1; }
 
 mkdir -p "$build_dir"
-cat "$data_contract" "$lua_entry" > "$build_dir/index.lua"
+cat "$data_contract" "$navigation_contract" "$lua_entry" > "$build_dir/index.lua"
 "$bin_dir/vita-mksfoex" -d ATTRIBUTE=0 -d PARENTAL_LEVEL=1 \
     -s APP_VER=00.01 -s TITLE_ID="$title_id" \
     "$title" "$build_dir/param.sfo"

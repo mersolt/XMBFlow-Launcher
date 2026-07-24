@@ -9,6 +9,8 @@ $required = @(
     'local xmb_prototype_homebrew_apps_category = 2',
     'local xmb_prototype_icon_paths = {',
     'local function xmb_prototype_read_only_data()',
+    'XmbNavigation.move(',
+    'XmbNavigation.approach(',
     'local function xmb_prototype_category_icon(column)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
