@@ -3081,6 +3081,8 @@ xmbPrototypeSystemAppsSelection = 1
 xmbPrototypeHomebrewAppsSelection = 1
 xmbPrototypeSystemAppsVisualSelection = 1
 xmbPrototypeHomebrewAppsVisualSelection = 1
+xmbPrototypeInertSelections = {[2] = 1, [6] = 1}
+xmbPrototypeInertVisualSelections = {[2] = 1, [6] = 1}
 xmbPrototypeGlowPhase = 0
 xmbPrototypeSubmenuAlpha = 0
 xmbPrototypeHeldDirection = 0
@@ -14312,6 +14314,31 @@ xmb_prototype_icon_paths = {
     "app0:/DATA/xmb-icon-apps.png", "app0:/DATA/xmb-icon-apps.png"
 }
 xmb_prototype_icons = {}
+xmb_prototype_object_icons = {}
+xmb_prototype_system_app_icon_paths = {
+    ["browser"] = "app0:/DATA/xmb-system-browser.png",
+    ["friends"] = "app0:/DATA/xmb-system-friends.png",
+    ["messages"] = "app0:/DATA/xmb-system-messages.png",
+    ["music"] = "app0:/DATA/xmb-system-music.png",
+    ["party"] = "app0:/DATA/xmb-system-party.png",
+    ["ps store"] = "app0:/DATA/xmb-system-psstore.png",
+    ["playstation store"] = "app0:/DATA/xmb-system-psstore.png",
+    ["settings"] = "app0:/DATA/xmb-system-settings.png",
+    ["trophies"] = "app0:/DATA/xmb-system-trophy.png",
+    ["videos"] = "app0:/DATA/xmb-system-video.png",
+    ["photos"] = "app0:/DATA/xmb-object-photoviewer.png"
+}
+xmb_prototype_inert_columns = {
+    [2] = {
+        {label = "Gallery", icon_path = "app0:/DATA/xmb-object-photoviewer.png"},
+        {label = "Camera", icon_path = "app0:/DATA/xmb-icon-photo.png"},
+        {label = "Panoramic Camera", icon_path = "app0:/DATA/xmb-icon-photo.png"}
+    },
+    [6] = {
+        {label = "Internet Browser", icon_path = "app0:/DATA/xmb-system-browser.png"},
+        {label = "Online Manual", icon_path = "app0:/DATA/xmb-icon-network.png"}
+    }
+}
 
 -- These folder records are read-only pointers to existing RetroFlow data.
 -- They do not create a second library or save any new configuration.
@@ -14343,7 +14370,10 @@ for category_number = 5, 46 do
     -- column. Every other existing emulator category remains read-only here.
     if system and category_number ~= 39 and category_number ~= 42 then
         local table_name = system.table or "system"
-        local label = string.upper(table_name:gsub("_table$", ""):gsub("_", " "))
+        local label = table_name:gsub("_table$", ""):gsub("_", " ")
+        label = label:gsub("(%a)([%w']*)", function(first, rest)
+            return string.upper(first) .. string.lower(rest)
+        end)
 
         table.insert(xmb_prototype_retro_systems, {
             category = category_number,
@@ -14377,6 +14407,25 @@ local function xmb_prototype_category_icon(column)
         xmb_prototype_icons[column] = ok and icon or false
     end
     return xmb_prototype_icons[column] or nil
+end
+
+local function xmb_prototype_object_icon(path)
+    if path == nil then
+        return nil
+    end
+    if xmb_prototype_object_icons[path] == nil then
+        local ok, icon = pcall(Graphics.loadImage, path)
+        xmb_prototype_object_icons[path] = ok and icon or false
+    end
+    return xmb_prototype_object_icons[path] or nil
+end
+
+local function xmb_prototype_read_only_item_icon(column, item)
+    if column == 7 then
+        local label = string.lower(item.apptitle or item.title or item.name or "")
+        return xmb_prototype_object_icon(xmb_prototype_system_app_icon_paths[label]) or xmb_prototype_category_icon(column)
+    end
+    return xmb_prototype_category_icon(column)
 end
 
 -- Draw one object on the XMB vertical axis. The active object is positioned
@@ -14439,6 +14488,8 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeHomebrewAppsSelection = 1
     xmbPrototypeSystemAppsVisualSelection = 1
     xmbPrototypeHomebrewAppsVisualSelection = 1
+    xmbPrototypeInertSelections = {[2] = 1, [6] = 1}
+    xmbPrototypeInertVisualSelections = {[2] = 1, [6] = 1}
     xmbPrototypeGlowPhase = 0
     xmbPrototypeSubmenuAlpha = 0
     xmbPrototypeHeldDirection = 0
@@ -14495,6 +14546,17 @@ local function xmb_prototype_move_read_only_apps_selection(column, direction)
         xmbPrototypeSystemAppsSelection = selection
     else
         xmbPrototypeHomebrewAppsSelection = selection
+    end
+end
+
+local function xmb_prototype_current_inert_list(column)
+    return xmb_prototype_inert_columns[column] or {}
+end
+
+local function xmb_prototype_move_inert_selection(column, direction)
+    local list = xmb_prototype_current_inert_list(column)
+    if #list > 0 then
+        xmbPrototypeInertSelections[column] = XmbNavigation.move(xmbPrototypeInertSelections[column], direction, #list)
     end
 end
 
@@ -14675,7 +14737,7 @@ local function draw_xmb_prototype()
         local parent_axis_x = category_anchor_x + xmbPrototypeGamesParentStartOffset * (1 - xmbPrototypeChildAxisAlpha)
         local child_axis_x = parent_axis_x + xmbPrototypeChildAxisOffset
         local parent_up_spacing = 234
-        local child_up_spacing = 234 - 168 * xmbPrototypeChildAxisAlpha
+        local child_up_spacing = showing_child_axis and (234 - 168 * xmbPrototypeChildAxisAlpha) or 234
         if showing_child_axis then
             local parent_list = xmbPrototypeGamesParentList
             local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, parent_up_spacing)
@@ -14706,11 +14768,20 @@ local function draw_xmb_prototype()
             xmbPrototypeHomebrewAppsVisualSelection = visual_selection
         end
         local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, 66, 234)
-        local vertical_icon = xmb_prototype_category_icon(display_column)
         XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, _, y, focus)
             local item = apps_list[index]
             local label = xmb_prototype_read_only_item_label(item)
-            xmb_prototype_draw_vertical_object(vertical_icon, category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
+            xmb_prototype_draw_vertical_object(xmb_prototype_read_only_item_icon(display_column, item), category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
+        end)
+    elseif display_column == 2 or display_column == 6 then
+        local inert_list = xmb_prototype_current_inert_list(display_column)
+        local selection = xmbPrototypeInertSelections[display_column]
+        local visual_selection = XmbNavigation.approach(xmbPrototypeInertVisualSelections[display_column], selection, 0.18)
+        xmbPrototypeInertVisualSelections[display_column] = visual_selection
+        local first_item, last_item = xmb_prototype_visible_vertical_range(#inert_list, visual_selection, 296, 66, 234)
+        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, _, y, focus)
+            local item = inert_list[index]
+            xmb_prototype_draw_vertical_object(xmb_prototype_object_icon(item.icon_path), category_anchor_x, y, item.label, focus, xmbPrototypeVerticalAlpha)
         end)
     end
 
@@ -14744,12 +14815,16 @@ function xmb_prototype_move_direction(direction)
             xmb_prototype_move_games_selection(-1)
         elseif xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8 then
             xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, -1)
+        elseif xmbPrototypeColumn == 2 or xmbPrototypeColumn == 6 then
+            xmb_prototype_move_inert_selection(xmbPrototypeColumn, -1)
         end
     elseif direction == 2 then
         if xmbPrototypeColumn == 5 then
             xmb_prototype_move_games_selection(1)
         elseif xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8 then
             xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, 1)
+        elseif xmbPrototypeColumn == 2 or xmbPrototypeColumn == 6 then
+            xmb_prototype_move_inert_selection(xmbPrototypeColumn, 1)
         end
     end
 end
