@@ -1,0 +1,2327 @@
+﻿{
+    "schema":  1,
+    "status":  "blocked",
+    "purpose":  "Closed source, licence, and checksum manifest seed for the full XMBFlow DATA package. It is not approval to package or distribute any asset.",
+    "boot_profile":  {
+                         "name":  "normal-startup-english-default",
+                         "asset_count":  23,
+                         "notes":  [
+                                       "These assets are loaded before the normal library renderer reaches the integrated XMB overlay.",
+                                       "A non-default CJK language requires its matching conditional font before the renderer starts.",
+                                       "No asset becomes package-eligible until source, SPDX-compatible licence, SHA-256, and transformation fields are complete."
+                                   ]
+                     },
+    "files":  [
+                  {
+                      "package_path":  "DATA/Aurora.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/bat.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/bat_ch.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/BG_Default.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/Blur 1.jpg",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/Blur 2.jpg",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/Blur 3.jpg",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/box.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/box_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/boxpsp.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/boxpsp_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/boxpsx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/boxpsx_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/click2.ogg",
+                      "kind":  "audio",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/cover.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/cover_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/cover_square.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/cover_square_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/coveratari.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/coveratari_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covergb.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covergb_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/coverlynx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/coverlynx_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covermd.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covermd_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covermiddle.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covermiddle_noreflix.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covern64.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covern64_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covernes.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covernes_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covernsnesjapan.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covernsnesjapan_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/coverpsp.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/coverpsp_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/coverpsx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/coverpsx_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covertape.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/covertape_noreflx.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/fav-large-off.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/fav-large-on.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/fav-small-on.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/file-browser-file.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/file-browser-folder-closed.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/file-browser-folder-open.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/floor.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/font-NotoSansCJKkr-Regular-Slim.otf",
+                      "kind":  "font",
+                      "source_references":  [
+                                                "dynamic font selection"
+                                            ],
+                      "boot_class":  "boot-required-language-conditional",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/font-NotoSansCJKsc-Regular-Slim.otf",
+                      "kind":  "font",
+                      "source_references":  [
+                                                "dynamic font selection"
+                                            ],
+                      "boot_class":  "boot-required-language-conditional",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/font-NotoSansCJKtc-Regular.otf",
+                      "kind":  "font",
+                      "source_references":  [
+                                                "dynamic font selection"
+                                            ],
+                      "boot_class":  "boot-required-language-conditional",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/font-SawarabiGothic-Regular.woff",
+                      "kind":  "font",
+                      "source_references":  [
+                                                "dynamic font selection"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/footer_gradient.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/Grey.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/hidden-large-on.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/hidden-small-on.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_32x.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_amiga.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_atari_2600.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_atari_5200.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_atari_7800.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_atari_lynx.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_atari_st.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_c64.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_colecovision.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_dos.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_dreamcast_eur.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua",
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_dreamcast_j.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_dreamcast_usa.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_easyrpg.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_fba.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_gb.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_gba.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_gbc.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_gg.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_homebrew.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua",
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_mame.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_md.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua",
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_md_usa.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_msx1.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_msx2.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_n64.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_nds.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_neogeo.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_nes.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_ngpc.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_pce.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_pcecd.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_pico8.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_psp.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_psv.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_psx.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_scummvm.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_sega_cd.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_sms.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_snes.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_tg16.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_tgcd.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_vectrex.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_wswan.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_wswan_col.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon_zxs.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon-cart.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/icon-cart-inserted.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/loading.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_32x.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_amiga.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_atari_2600.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_atari_5200.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_atari_7800.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_atari_lynx.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_atari_st.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_c64.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_colecovision.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_dos.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_dreamcast_eur.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua",
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_dreamcast_j.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_dreamcast_usa.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_easyrpg.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_fba.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_gb.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_gba.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_gbc.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_gg.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_homebrew.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_mame.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_md.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua",
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_md_usa.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_msx1.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_msx2.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_n64.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_nds.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_neogeo.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_nes.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_ngpc.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_pce.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_pcecd.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_pico8.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_psm.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_psp.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua",
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_psv.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua",
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_psx.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua",
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_scummvm.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_sega_cd.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_sms.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_snes.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_tg16.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_tgcd.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_vectrex.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_wswan.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_wswan_col.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/missing_cover_zxs.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua (SystemsToScan dynamic path)"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/noimg.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/o.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "addons/recovery.lua",
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/planebg.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/planefloor.obj",
+                      "kind":  "model",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/psp_cover.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/psx_cover.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/s.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-about.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-artwork.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-categories.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-filter.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-heart.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-language.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-other.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-random.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-scanning.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-search.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-sort.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-sort-down.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-sort-up.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-sounds.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/setting-icon-theme.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/t.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/vita_cover.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/wifi.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  },
+                  {
+                      "package_path":  "DATA/x.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "addons/recovery.lua",
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "boot-required-default-profile",
+                      "source":  null,
+                      "license":  null,
+                      "sha256":  null,
+                      "transformation":  null,
+                      "status":  "unresolved-source-and-license"
+                  }
+              ]
+}
