@@ -14333,11 +14333,11 @@ xmb_prototype_system_app_icon_paths = {
 xmb_prototype_inert_columns = {
     [2] = {
         {label = "Gallery", icon_path = "app0:/DATA/xmb-object-photoviewer.png"},
-        {label = "Photos", icon_path = "app0:/DATA/xmb-icon-photo.png", system_app = "Photos"},
-        {label = "Panoramic Camera", icon_path = "app0:/DATA/xmb-icon-photo.png"}
+        {label = "Photos", icon_path = "app0:/DATA/xmb-icon-photo.png", system_app = "NPXS10004"},
+        {label = "Panoramic Camera", icon_path = "app0:/DATA/xmb-object-panorama.png"}
     },
     [6] = {
-        {label = "Browser", icon_path = "app0:/DATA/xmb-system-browser.png", system_app = "Browser"},
+        {label = "Browser", icon_path = "app0:/DATA/xmb-system-browser.png", system_app = "NPXS10003"},
         {label = "Online Manual", icon_path = "app0:/DATA/xmb-icon-network.png"}
     }
 }
@@ -14348,7 +14348,7 @@ xmb_prototype_games_folders = {
     {label = "COLLECTIONS", kind = "categories"},
     {label = "RETRO SYSTEMS", kind = "retro"},
     {label = "USER COLLECTIONS", kind = "collections"},
-    {label = "Trophies", system_app = "Trophies", icon_path = "app0:/DATA/xmb-system-trophy.png"}
+    {label = "Trophies", system_app = "NPXS10008", icon_path = "app0:/DATA/xmb-system-trophy.png"}
 }
 xmb_prototype_library_categories = {
     {label = "ALL GAMES", category = 0},

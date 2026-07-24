@@ -7,6 +7,7 @@ licence record as `LicenseRef-XMBFlow-Original`.
 
 | File | SHA-256 | Source / transformation |
 | --- | --- | --- |
+| `DATA/xmb-object-panorama.png` | `65d4caebe34d8db0bf88fe3d70d6345a10b898ab2c4910c1c930505dd8a615a2` | Owner-supplied `panorama.png`, recoloured from black to white while preserving its 512×512 alpha canvas and silhouette. |
 | `DATA/xmb-system-browser.png` | `96f14a9609f7a32a7dd36abf834ea7d72d2bb1c9d576760cc40f1f3a48334c03` | Owner-supplied `browser.png`, recoloured from black to white while preserving alpha and silhouette. |
 | `DATA/xmb-system-friends.png` | `97eead1d28109d7737e8f6f5219b83324d5a871d3873075949db03d40ffacd7c` | Owner-supplied `friends.png`, unchanged. |
 | `DATA/xmb-system-messages.png` | `924cf5270487bc9f608c5c0db15735d6d17f2f49be4cabf0ec04d2392b30e4ff` | Owner-supplied `messages.png`, unchanged. |
