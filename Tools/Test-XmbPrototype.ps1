@@ -115,6 +115,9 @@ if (-not $text.Contains('xmbPrototypeAppOptionsOpen = true')) {
 if ($text.Contains('(xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_TRIANGLE)')) {
     throw 'Triangle must use selected-entry app detection instead of a column-specific check.'
 }
+if ($prototypeRenderer.Contains('Font.print(fnt28')) {
+    throw 'The XMB renderer must use only initialized font handles.'
+}
 if ($text.Contains('xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP)')) {
     throw 'Apps navigation must use the shared XMB direction handler exactly once.'
 }
