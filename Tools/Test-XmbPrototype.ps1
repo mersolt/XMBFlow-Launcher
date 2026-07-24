@@ -33,6 +33,9 @@ $required = @(
     'xmbPrototypeGamesParentStartOffset = 0',
     'xmbPrototypeChildAxisAlpha = xmbPrototypeChildAxisAlpha +',
     'xmbPrototypeReturningToNestedParent = true',
+    'xmbPrototypeAppOptionsOpen = false',
+    'local function xmb_prototype_draw_app_options()',
+    '"Information", "Change category"',
     'xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha +',
     'Sound.setVolume(xmbNavigationClick, 32767)',
     '"app0:/DATA/xmb-system-browser.png"',
@@ -97,6 +100,9 @@ if (-not $text.Contains('xmb_prototype_activate_app_selection(xmbPrototypeColumn
 }
 if (-not $text.Contains('xmb_prototype_activate_inert_selection(xmbPrototypeColumn)')) {
     throw 'The Photo and Network shortcut columns must activate their mapped system apps from XMB.'
+}
+if (-not $text.Contains('xmbPrototypeAppOptionsOpen = true')) {
+    throw 'Triangle must open the inert XMB app options pane for selected app entries.'
 }
 if ($text.Contains('xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP)')) {
     throw 'Apps navigation must use the shared XMB direction handler exactly once.'

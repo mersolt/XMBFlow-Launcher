@@ -3085,6 +3085,9 @@ xmbPrototypeSystemAppsVisualSelection = 1
 xmbPrototypeHomebrewAppsVisualSelection = 1
 xmbPrototypeInertSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
 xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
+xmbPrototypeAppOptionsOpen = false
+xmbPrototypeAppOptionsAlpha = 0
+xmbPrototypeAppOptionsSelection = 1
 xmbPrototypeGlowPhase = 0
 xmbPrototypeSubmenuAlpha = 0
 xmbPrototypeHeldDirection = 0
@@ -14514,6 +14517,9 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeHomebrewAppsVisualSelection = 1
     xmbPrototypeInertSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
     xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
+    xmbPrototypeAppOptionsOpen = false
+    xmbPrototypeAppOptionsAlpha = 0
+    xmbPrototypeAppOptionsSelection = 1
     xmbPrototypeGlowPhase = 0
     xmbPrototypeSubmenuAlpha = 0
     xmbPrototypeHeldDirection = 0
@@ -14733,6 +14739,41 @@ local function xmb_prototype_read_only_item_label(item)
     return item.apptitle or item.title or item.name or "Untitled"
 end
 
+local xmb_prototype_app_options = {"Information", "Change category"}
+
+local function xmb_prototype_current_app_option_entry()
+    if xmbPrototypeColumn ~= 7 and xmbPrototypeColumn ~= 8 then
+        return nil
+    end
+    local entries = xmb_prototype_current_read_only_apps_list(xmbPrototypeColumn)
+    local selection = xmbPrototypeColumn == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
+    return entries[selection]
+end
+
+local function xmb_prototype_draw_app_options()
+    local target = xmbPrototypeAppOptionsOpen and 1 or 0
+    xmbPrototypeAppOptionsAlpha = xmbPrototypeAppOptionsAlpha + (target - xmbPrototypeAppOptionsAlpha) * 0.16
+    if xmbPrototypeAppOptionsAlpha <= 0.01 then
+        return
+    end
+
+    local alpha = xmbPrototypeAppOptionsAlpha
+    local panel_x = math.floor(960 - 322 * alpha)
+    local title = xmb_prototype_read_only_item_label(xmb_prototype_current_app_option_entry() or {})
+    Graphics.fillRect(0, 960, 0, 544, Color.new(0, 0, 0, math.floor(96 * alpha)))
+    Graphics.fillRect(panel_x, 960, 0, 544, Color.new(18, 42, 86, math.floor(224 * alpha)))
+    Font.print(fnt20, panel_x + 34, 118, title, Color.new(225, 238, 255, math.floor(220 * alpha)))
+    for index, label in ipairs(xmb_prototype_app_options) do
+        local y = 236 + (index - 1) * 72
+        local focus = index == xmbPrototypeAppOptionsSelection
+        if focus then
+            Graphics.fillRect(panel_x + 16, 946, y - 11, y + 38, Color.new(112, 205, 255, math.floor(152 * alpha)))
+            Graphics.fillRect(panel_x + 3, panel_x + 12, y + 5, y + 20, Color.new(255, 255, 255, math.floor(230 * alpha)))
+        end
+        Font.print(fnt22, panel_x + 38, y, label, Color.new(235, 245, 255, math.floor((focus and 255 or 180) * alpha)))
+    end
+end
+
 local function draw_xmb_prototype()
     xmb_prototype_update_transition()
     xmbPrototypeGlowPhase = xmbPrototypeGlowPhase + 1
@@ -14840,6 +14881,7 @@ local function draw_xmb_prototype()
         xmbPrototypeReturnAxisAlpha = 1
     end
 
+    xmb_prototype_draw_app_options()
     xmb_prototype_draw_status()
 
 end
@@ -14861,6 +14903,12 @@ function xmb_prototype_read_direction(pad)
 end
 
 function xmb_prototype_move_direction(direction)
+    if xmbPrototypeAppOptionsOpen or xmbPrototypeAppOptionsAlpha > 0.01 then
+        if direction == -2 or direction == 2 then
+            xmbPrototypeAppOptionsSelection = XmbNavigation.move(xmbPrototypeAppOptionsSelection, direction / 2, #xmb_prototype_app_options)
+        end
+        return
+    end
     if direction == -1 then
         xmb_prototype_move_column(-1)
     elseif direction == 1 then
@@ -22410,7 +22458,20 @@ while true do
                 xmbPrototypeNavigationRepeat = xmbPrototypeNavigationRepeat - 1
             end
 
-            if xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+            if xmbPrototypeAppOptionsOpen or xmbPrototypeAppOptionsAlpha > 0.01 then
+                if Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
+                    xmbPrototypeAppOptionsOpen = false
+                    if setSounds == 1 and xmbNavigationClick then
+                        Sound.play(xmbNavigationClick, NO_LOOP)
+                    end
+                end
+            elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_TRIANGLE) and not Controls.check(oldpad, SCE_CTRL_TRIANGLE) and xmb_prototype_current_app_option_entry() ~= nil then
+                xmbPrototypeAppOptionsOpen = true
+                xmbPrototypeAppOptionsSelection = 1
+                if setSounds == 1 and xmbNavigationClick then
+                    Sound.play(xmbNavigationClick, NO_LOOP)
+                end
+            elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 if xmbPrototypeGamesMode == "entries" then
                     xmb_prototype_focus_legacy_selection()
                 else
