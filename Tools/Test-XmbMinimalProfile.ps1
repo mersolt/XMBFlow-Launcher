@@ -6,6 +6,8 @@ $navigationTest = Join-Path $PSScriptRoot 'Test-XmbNavigation.ps1'
 & $navigationTest
 $layoutTest = Join-Path $PSScriptRoot 'Test-XmbLayout.ps1'
 & $layoutTest
+$transitionTest = Join-Path $PSScriptRoot 'Test-XmbTransition.ps1'
+& $transitionTest
 
 $text = Get-Content -Raw $Source
 $required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'SCE_CTRL_UP', 'SCE_CTRL_DOWN', 'local option_counts = {7, 3, 3, 3, 6, 2, 3, 2}', 'local selected_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_column = 5', 'Graphics.drawScaleImage', 'XmbReadOnlyData.create({', 'xmb_test_data.category_rows(column)[option]', 'XmbNavigation.move(', 'XmbNavigation.approach(')
@@ -24,7 +26,7 @@ foreach ($entry in $forbidden) {
 if ($text.Contains('SCE_CTRL_CIRCLE_MAP')) { throw 'Standalone XMB test must not rely on the legacy mapping variable.' }
 if ($text.Contains('draw_placeholder_card') -or $text.Contains('Graphics.fillRect(x, x + 52')) { throw 'Standalone XMB test must render icons without obsolete markers or cards.' }
 if ($text.IndexOf('local selected_option = selected_options[selected_column]') -gt $text.IndexOf('for column = 1, column_count do')) { throw 'Vertical objects must render before the fixed category axis.' }
-if (-not $text.Contains('local vertical_column = 5') -or -not $text.Contains('local pending_column = 5') -or -not $text.Contains('local vertical_fade_direction = 0') -or -not $text.Contains('local vertical_fade_delay = 0') -or -not $text.Contains('vertical_fade_delay = 12') -or -not $text.Contains('vertical_alpha = math.min(1, vertical_alpha + 0.06)')) { throw 'Horizontal category changes must fully fade out, pause, then gently fade in the vertical object axis.' }
+if (-not $text.Contains('local vertical_column = 5') -or -not $text.Contains('local pending_column = 5') -or -not $text.Contains('local vertical_fade_direction = 0') -or -not $text.Contains('local vertical_fade_delay = 0') -or -not $text.Contains('XmbTransition.update(visual_column, selected_column, vertical_alpha, vertical_fade_direction, vertical_fade_delay, vertical_column, pending_column)')) { throw 'Horizontal category changes must fully fade out, pause, then gently fade in the vertical object axis.' }
 if (-not $text.Contains('XmbLayout.vertical_y(296, option, visual_option, 66, 234)') -or $text.Contains('local arc = 1 - math.abs(1 + relative * 2)')) { throw 'The preceding object must move behind the fixed category icon without a lateral detour.' }
 if (-not $text.Contains('math.sin(glow_phase / 18)') -or -not $text.Contains('category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255') -or -not $text.Contains('local text_color = Color.new')) { throw 'Focused icons and labels must use the persistent white XMB-style silhouette glow pulse.' }
 if (-not $text.Contains('Controls.readLeftAnalog()') -or -not $text.Contains('local navigation_repeat = 0') -or -not $text.Contains('analog_x < 96') -or -not $text.Contains('analog_y > 160')) { throw 'The standalone mockup must support held D-pad and left-analog navigation.' }

@@ -166,22 +166,7 @@ while running do
     -- XMB hides the object axis completely before showing the next category.
     -- Fast horizontal input updates the pending category while the axis is
     -- hidden, preventing intermediate object lists from flashing onscreen.
-    visual_column = XmbNavigation.approach(visual_column, selected_column, 0.18)
-    if vertical_fade_direction < 0 then
-        vertical_alpha = math.max(0, vertical_alpha - 0.14)
-        if vertical_alpha == 0 then
-            vertical_column = pending_column
-            vertical_fade_direction = 1
-            vertical_fade_delay = 12
-        end
-    elseif vertical_fade_direction > 0 then
-        if vertical_fade_delay > 0 then
-            vertical_fade_delay = vertical_fade_delay - 1
-        else
-            vertical_alpha = math.min(1, vertical_alpha + 0.06)
-            if vertical_alpha == 1 then vertical_fade_direction = 0 end
-        end
-    end
+    visual_column, vertical_alpha, vertical_fade_direction, vertical_fade_delay, vertical_column = XmbTransition.update(visual_column, selected_column, vertical_alpha, vertical_fade_direction, vertical_fade_delay, vertical_column, pending_column)
     local submenu_target = submenu_open and 1 or 0
     submenu_alpha = submenu_alpha + (submenu_target - submenu_alpha) * 0.14
     local parent_x = category_anchor_x - 390 * submenu_alpha
@@ -231,13 +216,13 @@ while running do
             else
                 selected_column = XmbNavigation.move(selected_column, -1, column_count)
                 pending_column = selected_column
-                if pending_column ~= vertical_column then vertical_fade_direction = -1 end
+                vertical_fade_direction = XmbTransition.request(vertical_column, pending_column, vertical_fade_direction)
             end
         elseif direction == 1 then
             if not submenu_open then
                 selected_column = XmbNavigation.move(selected_column, 1, column_count)
                 pending_column = selected_column
-                if pending_column ~= vertical_column then vertical_fade_direction = -1 end
+                vertical_fade_direction = XmbTransition.request(vertical_column, pending_column, vertical_fade_direction)
             end
         elseif direction == -2 then
             if submenu_open then

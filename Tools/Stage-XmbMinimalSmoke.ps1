@@ -44,8 +44,9 @@ Copy-Item -LiteralPath $RuntimePath -Destination (Join-Path $OutputDirectory 'eb
 $contract = Get-Content -Raw (Join-Path $root 'src\addons\xmb-readonly-data.lua')
 $navigation = Get-Content -Raw (Join-Path $root 'src\addons\xmb-navigation.lua')
 $layout = Get-Content -Raw (Join-Path $root 'src\addons\xmb-layout.lua')
+$transition = Get-Content -Raw (Join-Path $root 'src\addons\xmb-transition.lua')
 $entry = Get-Content -Raw (Join-Path $root 'src\xmb-test.lua')
-Set-Content -LiteralPath (Join-Path $OutputDirectory 'index.lua') -Value ($contract + "`n" + $navigation + "`n" + $layout + "`n" + $entry) -Encoding UTF8
+Set-Content -LiteralPath (Join-Path $OutputDirectory 'index.lua') -Value ($contract + "`n" + $navigation + "`n" + $layout + "`n" + $transition + "`n" + $entry) -Encoding UTF8
 Copy-Item -LiteralPath (Join-Path $root 'LICENSE') -Destination (Join-Path $OutputDirectory 'LICENSE')
 Copy-Item -LiteralPath $SceSysRoot -Destination (Join-Path $OutputDirectory 'sce_sys') -Recurse
 

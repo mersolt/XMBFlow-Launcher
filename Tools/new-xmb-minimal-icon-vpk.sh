@@ -15,6 +15,7 @@ lua_entry="$root_dir/src/xmb-test.lua"
 data_contract="$root_dir/src/addons/xmb-readonly-data.lua"
 navigation_contract="$root_dir/src/addons/xmb-navigation.lua"
 layout_contract="$root_dir/src/addons/xmb-layout.lua"
+transition_contract="$root_dir/src/addons/xmb-transition.lua"
 
 sh "$root_dir/Tools/Inspect-VitaSdkToolchain.sh"
 
@@ -53,9 +54,10 @@ done
 [ -f "$data_contract" ] || { echo "Missing XMB data contract: $data_contract" >&2; exit 1; }
 [ -f "$navigation_contract" ] || { echo "Missing XMB navigation contract: $navigation_contract" >&2; exit 1; }
 [ -f "$layout_contract" ] || { echo "Missing XMB layout contract: $layout_contract" >&2; exit 1; }
+[ -f "$transition_contract" ] || { echo "Missing XMB transition contract: $transition_contract" >&2; exit 1; }
 
 mkdir -p "$build_dir"
-cat "$data_contract" "$navigation_contract" "$layout_contract" "$lua_entry" > "$build_dir/index.lua"
+cat "$data_contract" "$navigation_contract" "$layout_contract" "$transition_contract" "$lua_entry" > "$build_dir/index.lua"
 "$bin_dir/vita-mksfoex" -d ATTRIBUTE=0 -d PARENTAL_LEVEL=1 \
     -s APP_VER=00.01 -s TITLE_ID="$title_id" \
     "$title" "$build_dir/param.sfo"

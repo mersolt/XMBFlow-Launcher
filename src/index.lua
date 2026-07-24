@@ -18,6 +18,7 @@ dofile("app0:addons/threads.lua")
 dofile("app0:addons/xmb-readonly-data.lua")
 dofile("app0:addons/xmb-navigation.lua")
 dofile("app0:addons/xmb-layout.lua")
+dofile("app0:addons/xmb-transition.lua")
 
 -- Speed related settings - MOVED EARLY for maximum performance impact
 local cpu_speed = 444 -- Was 333
@@ -14296,9 +14297,7 @@ local function xmb_prototype_move_column(direction)
     xmbPrototypeColumn = XmbNavigation.move(xmbPrototypeColumn, direction, #xmb_prototype_columns)
 
     xmbPrototypePendingColumn = xmbPrototypeColumn
-    if xmbPrototypePendingColumn ~= xmbPrototypeDisplayColumn then
-        xmbPrototypeVerticalFadeDirection = -1
-    end
+    xmbPrototypeVerticalFadeDirection = XmbTransition.request(xmbPrototypeDisplayColumn, xmbPrototypePendingColumn, xmbPrototypeVerticalFadeDirection)
 end
 
 local function xmb_prototype_reset_navigation()
@@ -14481,24 +14480,7 @@ local function xmb_prototype_existing_game_icon(item)
 end
 
 local function xmb_prototype_update_transition()
-    xmbPrototypeVisualColumn = XmbNavigation.approach(xmbPrototypeVisualColumn, xmbPrototypeColumn, 0.18)
-    if xmbPrototypeVerticalFadeDirection < 0 then
-        xmbPrototypeVerticalAlpha = math.max(0, xmbPrototypeVerticalAlpha - 0.14)
-        if xmbPrototypeVerticalAlpha == 0 then
-            xmbPrototypeDisplayColumn = xmbPrototypePendingColumn
-            xmbPrototypeVerticalFadeDirection = 1
-            xmbPrototypeVerticalFadeDelay = 12
-        end
-    elseif xmbPrototypeVerticalFadeDirection > 0 then
-        if xmbPrototypeVerticalFadeDelay > 0 then
-            xmbPrototypeVerticalFadeDelay = xmbPrototypeVerticalFadeDelay - 1
-        else
-            xmbPrototypeVerticalAlpha = math.min(1, xmbPrototypeVerticalAlpha + 0.06)
-            if xmbPrototypeVerticalAlpha == 1 then
-                xmbPrototypeVerticalFadeDirection = 0
-            end
-        end
-    end
+    xmbPrototypeVisualColumn, xmbPrototypeVerticalAlpha, xmbPrototypeVerticalFadeDirection, xmbPrototypeVerticalFadeDelay, xmbPrototypeDisplayColumn = XmbTransition.update(xmbPrototypeVisualColumn, xmbPrototypeColumn, xmbPrototypeVerticalAlpha, xmbPrototypeVerticalFadeDirection, xmbPrototypeVerticalFadeDelay, xmbPrototypeDisplayColumn, xmbPrototypePendingColumn)
 end
 
 local function xmb_prototype_read_only_item_label(item)
