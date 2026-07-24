@@ -1266,7 +1266,7 @@ local click = Sound.open("app0:/DATA/click2.ogg")
 xmbNavigationClick = nil
 if xmbSafeProfile then
     xmbNavigationClick = Sound.open("app0:/DATA/xmb-cursor.ogg")
-    Sound.setVolume(xmbNavigationClick, 30000)
+    Sound.setVolume(xmbNavigationClick, 32767)
 end
 local sndMusic = click--temp
 local imgCoverTmp = Graphics.loadImage("app0:/DATA/noimg.png")
@@ -14393,6 +14393,15 @@ local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alph
     Font.print(focus > 0.50 and fnt22 or fnt20, x + 40, y - 10, label, Color.new(text_brightness, text_brightness, text_brightness, text_alpha))
 end
 
+local function xmb_prototype_draw_submenu_indicator(parent_x, child_x, y, alpha)
+    local arrow_x = math.floor((parent_x + child_x) / 2) - 5
+    local arrow_alpha = math.floor(210 * alpha)
+    for step = 0, 4 do
+        Graphics.fillRect(arrow_x + step * 2, arrow_x + step * 2 + 3, y - 9 + step * 4, y - 6 + step * 4, Color.new(255, 255, 255, arrow_alpha))
+        Graphics.fillRect(arrow_x + step * 2, arrow_x + step * 2 + 3, y + 9 - step * 4, y + 12 - step * 4, Color.new(255, 255, 255, arrow_alpha))
+    end
+end
+
 local function xmb_prototype_move_column(direction)
     xmbPrototypeColumn = XmbNavigation.move(xmbPrototypeColumn, direction, #xmb_prototype_columns)
 
@@ -14646,23 +14655,25 @@ local function draw_xmb_prototype()
         xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, 0.18)
         local showing_child_axis = xmbPrototypeGamesParentList ~= nil
         local vertical_icon = xmb_prototype_category_icon(display_column)
+        local up_spacing = 234 - 168 * xmbPrototypeSubmenuAlpha
+        local child_axis_x = category_anchor_x + 160
         if showing_child_axis then
             local parent_list = xmbPrototypeGamesParentList
-            local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, 234)
-            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, 234, function(parent_index, _, parent_y, parent_focus)
-                local parent_item = parent_list[parent_index]
+            local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, up_spacing)
+            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, up_spacing, function(parent_index, _, parent_y, parent_focus)
                 xmb_prototype_draw_vertical_object(vertical_icon, category_anchor_x, parent_y, "", parent_focus, xmbPrototypeVerticalAlpha * 0.58)
             end)
+            xmb_prototype_draw_submenu_indicator(category_anchor_x, child_axis_x, 296, xmbPrototypeVerticalAlpha * xmbPrototypeSubmenuAlpha)
         end
         if #games_list == 0 then
-            Font.print(fnt22, (showing_child_axis and category_anchor_x + 220 or category_anchor_x + 40), 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 180)))
+            Font.print(fnt22, (showing_child_axis and child_axis_x or category_anchor_x + 40), 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeSubmenuAlpha or 1) * 180)))
         else
-            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, 234)
+            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, up_spacing)
 
-            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, 234, function(index, _, y, focus)
+            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
-                xmb_prototype_draw_vertical_object(vertical_icon, showing_child_axis and category_anchor_x + 220 or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
+                xmb_prototype_draw_vertical_object(vertical_icon, showing_child_axis and child_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeSubmenuAlpha or 1))
             end)
         end
     elseif showing_read_only_apps then
