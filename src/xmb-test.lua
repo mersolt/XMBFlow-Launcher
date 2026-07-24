@@ -9,6 +9,9 @@ local width = 960
 local height = 544
 local selected_column = 5
 local visual_column = 5
+local previous_column = 5
+local vertical_fade = 1
+local glow_phase = 0
 local column_count = 7
 local category_anchor_x = 480
 local option_counts = {4, 3, 4, 3, 5, 3, 3}
@@ -46,10 +49,38 @@ local function draw_wave(base_y, phase, color)
     end
 end
 
+local function draw_vertical_options(column, alpha)
+    if alpha <= 0.01 then return end
+    local selected_option = selected_options[column]
+    visual_options[column] = visual_options[column] + (selected_option - visual_options[column]) * 0.18
+    local visual_option = visual_options[column]
+    for option = 1, option_counts[column] do
+        local relative = option - visual_option
+        if relative >= -1 and relative <= 2 then
+            local focus = math.max(0, 1 - math.abs(relative))
+            local scale = 0.42 + 0.20 * focus
+            local color = Color.new(math.floor(120 + 135 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor((145 + 110 * focus) * alpha))
+            local x = category_anchor_x
+            local y = 296 + relative * 66
+            if relative < 0 then
+                y = 296 + relative * 234
+            end
+            if focus > 0.02 then
+                local pulse = 0.88 + 0.12 * ((math.sin(glow_phase / 18) + 1) * 0.5)
+                local glow_scale = scale + 0.10 * focus * pulse
+                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(95, 220, 255, math.floor(35 * focus * alpha * pulse)))
+            end
+            Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[column], scale, scale, color)
+            Font.print(font, x + 40, y - 10, object_labels[column][option], color)
+        end
+    end
+end
+
 while running do
     -- Lua Player Plus requires an explicit blend phase around 2D drawing.
     -- This matches the frame lifecycle used by the known-working export tool.
     Graphics.initBlend()
+    glow_phase = glow_phase + 1
     Screen.clear()
     Graphics.fillRect(0, width, 0, height, Color.new(4, 10, 28, 255))
 
@@ -67,34 +98,13 @@ while running do
     Graphics.fillRect(917, 937, 23, 31, Color.new(4, 10, 28, 255))
     Graphics.fillRect(919, 934, 25, 29, Color.new(245, 250, 255, 230))
 
-    -- XMB keeps a fixed category anchor. The selected object list animates
-    -- around it: the prior object takes a short lateral arc to the above
-    -- slot, rather than vanishing behind the fixed category icon.
+    -- XMB keeps a fixed category anchor. During a horizontal move, both
+    -- object lists share the same vertical path and cross-fade; the category
+    -- axis renders afterwards, so the passing item stays behind it.
     visual_column = visual_column + (selected_column - visual_column) * 0.18
-    local selected_option = selected_options[selected_column]
-    visual_options[selected_column] = visual_options[selected_column] + (selected_option - visual_options[selected_column]) * 0.18
-    local visual_option = visual_options[selected_column]
-    for option = 1, option_counts[selected_column] do
-        local relative = option - visual_option
-        if relative >= -1 and relative <= 2 then
-            local focus = math.max(0, 1 - math.abs(relative))
-            local scale = 0.42 + 0.20 * focus
-            local color = Color.new(math.floor(120 + 135 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(145 + 110 * focus))
-            local x = category_anchor_x
-            local y = 296 + relative * 66
-            if relative < 0 then
-                local arc = 1 - math.abs(1 + relative * 2)
-                x = x + 110 * arc
-                y = 296 + relative * 234
-            end
-            if focus > 0.02 then
-                local glow_scale = scale + 0.10 * focus
-                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[selected_column], glow_scale, glow_scale, Color.new(95, 220, 255, math.floor(35 * focus)))
-            end
-            Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[selected_column], scale, scale, color)
-            Font.print(font, x + 40, y - 10, object_labels[selected_column][option], color)
-        end
-    end
+    vertical_fade = vertical_fade + (1 - vertical_fade) * 0.16
+    if previous_column ~= selected_column then draw_vertical_options(previous_column, 1 - vertical_fade) end
+    draw_vertical_options(selected_column, vertical_fade)
 
     for column = 1, column_count do
         local relative = column - visual_column
@@ -102,18 +112,25 @@ while running do
         local focus = math.max(0, 1 - math.abs(relative))
         local color = Color.new(math.floor(120 - 15 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(150 + 105 * focus))
         local scale = 0.82 + 0.33 * focus
-        if focus > 0.02 then Graphics.drawScaleImage(x - 48 * (scale + 0.10 * focus), 166 - 48 * (scale + 0.10 * focus), category_icons[column], scale + 0.10 * focus, scale + 0.10 * focus, Color.new(95, 220, 255, math.floor(35 * focus))) end
+        if focus > 0.02 then
+            local pulse = 0.88 + 0.12 * ((math.sin(glow_phase / 18) + 1) * 0.5)
+            Graphics.drawScaleImage(x - 48 * (scale + 0.10 * focus * pulse), 166 - 48 * (scale + 0.10 * focus * pulse), category_icons[column], scale + 0.10 * focus * pulse, scale + 0.10 * focus * pulse, Color.new(95, 220, 255, math.floor(35 * focus * pulse)))
+        end
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
         Font.print(font, x - 30, 226, category_labels[column], color)
     end
 
     local pad = Controls.read()
     if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then
+        previous_column = selected_column
         selected_column = selected_column - 1
         if selected_column < 1 then selected_column = column_count end
+        vertical_fade = 0
     elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
+        previous_column = selected_column
         selected_column = selected_column + 1
         if selected_column > column_count then selected_column = 1 end
+        vertical_fade = 0
     elseif Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
         selected_options[selected_column] = selected_options[selected_column] - 1
         if selected_options[selected_column] < 1 then selected_options[selected_column] = option_counts[selected_column] end
