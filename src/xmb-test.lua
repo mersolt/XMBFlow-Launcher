@@ -19,7 +19,7 @@ local held_direction = 0
 local navigation_repeat = 0
 local column_count = 7
 local category_anchor_x = 480
-local option_counts = {6, 3, 3, 3, 5, 2, 3}
+local option_counts = {6, 3, 3, 3, 6, 2, 4}
 local selected_options = {1, 1, 1, 1, 1, 1, 1}
 local visual_options = {1, 1, 1, 1, 1, 1, 1}
 local oldpad = Controls.read()
@@ -39,7 +39,8 @@ local setting_icons = {
     display = Graphics.loadImage("app0:/DATA/xmb-setting-display.png"),
     system = Graphics.loadImage("app0:/DATA/xmb-setting-system.png"),
     time = Graphics.loadImage("app0:/DATA/xmb-setting-time.png"),
-    photoviewer = Graphics.loadImage("app0:/DATA/xmb-object-photoviewer.png")
+    photoviewer = Graphics.loadImage("app0:/DATA/xmb-object-photoviewer.png"),
+    trophy = Graphics.loadImage("app0:/DATA/xmb-object-trophy.png")
 }
 Sound.init()
 local navigation_click = Sound.open("app0:/DATA/xmb-cursor.ogg")
@@ -52,9 +53,9 @@ local object_labels = {
     {"Photo Viewer", "Camera", "Slideshow"},
     {"Music Library", "Now Playing", "Internet Radio"},
     {"Video Library", "Remote Play", "Video Settings"},
-    {"Memory Stick", "Saved Data Utility", "Game Settings", "Retro Systems", "Collections"},
+    {"Memory Stick", "Saved Data Utility", "Game Settings", "Trophy Collection", "Retro Systems", "Collections"},
     {"Internet Browser", "Online Manual"},
-    {"Downloads", "Utilities", "XMBFlow Settings"}
+    {"LiveArea Apps", "Homebrew Apps", "Downloads", "XMBFlow Settings"}
 }
 
 local function draw_wave(base_y, phase, color)
@@ -87,6 +88,7 @@ local function draw_vertical_options(column, alpha)
             if column == 1 and option == 5 then object_icon = setting_icons.system end
             if column == 1 and option == 6 then object_icon = setting_icons.time end
             if column == 2 and option == 1 then object_icon = setting_icons.photoviewer end
+            if column == 5 and option == 4 then object_icon = setting_icons.trophy end
             if relative < 0 then
                 y = 296 + relative * 234
             end

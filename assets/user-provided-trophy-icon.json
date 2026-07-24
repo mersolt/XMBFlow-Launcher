@@ -1,0 +1,10 @@
+﻿{
+    "schema":  1,
+    "provenance":  "User-provided original XMBFlow trophy artwork; author asserted original work in project discussion on 2026-07-24.",
+    "license":  "LicenseRef-XMBFlow-Original",
+    "transformation":  "Tools/Import-XmbFlowOriginalTrophyIcon.ps1",
+    "input_sha256":  "1e7c1626b9bd43bed3b90ef04ffced148c8040641500639364d4829583c9de3f",
+    "output_path":  "assets/bootstrap-placeholders/DATA/xmb-object-trophy.png",
+    "output_sha256":  "bf05ebbd4ddb2fe3f986e3c6f98e2e9da434428d4cf9ae693e33ef65d8b6b0cc",
+    "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+}
