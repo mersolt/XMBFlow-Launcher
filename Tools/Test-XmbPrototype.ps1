@@ -6,7 +6,7 @@ $required = @(
     'xmbPrototypeEnabled = xmbSafeProfile',
     '{label = "PLAYSTATION MOBILE", category = 39}',
     '"SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "NETWORK", "SYSTEM APPS", "HOMEBREW APPS"',
-    'xmb_prototype_system_apps_category = 42',
+    'xmb_prototype_system_apps_category = 46',
     'xmb_prototype_homebrew_apps_category = 2',
     'xmb_prototype_icon_paths = {',
     'local function xmb_prototype_read_only_data()',
@@ -20,7 +20,7 @@ $required = @(
     'local function xmb_prototype_category_icon(column)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
-    'local function xmb_prototype_focus_legacy_selection()',
+    'local function xmb_prototype_focus_legacy_selection(category, selection)',
     'local function xmb_prototype_existing_game_icon(item)',
     'local function xmb_prototype_update_transition()',
     'local function xmb_prototype_reset_navigation()',
@@ -60,8 +60,11 @@ foreach ($button in @('SCE_CTRL_TRIANGLE', 'SCE_CTRL_START', 'SCE_CTRL_SELECT', 
         throw "The legacy $button handler must be disabled while the XMB prototype owns input."
     }
 }
-if (-not $prototypeRenderer.Contains('showCat = xmbPrototypeGamesCategory') -or -not $prototypeRenderer.Contains('xmbPrototypeEnabled = false')) {
+if (-not $prototypeRenderer.Contains('showCat = category') -or -not $prototypeRenderer.Contains('xmbPrototypeEnabled = false')) {
     throw 'The XMB entry handoff must select the existing legacy category and return to the legacy renderer.'
+}
+if (-not $text.Contains('xmb_prototype_focus_legacy_selection(category, selection)')) {
+    throw 'The System and Homebrew Apps columns must use the legacy launch handoff.'
 }
 if ($text.Contains('draw_xmb_prototype_placeholder_column') -or $text.Contains('xmb_prototype_placeholder_columns')) { throw 'Prototype must not render obsolete category cards.' }
 

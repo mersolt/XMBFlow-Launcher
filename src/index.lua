@@ -5962,27 +5962,40 @@ function launch_vita_title(def_titleid)
 end
 
 function launch_vita_sysapp(def_titleid)
+    local uri = {
+        ["NPXS10000"] = "near:",
+        ["NPXS10001"] = "pspy:",
+        ["NPXS10002"] = "psns:browse?category=STORE-MSF73008-VITAGAMES:",
+        ["NPXS10003"] = "wbapp0:",
+        ["NPXS10004"] = "photo:",
+        ["NPXS10008"] = "pstc:",
+        ["NPXS10009"] = "music:",
+        ["NPXS10014"] = "psnmsg:",
+        ["NPXS10015"] = "settings_dlg:",
+        ["NPXS10072"] = "email:",
+        ["NPXS10078"] = "scecomboplay:",
+        ["NPXS10091"] = "scecalendar:"
+    }
+
+    -- Safe-profile entries come from RetroFlow's existing cache, but its
+    -- filesystem preflight cannot inspect system app locations.  Preserve the
+    -- legacy URI routes and use the normal title launcher only as a fallback.
+    if xmbSafeProfile then
+        if uri[def_titleid] then
+            System.executeUri(uri[def_titleid])
+            return true
+        elseif type(def_titleid) == "string" and string.match(def_titleid, "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$") then
+            System.launchApp(def_titleid)
+            System.exit()
+            return true
+        end
+        return false
+    end
+
     -- Launch preflight check
     check_app_installed(def_titleid, lang_lines.Game_not_installed_rescan)
 
     if launch_check_app_installed == true then
-        
-        local uri = {
-            ["NPXS10000"] = "near:",            -- Near
-            ["NPXS10001"] = "pspy:",            -- Party
-            ["NPXS10002"] = "psns:browse?category=STORE-MSF73008-VITAGAMES:",            -- Playstation Store
-            ["NPXS10003"] = "wbapp0:",          -- Internet browser
-            ["NPXS10004"] = "photo:",           -- Photos
-            ["NPXS10008"] = "pstc:",            -- Trophy collection
-            ["NPXS10009"] = "music:",           -- Music
-            -- ["NPXS10010"] = "video:",           -- Video
-            ["NPXS10014"] = "psnmsg:",          -- Messages
-            ["NPXS10015"] = "settings_dlg:",    -- Settings
-            ["NPXS10072"] = "email:",           -- Email
-            ["NPXS10078"] = "scecomboplay:",    -- Cross-Controller
-            ["NPXS10091"] = "scecalendar:"      -- Calendar
-        }
-
         -- Check if def_titleid exists in uri table and execute the corresponding URI
         if uri[def_titleid] then
             System.executeUri(uri[def_titleid])
@@ -14287,21 +14300,24 @@ xmb_prototype_icons = {}
 -- These folder records are read-only pointers to existing RetroFlow data.
 -- They do not create a second library or save any new configuration.
 xmb_prototype_games_folders = {
+    {label = "COLLECTIONS", kind = "categories"},
+    {label = "RETRO SYSTEMS", kind = "retro"},
+    {label = "USER COLLECTIONS", kind = "collections"}
+}
+xmb_prototype_library_categories = {
     {label = "ALL GAMES", category = 0},
     {label = "PS VITA", category = 1},
+    {label = "HOMEBREW", category = 2},
     {label = "PSP", category = 3},
     {label = "PLAYSTATION", category = 4},
     {label = "PLAYSTATION MOBILE", category = 39},
-    {label = "HOMEBREW", category = 2},
-    {label = "RETRO SYSTEMS", kind = "retro"},
     {label = "FAVOURITES", category = 47},
-    {label = "RECENTLY PLAYED", category = 48},
-    {label = "COLLECTIONS", kind = "collections"}
+    {label = "RECENTLY PLAYED", category = 48}
 }
 
--- System and Homebrew Apps stay separate read-only views over the scanned
--- RetroFlow tables. They neither enumerate Vita locations nor invoke titles.
-xmb_prototype_system_apps_category = 42
+-- System and Homebrew Apps reuse RetroFlow's cached category rows.  They do
+-- not enumerate Vita locations; selection hands off to legacy launch adapters.
+xmb_prototype_system_apps_category = 46
 xmb_prototype_homebrew_apps_category = 2
 
 xmb_prototype_retro_systems = {}
@@ -14380,6 +14396,8 @@ local function xmb_prototype_current_games_list()
     local data = xmb_prototype_read_only_data()
     if xmbPrototypeGamesMode == "folders" then
         return data.folders
+    elseif xmbPrototypeGamesMode == "categories" then
+        return xmb_prototype_library_categories
     elseif xmbPrototypeGamesMode == "retro_systems" then
         return data.retro_systems
     elseif xmbPrototypeGamesMode == "collections" then
@@ -14461,8 +14479,10 @@ local function xmb_prototype_open_games_selection()
     end
 
     if xmbPrototypeGamesMode == "folders" then
-        if selected.category ~= nil then
-            xmb_prototype_open_entries(selected.category, selected.label, "folders")
+        if selected.kind == "categories" then
+            xmbPrototypeGamesMode = "categories"
+            xmbPrototypeGamesTitle = "COLLECTIONS"
+            xmbPrototypeGamesSelection = 1
         elseif selected.kind == "retro" then
             xmbPrototypeGamesMode = "retro_systems"
             xmbPrototypeGamesTitle = "RETRO SYSTEMS"
@@ -14472,8 +14492,8 @@ local function xmb_prototype_open_games_selection()
             xmbPrototypeGamesTitle = "COLLECTIONS"
             xmbPrototypeGamesSelection = 1
         end
-    elseif xmbPrototypeGamesMode == "retro_systems" then
-        xmb_prototype_open_entries(selected.category, selected.label, "retro_systems")
+    elseif xmbPrototypeGamesMode == "categories" or xmbPrototypeGamesMode == "retro_systems" then
+        xmb_prototype_open_entries(selected.category, selected.label, xmbPrototypeGamesMode)
     elseif xmbPrototypeGamesMode == "collections" then
         xmb_prototype_open_entries(49 + xmbPrototypeGamesSelection, selected.display_name or selected.table_name or "COLLECTION", "collections")
     end
@@ -14495,7 +14515,7 @@ local function xmb_prototype_go_back()
         else
             xmbPrototypeGamesTitle = "COLLECTIONS"
         end
-    elseif xmbPrototypeGamesMode == "retro_systems" or xmbPrototypeGamesMode == "collections" then
+    elseif xmbPrototypeGamesMode == "categories" or xmbPrototypeGamesMode == "retro_systems" or xmbPrototypeGamesMode == "collections" then
         xmbPrototypeGamesMode = "folders"
         xmbPrototypeGamesTitle = "GAMES"
         xmbPrototypeGamesSelection = 1
@@ -14505,18 +14525,20 @@ end
 -- The XMB entry view does not implement a second launcher. It selects the
 -- same category row in the legacy renderer, then returns to that renderer.
 -- A subsequent legacy Cross press follows RetroFlow's existing launch path.
-local function xmb_prototype_focus_legacy_selection()
-    if xmbPrototypeGamesMode ~= "entries" or xmbPrototypeGamesCategory == nil or xmbPrototypeGamesSelection < 1 then
+local function xmb_prototype_focus_legacy_selection(category, selection)
+    category = category or xmbPrototypeGamesCategory
+    selection = selection or xmbPrototypeGamesSelection
+    if category == nil or selection < 1 then
         return false
     end
 
-    local entries = xmb_prototype_current_games_list()
-    if entries[xmbPrototypeGamesSelection] == nil then
+    local entries = xCatLookup(category) or {}
+    if entries[selection] == nil then
         return false
     end
 
-    showCat = xmbPrototypeGamesCategory
-    p = xmbPrototypeGamesSelection
+    showCat = category
+    p = selection
     master_index = p
     GetNameAndAppTypeSelected()
     xmbPrototypeEnabled = false
@@ -14600,8 +14622,8 @@ local function draw_xmb_prototype()
         local showing_child_axis = xmbPrototypeGamesMode == "entries" and xmbPrototypeGamesParentList ~= nil
         if showing_child_axis then
             local parent_list = xmbPrototypeGamesParentList
-            local parent_first = math.max(1, xmbPrototypeGamesParentSelection - 3)
-            local parent_last = math.min(#parent_list, xmbPrototypeGamesParentSelection + 3)
+            local parent_first = 1
+            local parent_last = #parent_list
             XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 278, 42, 42, function(parent_index, _, parent_y)
                 local parent_item = parent_list[parent_index]
                 local parent_selected = parent_index == xmbPrototypeGamesParentSelection
@@ -14611,8 +14633,8 @@ local function draw_xmb_prototype()
         if #games_list == 0 then
             Font.print(fnt22, 112, 282, "No items in this folder", Color.new(210, 222, 240, 180))
         else
-            local first_item = math.max(1, xmbPrototypeGamesSelection - 3)
-            local last_item = math.min(#games_list, xmbPrototypeGamesSelection + 3)
+            local first_item = 1
+            local last_item = #games_list
 
             XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 278, 42, 42, function(index, _, y)
                 local item = games_list[index]
@@ -14646,8 +14668,8 @@ local function draw_xmb_prototype()
         else
             xmbPrototypeHomebrewAppsVisualSelection = visual_selection
         end
-        local first_item = math.max(1, selection - 3)
-        local last_item = math.min(#apps_list, selection + 3)
+        local first_item = 1
+        local last_item = #apps_list
         XmbRender.each_vertical(first_item, last_item, visual_selection, 278, 42, 42, function(index, _, y)
             local item = apps_list[index]
             local selected = index == selection
@@ -14671,7 +14693,7 @@ local function draw_xmb_prototype()
             Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open   Circle: Back", Color.new(210, 225, 245, 210))
         end
     elseif showing_read_only_apps then
-        Font.print(fnt20, 34, 508, "Up / Down: Browse   Cross: Preview only   Start + Select: Legacy UI", Color.new(210, 225, 245, 210))
+        Font.print(fnt20, 34, 508, "Up / Down: Browse   Cross: Legacy launch view   Start + Select: Legacy UI", Color.new(210, 225, 245, 210))
     else
         Font.print(fnt20, 34, 508, "Left / Right: XMB categories   Start + Select: Legacy UI", Color.new(210, 225, 245, 210))
     end
@@ -22150,6 +22172,10 @@ while true do
                 xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, -1)
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
                 xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, 1)
+            elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+                local category = xmbPrototypeColumn == 7 and xmb_prototype_system_apps_category or xmb_prototype_homebrew_apps_category
+                local selection = xmbPrototypeColumn == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
+                xmb_prototype_focus_legacy_selection(category, selection)
             end
         end
 
