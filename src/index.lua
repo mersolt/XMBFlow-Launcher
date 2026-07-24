@@ -14353,13 +14353,14 @@ xmb_prototype_inert_columns = {
         {label = "Panoramic Camera", icon_path = "app0:/DATA/xmb-object-panorama.png"}
     },
     [3] = {
+        {label = "Music", icon_path = "app0:/DATA/xmb-system-music.png", system_app_label = "music"},
         {label = "Music Library", icon_path = "app0:/DATA/xmb-icon-music.png"},
         {label = "Now Playing", icon_path = "app0:/DATA/xmb-icon-music.png"},
         {label = "Internet Radio", icon_path = "app0:/DATA/xmb-icon-music.png"}
     },
     [4] = {
         {label = "Video Library", icon_path = "app0:/DATA/xmb-icon-video.png"},
-        {label = "Remote Play", icon_path = "app0:/DATA/xmb-icon-video.png"},
+        {label = "Videos", icon_path = "app0:/DATA/xmb-system-video.png", system_app_label = "videos"},
         {label = "Video Settings", icon_path = "app0:/DATA/xmb-icon-video.png"}
     },
     [6] = {
@@ -14572,7 +14573,7 @@ local function xmb_prototype_current_read_only_apps_list(column)
         local entries = {}
         for _, entry in ipairs(data.category_rows(xmb_prototype_system_apps_category)) do
             local label = string.lower(entry.apptitle or entry.title or entry.name or "")
-            if label ~= "trophies" and label ~= "trophy collection" and label ~= "photos" and label ~= "browser" and label ~= "internet browser" and label ~= "settings" and label ~= "parental controls" then
+            if label ~= "trophies" and label ~= "trophy collection" and label ~= "photos" and label ~= "browser" and label ~= "internet browser" and label ~= "settings" and label ~= "parental controls" and label ~= "music" and label ~= "videos" then
                 table.insert(entries, entry)
             end
         end
@@ -14767,7 +14768,7 @@ local function xmb_prototype_current_selected_entry()
 end
 
 local function xmb_prototype_is_app_entry(entry)
-    return entry ~= nil and (entry.system_app ~= nil or entry.name ~= nil or entry.titleid ~= nil or entry.game_path ~= nil)
+    return entry ~= nil and (entry.system_app ~= nil or entry.system_app_label ~= nil or entry.name ~= nil or entry.titleid ~= nil or entry.game_path ~= nil)
 end
 
 local function xmb_prototype_current_app_option_entry()
@@ -14776,15 +14777,45 @@ local function xmb_prototype_current_app_option_entry()
     return nil
 end
 
+local function xmb_prototype_system_app_record(reference)
+    if type(reference) ~= "string" then return nil end
+    local wanted_label = string.lower(reference)
+    for _, candidate in ipairs(xmb_prototype_read_only_data().category_rows(xmb_prototype_system_apps_category)) do
+        local label = string.lower(candidate.apptitle or candidate.title or candidate.name or "")
+        if candidate.name == reference or candidate.titleid == reference or label == wanted_label then
+            return candidate
+        end
+    end
+    return nil
+end
+
 local function xmb_prototype_information_entry(entry)
     if entry and type(entry.system_app) == "string" then
-        for _, candidate in ipairs(xmb_prototype_read_only_data().category_rows(xmb_prototype_system_apps_category)) do
-            if candidate.name == entry.system_app or candidate.titleid == entry.system_app then
-                return candidate
+        return xmb_prototype_system_app_record(entry.system_app) or entry
+    elseif entry and type(entry.system_app_label) == "string" then
+        return xmb_prototype_system_app_record(entry.system_app_label) or entry
+    end
+    return entry or {}
+end
+
+local function xmb_prototype_information_directory_size(dir)
+    local total = 0
+    local function visit(path)
+        for _, child in ipairs(System.listDirectory(path) or {}) do
+            local child_path = path .. "/" .. child.name
+            if child.directory then
+                visit(child_path)
+            else
+                local file = System.openFile(child_path, FREAD)
+                if file then
+                    total = total + (System.sizeFile(file) or 0)
+                    System.closeFile(file)
+                end
             end
         end
     end
-    return entry or {}
+    visit(dir)
+    return formatSize(total)
 end
 
 local function xmb_prototype_information_size(entry)
@@ -14794,7 +14825,7 @@ local function xmb_prototype_information_size(entry)
     if type(entry.path) == "string" then table.insert(paths, entry.path) end
     for _, path in ipairs(paths) do
         if type(path) == "string" and path ~= "" then
-            if System.doesDirExist(path) then return getAppSize(path) end
+            if System.doesDirExist(path) then return xmb_prototype_information_directory_size(path) end
             if System.doesFileExist(path) then
                 local file = System.openFile(path, FREAD)
                 if file then
@@ -14812,14 +14843,14 @@ local function xmb_prototype_information_size(entry)
     if type(entry.titleid) == "string" then table.insert(titleids, entry.titleid) end
     for _, titleid in ipairs(titleids) do
         if type(titleid) == "string" and string.len(titleid) == 9 then
-            return getAppSize("ux0:/app/" .. titleid)
+            return xmb_prototype_information_directory_size("ux0:/app/" .. titleid)
         end
     end
     return "Not reported"
 end
 
 local function xmb_prototype_information_type(entry, source)
-    if entry and entry.system_app then return "System application" end
+    if entry and (entry.system_app or entry.system_app_label) then return "System application" end
     if source and source.app_type == 42 then return "System application" end
     if xmbPrototypeColumn == 8 or (source and (source.category == "MG" or source.app_type_default == 0)) then
         return "Homebrew application"
@@ -15130,14 +15161,19 @@ end
 
 function xmb_prototype_activate_inert_selection(column)
     local entry = xmb_prototype_current_inert_list(column)[xmbPrototypeInertSelections[column]]
-    if entry == nil or type(entry.system_app) ~= "string" then
+    local system_app = entry and entry.system_app
+    if entry and type(entry.system_app_label) == "string" then
+        local record = xmb_prototype_system_app_record(entry.system_app_label)
+        system_app = record and (record.name or record.titleid) or nil
+    end
+    if entry == nil or type(system_app) ~= "string" then
         if entry and entry.action == "exit" then
             System.exit()
             return true
         end
         return false
     end
-    return xmb_prototype_start_system_app(entry.system_app)
+    return xmb_prototype_start_system_app(system_app)
 end
 
 function xmb_prototype_start_system_app(titleid)
