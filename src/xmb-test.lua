@@ -8,10 +8,12 @@
 local width = 960
 local height = 544
 local selected_column = 5
-local column_count = 6
-local option_counts = {4, 3, 4, 3, 5, 3}
-local selected_options = {1, 1, 1, 1, 1, 1}
-local visual_options = {1, 1, 1, 1, 1, 1}
+local visual_column = 5
+local column_count = 7
+local category_anchor_x = 480
+local option_counts = {4, 3, 4, 3, 5, 3, 3}
+local selected_options = {1, 1, 1, 1, 1, 1, 1}
+local visual_options = {1, 1, 1, 1, 1, 1, 1}
 local oldpad = Controls.read()
 local running = true
 local category_icons = {
@@ -20,19 +22,21 @@ local category_icons = {
     Graphics.loadImage("app0:/DATA/xmb-icon-music.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-video.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-games.png"),
+    Graphics.loadImage("app0:/DATA/xmb-icon-network.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-apps.png")
 }
 local font_buffer = Extended.loadFontIntoMemory("app0:/DATA/font-SawarabiGothic-Regular.ttf")
 local font = Extended.loadFontFromMemory(font_buffer)
 Font.setPixelSizes(font, 18)
-local category_labels = {"Settings", "Photo", "Music", "Video", "Games", "Network"}
+local category_labels = {"Settings", "Photo", "Music", "Video", "Games", "Network", "Apps"}
 local object_labels = {
     {"Theme Settings", "Display Settings", "Power Settings", "System Information"},
     {"Photo Viewer", "Camera", "Slideshow"},
     {"Music Library", "Now Playing", "Internet Radio", "Sound Settings"},
     {"Video Library", "Remote Play", "Video Settings"},
     {"Memory Stick", "Saved Data Utility", "Game Settings", "Retro Systems", "Collections"},
-    {"Internet Browser", "Online Manual", "Network Settings"}
+    {"Internet Browser", "Online Manual", "Network Settings"},
+    {"Downloads", "Utilities", "XMBFlow Settings"}
 }
 
 local function draw_wave(base_y, phase, color)
@@ -63,21 +67,26 @@ while running do
     Graphics.fillRect(917, 937, 23, 31, Color.new(4, 10, 28, 255))
     Graphics.fillRect(919, 934, 25, 29, Color.new(245, 250, 255, 230))
 
-    -- XMB keeps a fixed category anchor. The current object occupies the
-    -- first slot below it; the immediately previous object appears above it
-    -- in a separate slot, never crossing or covering the category icon.
+    -- XMB keeps a fixed category anchor. The selected object list animates
+    -- around it: the prior object takes a short lateral arc to the above
+    -- slot, rather than vanishing behind the fixed category icon.
+    visual_column = visual_column + (selected_column - visual_column) * 0.18
     local selected_option = selected_options[selected_column]
     visual_options[selected_column] = visual_options[selected_column] + (selected_option - visual_options[selected_column]) * 0.18
     local visual_option = visual_options[selected_column]
     for option = 1, option_counts[selected_column] do
-        local is_previous = option == selected_option - 1
-        local is_visible_below = option >= selected_option and option <= selected_option + 2
-        if is_previous or is_visible_below then
-            local focus = math.max(0, 1 - math.abs(option - visual_option))
+        local relative = option - visual_option
+        if relative >= -1 and relative <= 2 then
+            local focus = math.max(0, 1 - math.abs(relative))
             local scale = 0.42 + 0.20 * focus
             local color = Color.new(math.floor(120 + 135 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(145 + 110 * focus))
-            local x = 90 + (selected_column - 1) * 130
-            local y = is_previous and 62 or 296 + (option - selected_option) * 66
+            local x = category_anchor_x
+            local y = 296 + relative * 66
+            if relative < 0 then
+                local arc = 1 - math.abs(1 + relative * 2)
+                x = x + 110 * arc
+                y = 296 + relative * 234
+            end
             if focus > 0.02 then
                 local glow_scale = scale + 0.10 * focus
                 Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[selected_column], glow_scale, glow_scale, Color.new(95, 220, 255, math.floor(35 * focus)))
@@ -88,11 +97,12 @@ while running do
     end
 
     for column = 1, column_count do
-        local x = 90 + (column - 1) * 130
-        local selected = column == selected_column
-        local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 150)
-        local scale = selected and 1.15 or 0.82
-        if selected then Graphics.drawScaleImage(x - 48 * (scale + 0.10), 166 - 48 * (scale + 0.10), category_icons[column], scale + 0.10, scale + 0.10, Color.new(95, 220, 255, 35)) end
+        local relative = column - visual_column
+        local x = category_anchor_x + relative * 130
+        local focus = math.max(0, 1 - math.abs(relative))
+        local color = Color.new(math.floor(120 - 15 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(150 + 105 * focus))
+        local scale = 0.82 + 0.33 * focus
+        if focus > 0.02 then Graphics.drawScaleImage(x - 48 * (scale + 0.10 * focus), 166 - 48 * (scale + 0.10 * focus), category_icons[column], scale + 0.10 * focus, scale + 0.10 * focus, Color.new(95, 220, 255, math.floor(35 * focus))) end
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
         Font.print(font, x - 30, 226, category_labels[column], color)
     end
