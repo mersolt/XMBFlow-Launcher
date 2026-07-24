@@ -37,6 +37,7 @@ for icon in settings photo music video games network apps; do
     [ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-$icon.png" ] || { echo "Missing reviewed XMB category icon: $icon" >&2; exit 1; }
 done
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/font-SawarabiGothic-Regular.ttf" ] || { echo 'Missing reviewed mockup font.' >&2; exit 1; }
+[ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-glow.png" ] || { echo 'Missing original XMB glow texture.' >&2; exit 1; }
 [ -f "$lua_entry" ] || { echo "Missing Lua entry source: $lua_entry" >&2; exit 1; }
 
 mkdir -p "$build_dir"
@@ -56,6 +57,7 @@ mkdir -p "$build_dir"
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-games.png=DATA/xmb-icon-games.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-network.png=DATA/xmb-icon-network.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-apps.png=DATA/xmb-icon-apps.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-glow.png=DATA/xmb-glow.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/font-SawarabiGothic-Regular.ttf=DATA/font-SawarabiGothic-Regular.ttf" \
     -a "$root_dir/assets/third-party-notices/SawarabiGothic-OFL.txt=THIRD-PARTY-NOTICES/SawarabiGothic-OFL.txt" \
     "$output_vpk"

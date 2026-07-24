@@ -32,6 +32,7 @@ local category_icons = {
     Graphics.loadImage("app0:/DATA/xmb-icon-network.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-apps.png")
 }
+local focus_glow = Graphics.loadImage("app0:/DATA/xmb-glow.png")
 local font_buffer = Extended.loadFontIntoMemory("app0:/DATA/font-SawarabiGothic-Regular.ttf")
 local font = Extended.loadFontFromMemory(font_buffer)
 Font.setPixelSizes(font, 18)
@@ -64,16 +65,16 @@ local function draw_vertical_options(column, alpha)
             local focus = math.max(0, 1 - math.abs(relative))
             local scale = 0.42 + 0.20 * focus
             local color = Color.new(math.floor(120 + 135 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor((145 + 110 * focus) * alpha))
-            local pulse = 0.65 + 0.35 * ((math.sin(glow_phase / 18) + 1) * 0.5)
-            local text_color = Color.new(math.floor(175 + 80 * focus * pulse), math.floor(185 + 70 * focus * pulse), math.floor(205 + 50 * focus * pulse), math.floor((145 + 110 * focus) * alpha))
+            local pulse = 0.35 + 0.65 * ((math.sin(glow_phase / 18) + 1) * 0.5)
+            local text_color = Color.new(math.floor(130 + 125 * focus * pulse), math.floor(145 + 110 * focus * pulse), math.floor(170 + 85 * focus * pulse), math.floor((145 + 110 * focus) * alpha))
             local x = category_anchor_x
             local y = 296 + relative * 66
             if relative < 0 then
                 y = 296 + relative * 234
             end
             if focus > 0.02 then
-                local glow_scale = scale + 0.10 * focus
-                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255, math.floor(40 + 45 * focus * alpha * pulse)))
+                local glow_scale = scale + 0.34 * focus
+                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, focus_glow, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor(220 * focus * alpha * pulse)))
             end
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[column], scale, scale, color)
             Font.print(font, x + 40, y - 10, object_labels[column][option], text_color)
@@ -114,7 +115,7 @@ while running do
             vertical_fade_direction = 1
         end
     elseif vertical_fade_direction > 0 then
-        vertical_alpha = math.min(1, vertical_alpha + 0.09)
+        vertical_alpha = math.min(1, vertical_alpha + 0.045)
         if vertical_alpha == 1 then vertical_fade_direction = 0 end
     end
     draw_vertical_options(vertical_column, vertical_alpha)
@@ -124,11 +125,12 @@ while running do
         local x = category_anchor_x + relative * 130
         local focus = math.max(0, 1 - math.abs(relative))
         local color = Color.new(math.floor(120 - 15 * focus), math.floor(160 + 75 * focus), math.floor(205 + 50 * focus), math.floor(150 + 105 * focus))
-        local pulse = 0.65 + 0.35 * ((math.sin(glow_phase / 18) + 1) * 0.5)
-        local text_color = Color.new(math.floor(175 + 80 * focus * pulse), math.floor(185 + 70 * focus * pulse), math.floor(205 + 50 * focus * pulse), math.floor(150 + 105 * focus))
+        local pulse = 0.35 + 0.65 * ((math.sin(glow_phase / 18) + 1) * 0.5)
+        local text_color = Color.new(math.floor(130 + 125 * focus * pulse), math.floor(145 + 110 * focus * pulse), math.floor(170 + 85 * focus * pulse), math.floor(150 + 105 * focus))
         local scale = 0.82 + 0.33 * focus
         if focus > 0.02 then
-            Graphics.drawScaleImage(x - 48 * (scale + 0.10 * focus), 166 - 48 * (scale + 0.10 * focus), category_icons[column], scale + 0.10 * focus, scale + 0.10 * focus, Color.new(255, 255, 255, math.floor(40 + 45 * focus * pulse)))
+            local glow_scale = scale + 0.34 * focus
+            Graphics.drawScaleImage(x - 48 * glow_scale, 166 - 48 * glow_scale, focus_glow, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor(220 * focus * pulse)))
         end
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
         Font.print(font, x - 30, 226, category_labels[column], text_color)

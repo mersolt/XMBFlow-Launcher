@@ -3,7 +3,7 @@ param([Parameter(Mandatory = $true)][string]$Vpk)
 $ErrorActionPreference = 'Stop'
 if (-not (Test-Path -LiteralPath $Vpk -PathType Leaf)) { throw "VPK not found: $Vpk" }
 Add-Type -AssemblyName System.IO.Compression.FileSystem
-$expected = @('eboot.bin', 'index.lua', 'LICENSE', 'sce_sys/icon0.png', 'sce_sys/param.sfo', 'DATA/xmb-icon-settings.png', 'DATA/xmb-icon-photo.png', 'DATA/xmb-icon-music.png', 'DATA/xmb-icon-video.png', 'DATA/xmb-icon-games.png', 'DATA/xmb-icon-network.png', 'DATA/xmb-icon-apps.png', 'DATA/font-SawarabiGothic-Regular.ttf', 'THIRD-PARTY-NOTICES/SawarabiGothic-OFL.txt')
+$expected = @('eboot.bin', 'index.lua', 'LICENSE', 'sce_sys/icon0.png', 'sce_sys/param.sfo', 'DATA/xmb-icon-settings.png', 'DATA/xmb-icon-photo.png', 'DATA/xmb-icon-music.png', 'DATA/xmb-icon-video.png', 'DATA/xmb-icon-games.png', 'DATA/xmb-icon-network.png', 'DATA/xmb-icon-apps.png', 'DATA/xmb-glow.png', 'DATA/font-SawarabiGothic-Regular.ttf', 'THIRD-PARTY-NOTICES/SawarabiGothic-OFL.txt')
 $zip = [IO.Compression.ZipFile]::OpenRead($Vpk)
 try {
     $actual = @($zip.Entries | Where-Object { -not $_.FullName.EndsWith('/') } | ForEach-Object FullName | Sort-Object)
