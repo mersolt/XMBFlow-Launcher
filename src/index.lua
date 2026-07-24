@@ -3088,6 +3088,7 @@ xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1
 xmbPrototypeAppOptionsOpen = false
 xmbPrototypeAppOptionsAlpha = 0
 xmbPrototypeAppOptionsSelection = 1
+xmbPrototypeAppOptionsVisualSelection = 1
 xmbPrototypeGlowPhase = 0
 xmbPrototypeSubmenuAlpha = 0
 xmbPrototypeHeldDirection = 0
@@ -14520,6 +14521,7 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeAppOptionsOpen = false
     xmbPrototypeAppOptionsAlpha = 0
     xmbPrototypeAppOptionsSelection = 1
+    xmbPrototypeAppOptionsVisualSelection = 1
     xmbPrototypeGlowPhase = 0
     xmbPrototypeSubmenuAlpha = 0
     xmbPrototypeHeldDirection = 0
@@ -14759,18 +14761,32 @@ local function xmb_prototype_draw_app_options()
 
     local alpha = xmbPrototypeAppOptionsAlpha
     local panel_x = math.floor(960 - 322 * alpha)
+    local row_height = 58
+    local anchor_y = 250
     local title = xmb_prototype_read_only_item_label(xmb_prototype_current_app_option_entry() or {})
+    xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(xmbPrototypeAppOptionsVisualSelection, xmbPrototypeAppOptionsSelection, 0.20)
     Graphics.fillRect(0, 960, 0, 544, Color.new(0, 0, 0, math.floor(96 * alpha)))
     Graphics.fillRect(panel_x, 960, 0, 544, Color.new(18, 42, 86, math.floor(224 * alpha)))
-    Font.print(fnt20, panel_x + 34, 118, title, Color.new(225, 238, 255, math.floor(220 * alpha)))
+    Font.print(fnt20, panel_x + 14, 118, title, Color.new(225, 238, 255, math.floor(220 * alpha)))
+
+    for step = 0, 19 do
+        local left = panel_x + math.floor((960 - panel_x) * step / 20)
+        local right = panel_x + math.floor((960 - panel_x) * (step + 1) / 20)
+        local bar_alpha = math.floor((188 - step * 8) * alpha)
+        Graphics.fillRect(left, right, anchor_y - math.floor(row_height / 2), anchor_y + math.ceil(row_height / 2), Color.new(118, 211, 255, bar_alpha))
+    end
     for index, label in ipairs(xmb_prototype_app_options) do
-        local y = 236 + (index - 1) * 72
-        local focus = index == xmbPrototypeAppOptionsSelection
-        if focus then
-            Graphics.fillRect(panel_x + 16, 946, y - 11, y + 38, Color.new(112, 205, 255, math.floor(152 * alpha)))
-            Graphics.fillRect(panel_x + 3, panel_x + 12, y + 5, y + 20, Color.new(255, 255, 255, math.floor(230 * alpha)))
+        local y = math.floor(anchor_y + (index - xmbPrototypeAppOptionsVisualSelection) * row_height)
+        local focus = math.max(0, 1 - math.abs(index - xmbPrototypeAppOptionsVisualSelection))
+        local text_x = panel_x + 14
+        if focus > 0.02 then
+            local glow_alpha = math.floor((42 + 58 * focus) * alpha)
+            Font.print(fnt22, text_x - 1, y - 1, label, Color.new(255, 255, 255, glow_alpha))
+            Font.print(fnt22, text_x + 1, y - 1, label, Color.new(255, 255, 255, glow_alpha))
+            Font.print(fnt22, text_x - 1, y + 1, label, Color.new(255, 255, 255, glow_alpha))
+            Font.print(fnt22, text_x + 1, y + 1, label, Color.new(255, 255, 255, glow_alpha))
         end
-        Font.print(fnt22, panel_x + 38, y, label, Color.new(235, 245, 255, math.floor((focus and 255 or 180) * alpha)))
+        Font.print(fnt22, text_x, y, label, Color.new(235, 245, 255, math.floor((180 + 75 * focus) * alpha)))
     end
 end
 
