@@ -43,9 +43,11 @@ existing RetroFlow categories. Cross opens read-only folders and Circle returns
 to the previous prototype folder. This includes Retro Systems, Collections,
 and the existing game entries within a selected folder. Selecting an actual
 game is still a no-op. Triangle, Square, Start, Select, analog, and touch
-actions are deliberately inert while the prototype is enabled. The other five
-columns remain non-interactive placeholders, so they cannot launch a game,
-alter settings, or access a guessed Vita app.
+actions are deliberately inert while the prototype is enabled. Settings,
+Photo, Music, and Video now have original geometric presentation cards that
+state their future role, but remain non-interactive: they cannot alter settings
+or scan/access media. Apps remains a read-only view over the existing scanned
+tables and does not guess or access Vita apps.
 
 ## Future hardware test
 

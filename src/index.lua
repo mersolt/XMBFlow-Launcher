@@ -14210,6 +14210,16 @@ local xmb_prototype_columns = {
     "SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "APPS"
 }
 
+-- These are intentional presentation-only columns. They make the XMB axis
+-- readable without borrowing legacy settings/media workflows before each has
+-- a separately reviewed integration path.
+local xmb_prototype_placeholder_columns = {
+    [1] = {title = "SETTINGS", headline = "Personalise XMBFlow", detail = "Settings stay in the legacy UI during this prototype."},
+    [2] = {title = "PHOTO", headline = "Your visual library", detail = "Photo browsing is planned; this column reads no media yet."},
+    [3] = {title = "MUSIC", headline = "Your soundtrack", detail = "Music browsing is planned; playback remains unavailable here."},
+    [4] = {title = "VIDEO", headline = "Your video library", detail = "Video browsing is planned; this column remains safely inert."}
+}
+
 -- These folder records are read-only pointers to existing RetroFlow data.
 -- They do not create a second library or save any new configuration.
 local xmb_prototype_games_folders = {
@@ -14443,10 +14453,26 @@ local function xmb_prototype_games_item_detail(item, index)
     return "Preview only"
 end
 
+local function draw_xmb_prototype_placeholder_column(column)
+    local preview = xmb_prototype_placeholder_columns[column]
+    if not preview then return end
+
+    -- Original geometric placeholder artwork. It uses no media assets and
+    -- deliberately presents no selectable action.
+    Graphics.fillRect(92, 838, 238, 418, Color.new(20, 48, 84, 185))
+    Graphics.fillRect(112, 174, 266, 390, Color.new(96, 184, 238, 220))
+    Graphics.fillRect(190, 252, 266, 390, Color.new(58, 117, 191, 230))
+    Graphics.fillRect(268, 330, 266, 390, Color.new(32, 78, 143, 240))
+    Font.print(fnt25, 112, 220, preview.headline, white)
+    Font.print(fnt20, 112, 274, preview.detail, Color.new(210, 222, 240, 185))
+    Font.print(fnt20, 112, 350, "Presentation placeholder", Color.new(190, 210, 235, 165))
+end
+
 local function draw_xmb_prototype()
     local active_column = xmb_prototype_active_column()
     local showing_games = active_column == 5
     local showing_apps = active_column == 6
+    local placeholder = xmb_prototype_placeholder_columns[active_column]
     local games_list = xmb_prototype_current_games_list()
 
     -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
@@ -14479,8 +14505,8 @@ local function draw_xmb_prototype()
         Font.print(fnt20, 110, 179, xmbPrototypeGamesTitle, Color.new(200, 215, 235, 190))
     elseif showing_apps then
         Font.print(fnt20, 110, 179, xmbPrototypeAppsTitle, Color.new(200, 215, 235, 190))
-    else
-        Font.print(fnt20, 110, 179, "Preview column", Color.new(200, 215, 235, 190))
+    elseif placeholder then
+        Font.print(fnt20, 110, 179, "PRESENTATION ONLY", Color.new(200, 215, 235, 190))
     end
 
     if showing_games then
@@ -14520,8 +14546,8 @@ local function draw_xmb_prototype()
             end
             Font.print(selected and fnt25 or fnt22, 112, y, label, selected and white or Color.new(210, 222, 240, 165))
         end
-    else
-        Font.print(fnt22, 112, 282, "Not connected in this prototype", Color.new(210, 222, 240, 180))
+    elseif placeholder then
+        draw_xmb_prototype_placeholder_column(active_column)
     end
 
     Graphics.fillRect(0, 960, 496, 544, Color.new(10, 26, 48, 245))
