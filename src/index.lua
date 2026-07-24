@@ -3094,6 +3094,7 @@ xmbPrototypeAppOptionsPanel = nil
 xmbPrototypeInformationOpen = false
 xmbPrototypeInformationAlpha = 0
 xmbPrototypeInformationEntry = nil
+xmbPrototypeInformationSize = "Not reported"
 xmbPrototypeGlowPhase = 0
 xmbPrototypeSubmenuAlpha = 0
 xmbPrototypeHeldDirection = 0
@@ -14530,6 +14531,7 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeInformationOpen = false
     xmbPrototypeInformationAlpha = 0
     xmbPrototypeInformationEntry = nil
+    xmbPrototypeInformationSize = "Not reported"
     xmbPrototypeGlowPhase = 0
     xmbPrototypeSubmenuAlpha = 0
     xmbPrototypeHeldDirection = 0
@@ -14774,6 +14776,41 @@ local function xmb_prototype_current_app_option_entry()
     return nil
 end
 
+local function xmb_prototype_information_entry(entry)
+    if entry and type(entry.system_app) == "string" then
+        for _, candidate in ipairs(xmb_prototype_read_only_data().category_rows(xmb_prototype_system_apps_category)) do
+            if candidate.name == entry.system_app or candidate.titleid == entry.system_app then
+                return candidate
+            end
+        end
+    end
+    return entry or {}
+end
+
+local function xmb_prototype_information_size(entry)
+    local path = entry and entry.game_path
+    if type(path) ~= "string" or path == "" then return "Not reported" end
+    if System.doesDirExist(path) then return getAppSize(path) end
+    if System.doesFileExist(path) then
+        local file = System.openFile(path, FREAD)
+        if file then
+            local size = System.sizeFile(file)
+            System.closeFile(file)
+            return formatSize(size)
+        end
+    end
+    return "Not reported"
+end
+
+local function xmb_prototype_information_type(entry, source)
+    if entry and entry.system_app then return "System application" end
+    if source and source.app_type == 42 then return "System application" end
+    if xmbPrototypeColumn == 8 or (source and (source.category == "MG" or source.app_type_default == 0)) then
+        return "Homebrew application"
+    end
+    return "Game"
+end
+
 local function xmb_prototype_draw_app_options()
     local target = xmbPrototypeAppOptionsOpen and 1 or 0
     xmbPrototypeAppOptionsAlpha = xmbPrototypeAppOptionsAlpha + (target - xmbPrototypeAppOptionsAlpha) * 0.16
@@ -14837,11 +14874,12 @@ local function xmb_prototype_draw_information_card()
 
     local alpha = xmbPrototypeInformationAlpha
     local entry = xmbPrototypeInformationEntry or xmb_prototype_current_app_option_entry() or {}
-    local title = xmb_prototype_read_only_item_label(entry)
-    local title_id = xmb_prototype_information_value(entry.titleid or entry.name, "Unavailable")
-    local version = xmb_prototype_information_value(entry.version, "Not reported")
+    local source = entry
+    local title = entry.label or xmb_prototype_read_only_item_label(source)
+    local title_id = xmb_prototype_information_value(source.titleid or source.name or entry.system_app, "Unavailable")
+    local version = xmb_prototype_information_value(source.version, "Not reported")
     local category = xmb_prototype_columns[xmbPrototypeColumn] or "Apps"
-    local kind = entry.system_app and "System application" or "Application entry"
+    local kind = xmb_prototype_information_type(entry, source)
     local text_alpha = math.floor(255 * alpha)
 
     -- The card is presentation-only. It reads the already selected RetroFlow
@@ -14859,6 +14897,8 @@ local function xmb_prototype_draw_information_card()
     Font.print(fnt20, 330, 322, kind, Color.new(242, 247, 255, text_alpha))
     Font.print(fnt20, 166, 362, "Version", Color.new(178, 202, 235, text_alpha))
     Font.print(fnt20, 330, 362, version, Color.new(242, 247, 255, text_alpha))
+    Font.print(fnt20, 166, 402, "Size", Color.new(178, 202, 235, text_alpha))
+    Font.print(fnt20, 330, 402, xmbPrototypeInformationSize, Color.new(242, 247, 255, text_alpha))
     Font.print(fnt20, 454, 488, "O  Back", Color.new(235, 245, 255, text_alpha))
 end
 
@@ -14992,9 +15032,9 @@ function xmb_prototype_read_direction(pad)
 end
 
 function xmb_prototype_move_direction(direction)
-    if xmbPrototypeInformationOpen or xmbPrototypeInformationAlpha > 0.01 then
+    if xmbPrototypeInformationOpen then
         return
-    elseif xmbPrototypeAppOptionsOpen or xmbPrototypeAppOptionsAlpha > 0.01 then
+    elseif xmbPrototypeAppOptionsOpen then
         if direction == -2 or direction == 2 then
             xmbPrototypeAppOptionsSelection = XmbNavigation.move(xmbPrototypeAppOptionsSelection, direction / 2, #xmb_prototype_app_options)
         end
@@ -22549,7 +22589,7 @@ while true do
                 xmbPrototypeNavigationRepeat = xmbPrototypeNavigationRepeat - 1
             end
 
-            if xmbPrototypeInformationOpen or xmbPrototypeInformationAlpha > 0.01 then
+            if xmbPrototypeInformationOpen then
                 if Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                     xmbPrototypeInformationOpen = false
                     xmbPrototypeAppOptionsOpen = true
@@ -22557,15 +22597,16 @@ while true do
                         Sound.play(xmbNavigationClick, NO_LOOP)
                     end
                 end
-            elseif xmbPrototypeAppOptionsOpen or xmbPrototypeAppOptionsAlpha > 0.01 then
+            elseif xmbPrototypeAppOptionsOpen then
                 if Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                     xmbPrototypeAppOptionsOpen = false
                     if setSounds == 1 and xmbNavigationClick then
                         Sound.play(xmbNavigationClick, NO_LOOP)
                     end
                 elseif Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) and xmbPrototypeAppOptionsSelection == 1 then
-                    xmbPrototypeInformationEntry = xmb_prototype_current_app_option_entry()
+                    xmbPrototypeInformationEntry = xmb_prototype_information_entry(xmb_prototype_current_app_option_entry())
                     xmbPrototypeInformationOpen = xmbPrototypeInformationEntry ~= nil
+                    xmbPrototypeInformationSize = xmb_prototype_information_size(xmbPrototypeInformationEntry)
                     xmbPrototypeAppOptionsOpen = false
                     if setSounds == 1 and xmbNavigationClick then
                         Sound.play(xmbNavigationClick, NO_LOOP)

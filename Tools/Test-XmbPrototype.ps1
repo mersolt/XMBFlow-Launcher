@@ -39,6 +39,9 @@ $required = @(
     'local function xmb_prototype_current_selected_entry()',
     'local function xmb_prototype_is_app_entry(entry)',
     'local function xmb_prototype_draw_information_card()',
+    'local function xmb_prototype_information_entry(entry)',
+    'local function xmb_prototype_information_size(entry)',
+    'local function xmb_prototype_information_type(entry, source)',
     '"Information", "Change category"',
     'xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(',
     '"app0:/DATA/xmb-app-options-highlight.png"',
@@ -117,6 +120,12 @@ if ($text.Contains('(xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Con
 }
 if ($prototypeRenderer.Contains('Font.print(fnt28')) {
     throw 'The XMB renderer must use only initialized font handles.'
+}
+if ($text.Contains('xmbPrototypeAppOptionsOpen or xmbPrototypeAppOptionsAlpha > 0.01')) {
+    throw 'Closing the app-options pane must not block XMB input.'
+}
+if ($text.Contains('xmbPrototypeInformationOpen or xmbPrototypeInformationAlpha > 0.01')) {
+    throw 'Closing the information card must not block XMB input.'
 }
 if ($text.Contains('xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP)')) {
     throw 'Apps navigation must use the shared XMB direction handler exactly once.'
