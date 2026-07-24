@@ -63,8 +63,11 @@ foreach ($button in @('SCE_CTRL_TRIANGLE', 'SCE_CTRL_START', 'SCE_CTRL_SELECT', 
 if (-not $prototypeRenderer.Contains('showCat = category') -or -not $prototypeRenderer.Contains('xmbPrototypeEnabled = false')) {
     throw 'The XMB entry handoff must select the existing legacy category and return to the legacy renderer.'
 }
-if (-not $text.Contains('xmb_prototype_focus_legacy_selection(category, selection)')) {
-    throw 'The System and Homebrew Apps columns must use the legacy launch handoff.'
+if (-not $text.Contains('xmb_prototype_activate_app_selection(xmbPrototypeColumn)')) {
+    throw 'The System and Homebrew Apps columns must activate their selected entry from XMB.'
+}
+foreach ($rendererChrome in @('"XMB prototype"', '"Left / Right: Categories"', 'tostring(xmbPrototypeGamesSelection) .. " / "')) {
+    if ($prototypeRenderer.Contains($rendererChrome)) { throw "The XMB renderer must not contain prototype chrome: $rendererChrome" }
 }
 if ($text.Contains('draw_xmb_prototype_placeholder_column') -or $text.Contains('xmb_prototype_placeholder_columns')) { throw 'Prototype must not render obsolete category cards.' }
 

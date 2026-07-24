@@ -14593,9 +14593,6 @@ local function draw_xmb_prototype()
 
     -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
     Graphics.fillRect(0, 960, 0, 544, Color.new(8, 18, 38, 235))
-    Graphics.fillRect(0, 960, 0, 82, Color.new(18, 43, 78, 245))
-    Font.print(fnt25, 34, 28, "XMBFlow", white)
-    Font.print(fnt20, 34, 57, "XMB prototype", Color.new(210, 225, 245, 220))
 
     -- The active category remains fixed while the complete horizontal axis
     -- moves behind it. This state is presentation-only; it never changes
@@ -14610,13 +14607,6 @@ local function draw_xmb_prototype()
         Font.print(fnt20, x - 42, 226, label, label_color)
     end)
 
-    Font.print(fnt22, 110, 150, xmb_prototype_columns[display_column], white)
-    if showing_games then
-        Font.print(fnt20, 110, 179, xmbPrototypeGamesTitle, Color.new(200, 215, 235, 190))
-    elseif showing_read_only_apps then
-        Font.print(fnt20, 110, 179, "READ-ONLY LIBRARY VIEW", Color.new(200, 215, 235, 190))
-    end
-
     if showing_games then
         xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, 0.18)
         local showing_child_axis = xmbPrototypeGamesMode == "entries" and xmbPrototypeGamesParentList ~= nil
@@ -14624,7 +14614,7 @@ local function draw_xmb_prototype()
             local parent_list = xmbPrototypeGamesParentList
             local parent_first = 1
             local parent_last = #parent_list
-            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 278, 42, 42, function(parent_index, _, parent_y)
+            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, 234, function(parent_index, _, parent_y)
                 local parent_item = parent_list[parent_index]
                 local parent_selected = parent_index == xmbPrototypeGamesParentSelection
                 Font.print(parent_selected and fnt22 or fnt20, 72, parent_y, xmb_prototype_games_item_label(parent_item), Color.new(190, 205, 225, parent_selected and 150 or 95))
@@ -14636,7 +14626,7 @@ local function draw_xmb_prototype()
             local first_item = 1
             local last_item = #games_list
 
-            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 278, 42, 42, function(index, _, y)
+            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, 234, function(index, _, y)
                 local item = games_list[index]
                 local is_selected = index == xmbPrototypeGamesSelection
                 local label = xmb_prototype_games_item_label(item)
@@ -14670,7 +14660,7 @@ local function draw_xmb_prototype()
         end
         local first_item = 1
         local last_item = #apps_list
-        XmbRender.each_vertical(first_item, last_item, visual_selection, 278, 42, 42, function(index, _, y)
+        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, _, y)
             local item = apps_list[index]
             local selected = index == selection
             local label = xmb_prototype_read_only_item_label(item)
@@ -14681,25 +14671,23 @@ local function draw_xmb_prototype()
         end)
     end
 
-    Graphics.fillRect(0, 960, 496, 544, Color.new(10, 26, 48, 245))
-    if showing_games then
-        Font.print(fnt20, 34, 508, tostring(xmbPrototypeGamesSelection) .. " / " .. tostring(#games_list), Color.new(210, 225, 245, 210))
-        Font.print(fnt20, 214, 508, "Left / Right: Categories", Color.new(210, 225, 245, 210))
-        if xmbPrototypeGamesMode == "entries" then
-            Font.print(fnt20, 564, 508, "Cross: Legacy launch view   Circle: Back", Color.new(210, 225, 245, 210))
-        elseif xmbPrototypeGamesMode == "folders" then
-            Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open", Color.new(210, 225, 245, 210))
-        else
-            Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open   Circle: Back", Color.new(210, 225, 245, 210))
-        end
-    elseif showing_read_only_apps then
-        Font.print(fnt20, 34, 508, "Up / Down: Browse   Cross: Legacy launch view   Start + Select: Legacy UI", Color.new(210, 225, 245, 210))
-    else
-        Font.print(fnt20, 34, 508, "Left / Right: XMB categories   Start + Select: Legacy UI", Color.new(210, 225, 245, 210))
-    end
 end
 
 -- Function to detect inserted Vita cartridge
+function xmb_prototype_activate_app_selection(column)
+    local entries = xmb_prototype_current_read_only_apps_list(column)
+    local selection = column == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
+    local entry = entries[selection]
+    if entry == nil or type(entry.name) ~= "string" then
+        return false
+    end
+
+    if column == 7 then
+        return launch_vita_sysapp(entry.name)
+    end
+    return launch_vita_title(entry.name)
+end
+
 function get_inserted_cartridge_titleid()
     local app_dir = "gro0:/app"
     if not System.doesDirExist(app_dir) then
@@ -22173,9 +22161,7 @@ while true do
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
                 xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, 1)
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
-                local category = xmbPrototypeColumn == 7 and xmb_prototype_system_apps_category or xmb_prototype_homebrew_apps_category
-                local selection = xmbPrototypeColumn == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
-                xmb_prototype_focus_legacy_selection(category, selection)
+                xmb_prototype_activate_app_selection(xmbPrototypeColumn)
             end
         end
 
