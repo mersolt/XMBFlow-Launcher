@@ -8,9 +8,11 @@ $layoutTest = Join-Path $PSScriptRoot 'Test-XmbLayout.ps1'
 & $layoutTest
 $transitionTest = Join-Path $PSScriptRoot 'Test-XmbTransition.ps1'
 & $transitionTest
+$renderTest = Join-Path $PSScriptRoot 'Test-XmbRender.ps1'
+& $renderTest
 
 $text = Get-Content -Raw $Source
-$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'SCE_CTRL_UP', 'SCE_CTRL_DOWN', 'local option_counts = {7, 3, 3, 3, 6, 2, 3, 2}', 'local selected_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_column = 5', 'Graphics.drawScaleImage', 'XmbReadOnlyData.create({', 'xmb_test_data.category_rows(column)[option]', 'XmbNavigation.move(', 'XmbNavigation.approach(')
+$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'SCE_CTRL_UP', 'SCE_CTRL_DOWN', 'local option_counts = {7, 3, 3, 3, 6, 2, 3, 2}', 'local selected_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_column = 5', 'XmbRender.glowing_icon(', 'XmbReadOnlyData.create({', 'xmb_test_data.category_rows(column)[option]', 'XmbNavigation.move(', 'XmbNavigation.approach(')
 foreach ($entry in $required) {
     if (-not $text.Contains($entry)) { throw "Missing minimal XMB profile invariant: $entry" }
 }
@@ -28,7 +30,7 @@ if ($text.Contains('draw_placeholder_card') -or $text.Contains('Graphics.fillRec
 if ($text.IndexOf('local selected_option = selected_options[selected_column]') -gt $text.IndexOf('for column = 1, column_count do')) { throw 'Vertical objects must render before the fixed category axis.' }
 if (-not $text.Contains('local vertical_column = 5') -or -not $text.Contains('local pending_column = 5') -or -not $text.Contains('local vertical_fade_direction = 0') -or -not $text.Contains('local vertical_fade_delay = 0') -or -not $text.Contains('XmbTransition.update(visual_column, selected_column, vertical_alpha, vertical_fade_direction, vertical_fade_delay, vertical_column, pending_column)')) { throw 'Horizontal category changes must fully fade out, pause, then gently fade in the vertical object axis.' }
 if (-not $text.Contains('XmbLayout.vertical_y(296, option, visual_option, 66, 234)') -or $text.Contains('local arc = 1 - math.abs(1 + relative * 2)')) { throw 'The preceding object must move behind the fixed category icon without a lateral detour.' }
-if (-not $text.Contains('math.sin(glow_phase / 18)') -or -not $text.Contains('category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255') -or -not $text.Contains('local text_color = Color.new')) { throw 'Focused icons and labels must use the persistent white XMB-style silhouette glow pulse.' }
+if (-not $text.Contains('math.sin(glow_phase / 18)') -or -not $text.Contains('XmbRender.glowing_icon(category_icons[column]') -or -not $text.Contains('local text_color = Color.new')) { throw 'Focused icons and labels must use the persistent white XMB-style silhouette glow pulse.' }
 if (-not $text.Contains('Controls.readLeftAnalog()') -or -not $text.Contains('local navigation_repeat = 0') -or -not $text.Contains('analog_x < 96') -or -not $text.Contains('analog_y > 160')) { throw 'The standalone mockup must support held D-pad and left-analog navigation.' }
 if (-not $text.Contains('local submenu_open = false') -or -not $text.Contains('local function draw_submenu_options(column, parent_x)') -or -not $text.Contains('Controls.check(pad, SCE_CTRL_CROSS)') -or -not $text.Contains('submenu_open = true') -or -not $text.Contains('if submenu_open then')) { throw 'The standalone mockup must open a second read-only vertical submenu axis with Cross.' }
 if (-not $text.Contains('XmbNavigation.move(submenu_selection, -1, #submenu_labels)') -or -not $text.Contains('XmbNavigation.move(submenu_selection, 1, #submenu_labels)') -or -not $text.Contains('local parent_x = category_anchor_x - 390 * submenu_alpha') -or -not $text.Contains('1 - 0.52 * submenu_alpha')) { throw 'The submenu must smoothly move and dim the parent axis while it owns Up/Down navigation.' }

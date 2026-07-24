@@ -19,6 +19,7 @@ dofile("app0:addons/xmb-readonly-data.lua")
 dofile("app0:addons/xmb-navigation.lua")
 dofile("app0:addons/xmb-layout.lua")
 dofile("app0:addons/xmb-transition.lua")
+dofile("app0:addons/xmb-render.lua")
 
 -- Speed related settings - MOVED EARLY for maximum performance impact
 local cpu_speed = 444 -- Was 333
@@ -14511,10 +14512,8 @@ local function draw_xmb_prototype()
         local label_color = Color.new(190 + math.floor(65 * focus), 205 + math.floor(50 * focus), 225 + math.floor(30 * focus), 145 + math.floor(110 * focus))
 
         local icon = xmb_prototype_category_icon(index)
-        if icon then
-            local scale = 0.82 + 0.33 * focus
-            Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, icon, scale, scale, label_color)
-        end
+        local scale = 0.82 + 0.33 * focus
+        XmbRender.icon(icon, x, 166, scale, label_color)
         Font.print(fnt20, x - 42, 226, label, label_color)
     end
 

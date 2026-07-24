@@ -114,9 +114,10 @@ local function draw_vertical_options(column, alpha, anchor_x)
             local object_icon = get_object_icon(column, option)
             if focus > 0.02 then
                 local glow_scale = scale + 0.045 * focus
-                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, object_icon, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * alpha)))
+                XmbRender.glowing_icon(object_icon, x, y, scale, glow_scale, color, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * alpha)))
+            else
+                XmbRender.icon(object_icon, x, y, scale, color)
             end
-            Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, object_icon, scale, scale, color)
             Font.print(font, x + 40, y - 10, xmb_test_data.category_rows(column)[option], text_color)
         end
     end
@@ -134,9 +135,10 @@ local function draw_submenu_options(column, parent_x)
         local alpha = math.floor((130 + 125 * focus) * submenu_alpha)
         if focus > 0.02 then
             local glow_scale = scale + 0.04 * focus
-            Graphics.drawScaleImage(parent_x + 220 - 48 * glow_scale, y - 48 * glow_scale, icon, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((38 + 92 * focus) * submenu_alpha)))
+            XmbRender.glowing_icon(icon, parent_x + 220, y, scale, glow_scale, Color.new(255, 255, 255, alpha), Color.new(255, 255, 255, math.floor((38 + 92 * focus) * submenu_alpha)))
+        else
+            XmbRender.icon(icon, parent_x + 220, y, scale, Color.new(255, 255, 255, alpha))
         end
-        Graphics.drawScaleImage(parent_x + 220 - 48 * scale, y - 48 * scale, icon, scale, scale, Color.new(255, 255, 255, alpha))
         Font.print(font, parent_x + 260, y - 10, submenu_labels[option], Color.new(255, 255, 255, alpha))
     end
 end
@@ -185,9 +187,10 @@ while running do
         local scale = 0.82 + 0.33 * focus
         if focus > 0.02 then
             local glow_scale = scale + 0.045 * focus
-            Graphics.drawScaleImage(x - 48 * glow_scale, 166 - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * (column == selected_column and 1 or 1 - submenu_alpha))))
+            XmbRender.glowing_icon(category_icons[column], x, 166, scale, glow_scale, color, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * (column == selected_column and 1 or 1 - submenu_alpha))))
+        else
+            XmbRender.icon(category_icons[column], x, 166, scale, color)
         end
-        Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
         Font.print(font, x - 30, 226, category_labels[column], text_color)
     end
 

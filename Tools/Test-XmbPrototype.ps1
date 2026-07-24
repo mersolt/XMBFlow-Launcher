@@ -15,6 +15,7 @@ $required = @(
     'XmbLayout.vertical_y(',
     'XmbTransition.request(',
     'XmbTransition.update(',
+    'XmbRender.icon(',
     'local function xmb_prototype_category_icon(column)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
