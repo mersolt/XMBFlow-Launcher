@@ -42,18 +42,18 @@ while running do
     draw_wave(368, 0.7, Color.new(0, 185, 245, 190))
     draw_wave(380, 1.2, Color.new(70, 220, 255, 230))
 
-    -- Draw the vertical axis first. Earlier objects may rise behind the
-    -- category anchor, which is deliberately drawn afterwards in the
-    -- foreground and never shifts or becomes occluded.
+    -- XMB keeps a fixed category anchor. The current object occupies the
+    -- first slot below it; the immediately previous object appears above it
+    -- in a separate slot, never crossing or covering the category icon.
     local selected_option = selected_options[selected_column]
     for option = 1, option_counts[selected_column] do
         local offset = option - selected_option
-        if offset >= -2 and offset <= 2 then
+        if offset >= -1 and offset <= 2 then
             local selected = option == selected_option
             local scale = selected and 0.62 or 0.42
             local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 145)
             local x = 90 + (selected_column - 1) * 130
-            local y = 296 + offset * 66
+            local y = offset == -1 and 62 or 296 + offset * 66
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[selected_column], scale, scale, color)
         end
     end
