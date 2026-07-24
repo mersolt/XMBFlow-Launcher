@@ -36,9 +36,13 @@ $required = @(
     'xmbPrototypeAppOptionsOpen = false',
     'xmbPrototypeAppOptionsVisualSelection = 1',
     'local function xmb_prototype_draw_app_options()',
+    'local function xmb_prototype_current_selected_entry()',
+    'local function xmb_prototype_is_app_entry(entry)',
+    'local function xmb_prototype_draw_information_card()',
     '"Information", "Change category"',
     'xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(',
     '"app0:/DATA/xmb-app-options-highlight.png"',
+    '"app0:/DATA/xmb-app-options-panel.png"',
     'Graphics.drawScaleImage(panel_x, anchor_y - math.floor(row_height / 2), xmbPrototypeAppOptionsHighlight, 1, 1',
     'xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha +',
     'Sound.setVolume(xmbNavigationClick, 32767)',
@@ -107,6 +111,9 @@ if (-not $text.Contains('xmb_prototype_activate_inert_selection(xmbPrototypeColu
 }
 if (-not $text.Contains('xmbPrototypeAppOptionsOpen = true')) {
     throw 'Triangle must open the inert XMB app options pane for selected app entries.'
+}
+if ($text.Contains('(xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_TRIANGLE)')) {
+    throw 'Triangle must use selected-entry app detection instead of a column-specific check.'
 }
 if ($text.Contains('xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP)')) {
     throw 'Apps navigation must use the shared XMB direction handler exactly once.'
