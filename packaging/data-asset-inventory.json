@@ -409,7 +409,8 @@
                        "path":  "DATA/font-SawarabiGothic-Regular.ttf",
                        "kind":  "other",
                        "source_references":  [
-                                                 "dynamic font selection"
+                                                 "dynamic font selection",
+                                                 "xmb-test.lua"
                                              ],
                        "status":  "missing-replacement-required"
                    },
@@ -1432,10 +1433,19 @@
                        "status":  "missing-replacement-required"
                    },
                    {
+                       "path":  "DATA/xmb-cursor.ogg",
+                       "kind":  "audio",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
                        "path":  "DATA/xmb-icon-apps.png",
                        "kind":  "image",
                        "source_references":  [
-                                                 "index.lua"
+                                                 "index.lua",
+                                                 "xmb-test.lua"
                                              ],
                        "status":  "missing-replacement-required"
                    },
@@ -1443,7 +1453,8 @@
                        "path":  "DATA/xmb-icon-games.png",
                        "kind":  "image",
                        "source_references":  [
-                                                 "index.lua"
+                                                 "index.lua",
+                                                 "xmb-test.lua"
                                              ],
                        "status":  "missing-replacement-required"
                    },
@@ -1451,7 +1462,16 @@
                        "path":  "DATA/xmb-icon-music.png",
                        "kind":  "image",
                        "source_references":  [
-                                                 "index.lua"
+                                                 "index.lua",
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-icon-network.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
                                              ],
                        "status":  "missing-replacement-required"
                    },
@@ -1459,7 +1479,8 @@
                        "path":  "DATA/xmb-icon-photo.png",
                        "kind":  "image",
                        "source_references":  [
-                                                 "index.lua"
+                                                 "index.lua",
+                                                 "xmb-test.lua"
                                              ],
                        "status":  "missing-replacement-required"
                    },
@@ -1467,7 +1488,8 @@
                        "path":  "DATA/xmb-icon-settings.png",
                        "kind":  "image",
                        "source_references":  [
-                                                 "index.lua"
+                                                 "index.lua",
+                                                 "xmb-test.lua"
                                              ],
                        "status":  "missing-replacement-required"
                    },
@@ -1475,7 +1497,80 @@
                        "path":  "DATA/xmb-icon-video.png",
                        "kind":  "image",
                        "source_references":  [
-                                                 "index.lua"
+                                                 "index.lua",
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-object-photoviewer.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-object-saved-data.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-object-trophy.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-setting-display.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-setting-network.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-setting-sound.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-setting-system.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-setting-theme.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-setting-time.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "xmb-test.lua"
                                              ],
                        "status":  "missing-replacement-required"
                    }
