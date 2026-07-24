@@ -1,0 +1,22 @@
+﻿{
+    "schema":  1,
+    "provenance":  "User-provided original XMBFlow icon artwork; author asserted original work in project discussion on 2026-07-24.",
+    "license":  "LicenseRef-XMBFlow-Original",
+    "transformation":  "Tools/Import-XmbFlowOriginalThemeAndSavedDataIcons.ps1",
+    "files":  [
+                  {
+                      "input_name":  "theme-settings.png",
+                      "input_sha256":  "58a0e0da6061e5b867ff4b49b39d2c67e8c194ff451c4b6eb07b22e0173e7856",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-setting-theme.png",
+                      "output_sha256":  "4e13c18a715843182c00e54a5d1b5e86feb01ea74ae0bf0cd00c245c1c1a4a91",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "saved-data-utility.png",
+                      "input_sha256":  "bee02d461b69c5fd7459b0543cdae2912352b59ca4b9caf4ef854c7c34ec1029",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-object-saved-data.png",
+                      "output_sha256":  "f3e1473935c8e67850dcad12d66776882eaed28ba4b96ba623aea6da277668db",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  }
+              ]
+}

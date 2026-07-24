@@ -17,11 +17,11 @@ local vertical_fade_delay = 0
 local glow_phase = 0
 local held_direction = 0
 local navigation_repeat = 0
-local column_count = 7
+local column_count = 8
 local category_anchor_x = 480
-local option_counts = {6, 3, 3, 3, 6, 2, 4}
-local selected_options = {1, 1, 1, 1, 1, 1, 1}
-local visual_options = {1, 1, 1, 1, 1, 1, 1}
+local option_counts = {7, 3, 3, 3, 6, 2, 3, 2}
+local selected_options = {1, 1, 1, 1, 1, 1, 1, 1}
+local visual_options = {1, 1, 1, 1, 1, 1, 1, 1}
 local oldpad = Controls.read()
 local running = true
 local category_icons = {
@@ -31,31 +31,35 @@ local category_icons = {
     Graphics.loadImage("app0:/DATA/xmb-icon-video.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-games.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-network.png"),
+    Graphics.loadImage("app0:/DATA/xmb-icon-apps.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-apps.png")
 }
 local setting_icons = {
+    theme = Graphics.loadImage("app0:/DATA/xmb-setting-theme.png"),
     sound = Graphics.loadImage("app0:/DATA/xmb-setting-sound.png"),
     network = Graphics.loadImage("app0:/DATA/xmb-setting-network.png"),
     display = Graphics.loadImage("app0:/DATA/xmb-setting-display.png"),
     system = Graphics.loadImage("app0:/DATA/xmb-setting-system.png"),
     time = Graphics.loadImage("app0:/DATA/xmb-setting-time.png"),
     photoviewer = Graphics.loadImage("app0:/DATA/xmb-object-photoviewer.png"),
-    trophy = Graphics.loadImage("app0:/DATA/xmb-object-trophy.png")
+    trophy = Graphics.loadImage("app0:/DATA/xmb-object-trophy.png"),
+    saved_data = Graphics.loadImage("app0:/DATA/xmb-object-saved-data.png")
 }
 Sound.init()
 local navigation_click = Sound.open("app0:/DATA/xmb-cursor.ogg")
 local font_buffer = Extended.loadFontIntoMemory("app0:/DATA/font-SawarabiGothic-Regular.ttf")
 local font = Extended.loadFontFromMemory(font_buffer)
 Font.setPixelSizes(font, 18)
-local category_labels = {"Settings", "Photo", "Music", "Video", "Games", "Network", "Apps"}
+local category_labels = {"Settings", "Photo", "Music", "Video", "Games", "Network", "System Apps", "Homebrew Apps"}
 local object_labels = {
-    {"Theme Settings", "Display Settings", "Sound Settings", "Network Settings", "System Settings", "Date and Time Settings"},
-    {"Photo Viewer", "Camera", "Slideshow"},
+    {"Theme Settings", "Display Settings", "Sound Settings", "Network Settings", "System Settings", "Date and Time Settings", "XMBFlow Settings"},
+    {"Gallery", "Camera", "Panoramic Camera"},
     {"Music Library", "Now Playing", "Internet Radio"},
     {"Video Library", "Remote Play", "Video Settings"},
     {"Memory Stick", "Saved Data Utility", "Game Settings", "Trophy Collection", "Retro Systems", "Collections"},
     {"Internet Browser", "Online Manual"},
-    {"LiveArea Apps", "Homebrew Apps", "Downloads", "XMBFlow Settings"}
+    {"LiveArea Apps", "Downloads", "Utilities"},
+    {"Homebrew Apps", "Homebrew Utilities"}
 }
 
 local function draw_wave(base_y, phase, color)
@@ -82,6 +86,7 @@ local function draw_vertical_options(column, alpha)
             local x = category_anchor_x
             local y = 296 + relative * 66
             local object_icon = category_icons[column]
+            if column == 1 and option == 1 then object_icon = setting_icons.theme end
             if column == 1 and option == 2 then object_icon = setting_icons.display end
             if column == 1 and option == 3 then object_icon = setting_icons.sound end
             if column == 1 and option == 4 then object_icon = setting_icons.network end
@@ -89,6 +94,7 @@ local function draw_vertical_options(column, alpha)
             if column == 1 and option == 6 then object_icon = setting_icons.time end
             if column == 2 and option == 1 then object_icon = setting_icons.photoviewer end
             if column == 5 and option == 4 then object_icon = setting_icons.trophy end
+            if column == 5 and option == 2 then object_icon = setting_icons.saved_data end
             if relative < 0 then
                 y = 296 + relative * 234
             end

@@ -38,10 +38,12 @@ for icon in settings photo music video games network apps; do
 done
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-sound.png" ] || { echo 'Missing reviewed sound-settings icon.' >&2; exit 1; }
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-network.png" ] || { echo 'Missing reviewed network-settings icon.' >&2; exit 1; }
+[ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-theme.png" ] || { echo 'Missing reviewed theme-settings icon.' >&2; exit 1; }
 for icon in xmb-setting-display xmb-setting-system xmb-setting-time xmb-object-photoviewer; do
     [ -f "$root_dir/assets/bootstrap-placeholders/DATA/$icon.png" ] || { echo "Missing reviewed object icon: $icon" >&2; exit 1; }
 done
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-object-trophy.png" ] || { echo 'Missing reviewed trophy icon.' >&2; exit 1; }
+[ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-object-saved-data.png" ] || { echo 'Missing reviewed saved-data icon.' >&2; exit 1; }
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/font-SawarabiGothic-Regular.ttf" ] || { echo 'Missing reviewed mockup font.' >&2; exit 1; }
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-cursor.ogg" ] || { echo 'Missing original navigation sound.' >&2; exit 1; }
 [ -f "$lua_entry" ] || { echo "Missing Lua entry source: $lua_entry" >&2; exit 1; }
@@ -63,6 +65,7 @@ mkdir -p "$build_dir"
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-games.png=DATA/xmb-icon-games.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-network.png=DATA/xmb-icon-network.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-apps.png=DATA/xmb-icon-apps.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-theme.png=DATA/xmb-setting-theme.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-sound.png=DATA/xmb-setting-sound.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-network.png=DATA/xmb-setting-network.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-display.png=DATA/xmb-setting-display.png" \
@@ -70,6 +73,7 @@ mkdir -p "$build_dir"
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-time.png=DATA/xmb-setting-time.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-object-photoviewer.png=DATA/xmb-object-photoviewer.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-object-trophy.png=DATA/xmb-object-trophy.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-object-saved-data.png=DATA/xmb-object-saved-data.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-cursor.ogg=DATA/xmb-cursor.ogg" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/font-SawarabiGothic-Regular.ttf=DATA/font-SawarabiGothic-Regular.ttf" \
     -a "$root_dir/assets/third-party-notices/SawarabiGothic-OFL.txt=THIRD-PARTY-NOTICES/SawarabiGothic-OFL.txt" \
