@@ -9,7 +9,7 @@ foreach ($entry in $required) {
 $forbidden = @(
     'ux0:', 'ur0:', 'vs0:', 'System.installVpk', 'System.reboot',
     'System.deleteFile', 'System.deleteDirectory', 'System.copyFile',
-    'dofile(', 'loadfile(', 'Sound.', 'Font.'
+    'dofile(', 'loadfile(', 'Sound.'
 )
 foreach ($entry in $forbidden) {
     if ($text.Contains($entry)) { throw "Minimal XMB profile must not contain: $entry" }
@@ -21,5 +21,6 @@ if (-not $text.Contains('local y = offset == -1 and 62 or 296 + offset * 66')) {
 foreach ($icon in @('settings','photo','music','video','games','apps')) {
     if (-not $text.Contains("app0:/DATA/xmb-icon-$icon.png")) { throw "Missing reviewed category icon: $icon" }
 }
+if (-not $text.Contains('font-SawarabiGothic-Regular.ttf') -or -not $text.Contains('Font.print')) { throw 'Mockup text must use the reviewed packaged font.' }
 
 Write-Host 'XMB minimal profile structural checks passed.'

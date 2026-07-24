@@ -11,6 +11,7 @@ local selected_column = 5
 local column_count = 6
 local option_counts = {4, 3, 4, 3, 5, 3}
 local selected_options = {1, 1, 1, 1, 1, 1}
+local visual_options = {1, 1, 1, 1, 1, 1}
 local oldpad = Controls.read()
 local running = true
 local category_icons = {
@@ -20,6 +21,18 @@ local category_icons = {
     Graphics.loadImage("app0:/DATA/xmb-icon-video.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-games.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-apps.png")
+}
+local font_buffer = Extended.loadFontIntoMemory("app0:/DATA/font-SawarabiGothic-Regular.ttf")
+local font = Extended.loadFontFromMemory(font_buffer)
+Font.setPixelSizes(font, 18)
+local category_labels = {"Settings", "Photo", "Music", "Video", "Games", "Network"}
+local object_labels = {
+    {"Theme Settings", "Display Settings", "Power Settings", "System Information"},
+    {"Photo Viewer", "Camera", "Slideshow"},
+    {"Music Library", "Now Playing", "Internet Radio", "Sound Settings"},
+    {"Video Library", "Remote Play", "Video Settings"},
+    {"Memory Stick", "Saved Data Utility", "Game Settings", "Retro Systems", "Collections"},
+    {"Internet Browser", "Online Manual", "Network Settings"}
 }
 
 local function draw_wave(base_y, phase, color)
@@ -42,19 +55,31 @@ while running do
     draw_wave(368, 0.7, Color.new(0, 185, 245, 190))
     draw_wave(380, 1.2, Color.new(70, 220, 255, 230))
 
+    -- Static mock status presentation, modelled on the compact top-right
+    -- arrangement in the supplied reference video.
+    Font.print(font, 770, 18, "7/4  0:14", Color.new(245, 250, 255, 230))
+    Graphics.fillRect(914, 930, 21, 31, Color.new(245, 250, 255, 230))
+    Graphics.fillRect(931, 934, 24, 28, Color.new(245, 250, 255, 230))
+    Graphics.fillRect(917, 927, 23, 29, Color.new(4, 10, 28, 255))
+    Graphics.fillRect(920, 929, 22, 27, Color.new(245, 250, 255, 230))
+    Graphics.fillRect(944, 933, 23, 27, Color.new(245, 250, 255, 230))
+
     -- XMB keeps a fixed category anchor. The current object occupies the
     -- first slot below it; the immediately previous object appears above it
     -- in a separate slot, never crossing or covering the category icon.
     local selected_option = selected_options[selected_column]
+    visual_options[selected_column] = visual_options[selected_column] + (selected_option - visual_options[selected_column]) * 0.18
+    local visual_option = visual_options[selected_column]
     for option = 1, option_counts[selected_column] do
-        local offset = option - selected_option
+        local offset = option - visual_option
         if offset >= -1 and offset <= 2 then
-            local selected = option == selected_option
+            local selected = math.abs(offset) < 0.18
             local scale = selected and 0.62 or 0.42
             local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 145)
             local x = 90 + (selected_column - 1) * 130
             local y = offset == -1 and 62 or 296 + offset * 66
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[selected_column], scale, scale, color)
+            Font.print(font, x + 40, y - 10, object_labels[selected_column][option], color)
         end
     end
 
@@ -64,6 +89,7 @@ while running do
         local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 150)
         local scale = selected and 1.15 or 0.82
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
+        Font.print(font, x - 30, 226, category_labels[column], color)
     end
 
     local pad = Controls.read()
