@@ -8,6 +8,12 @@ $guardText = Get-Content -Raw $Guard
 foreach ($required in @('local xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true', 'files_table = import_cached_DB()', 'local xmbPrototypeEnabled = xmbSafeProfile')) {
     if (-not $sourceText.Contains($required)) { throw "Missing safe-profile entry invariant: $required" }
 }
+foreach ($required in @('function Setup_Adrenaline()', 'function AutoMakeBootBin(', 'function launch_Adrenaline(')) {
+    $start = $sourceText.IndexOf($required)
+    if ($start -lt 0) { throw "Missing legacy helper boundary: $required" }
+    $slice = $sourceText.Substring($start, [Math]::Min(260, $sourceText.Length - $start))
+    if (-not $slice.Contains('if xmbSafeProfile then')) { throw "Safe profile must return before $required performs work." }
+}
 foreach ($required in @('XmbSafeProfile = {}', 'function XmbSafeProfile.enable()', '"installVpk"', '"reboot"', '"copyFile"', '"deleteFile"', '"deleteDirectory"', '"rename"', '"createDirectory"')) {
     if (-not $guardText.Contains($required)) { throw "Missing safe-profile guard invariant: $required" }
 }

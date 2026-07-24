@@ -4373,6 +4373,9 @@ end
     end
 
     function Setup_Adrenaline()
+        if xmbSafeProfile then
+            return false
+        end
 
         -- Install RetroFlow Adrenaline Launcher if needed
             if not System.doesAppExist("RETROLNCR") then
@@ -5359,6 +5362,9 @@ function cleanRomNames()
 end
 
 function AutoMakeBootBin(def_rom_location, def_driver, def_bin, def_plugins, def_speed, def_hm, def_nonpdrm, def_suspend)
+    if xmbSafeProfile then
+        return false
+    end
 
     -- Driver and bin tables
     local drivers = { "ENABLE", "INFERN0", "MARCH33", "NP9660" } -- 0,0,1,2
@@ -5634,6 +5640,10 @@ function prepare_for_launch()
 end
 
 function launch_Adrenaline(def_rom_location, def_rom_title_id, def_rom_filename)
+
+    if xmbSafeProfile then
+        return false
+    end
 
     check_app_installed("RETROLNCR", lang_lines.Please_install_RetroFlow_Adrenaline_Launcher .. "\n" .. lang_lines.The_VPK_is_saved_here .. "\n\nux0:/app/RETROFLOW/payloads/\nRetroFlow Adrenaline Launcher.vpk")
     if launch_check_app_installed == false then

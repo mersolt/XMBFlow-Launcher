@@ -13,7 +13,7 @@ uses existing complete cache tables only, and blocks mutation/helper APIs.
 | Directory/default setup | 116-136, 1426-1512 | `createDirectory` and `copyFile` are blocked. Existing data is read only. |
 | Cache rebuild/startup scan | 11078-11107 | Skipped. Only a complete existing cache is imported; otherwise the library is empty. |
 | Artwork downloads | 12283-13645 | `Network.downloadFile` is blocked. |
-| Helper install/repair/reboot | 4364-4492, 5374-5702 | `installVpk`, payload copies/deletes, and reboot are blocked. The safe profile does not call the scan path that invokes `Setup_Adrenaline`. |
+| Helper install/repair/reboot | 4364-4492, 5374-5702 | `Setup_Adrenaline`, `AutoMakeBootBin`, and `launch_Adrenaline` return immediately; `installVpk`, payload copies/deletes, and reboot are also blocked at the API boundary. |
 | Cache, collection, metadata deletes | throughout legacy menus | `deleteFile`, `deleteDirectory`, and `rename` are blocked. |
 | Settings writes | `SaveSettings` at 3216 | Returns without writing. |
 
