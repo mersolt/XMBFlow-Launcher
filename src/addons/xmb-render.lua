@@ -12,3 +12,11 @@ function XmbRender.glowing_icon(image, center_x, center_y, scale, glow_scale, co
     XmbRender.icon(image, center_x, center_y, glow_scale, glow_color)
     XmbRender.icon(image, center_x, center_y, scale, color)
 end
+
+function XmbRender.each_category(columns, visual_index, anchor_x, spacing, draw_category)
+    for index, label in ipairs(columns) do
+        local relative = XmbLayout.relative(index, visual_index)
+        local x = XmbLayout.horizontal_x(anchor_x, index, visual_index, spacing)
+        draw_category(index, label, relative, x, XmbLayout.focus(relative))
+    end
+end

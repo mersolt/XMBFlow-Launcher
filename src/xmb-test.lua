@@ -175,10 +175,7 @@ while running do
     draw_vertical_options(vertical_column, vertical_alpha * (1 - 0.52 * submenu_alpha), parent_x)
     if submenu_alpha > 0.01 then draw_submenu_options(vertical_column, parent_x) end
 
-    for column = 1, column_count do
-        local relative = XmbLayout.relative(column, visual_column)
-        local x = XmbLayout.horizontal_x(parent_x, column, visual_column, 130)
-        local focus = XmbLayout.focus(relative)
+    XmbRender.each_category(category_labels, visual_column, parent_x, 130, function(column, _, relative, x, focus)
         local category_alpha = math.floor((150 + 105 * focus) * (column == selected_column and 1 or 1 - submenu_alpha))
         local color = Color.new(255, 255, 255, category_alpha)
         local pulse = 0.50 + 0.50 * ((math.sin(glow_phase / 18) + 1) * 0.5)
@@ -192,7 +189,7 @@ while running do
             XmbRender.icon(category_icons[column], x, 166, scale, color)
         end
         Font.print(font, x - 30, 226, category_labels[column], text_color)
-    end
+    end)
 
     local pad = Controls.read()
     local analog_x, analog_y = Controls.readLeftAnalog()

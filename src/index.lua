@@ -14505,17 +14505,14 @@ local function draw_xmb_prototype()
     -- moves behind it. This state is presentation-only; it never changes
     -- showCat, caches, scanners, settings, or a launch target.
     local category_anchor_x = 480
-    for index, label in ipairs(xmb_prototype_columns) do
-        local relative = XmbLayout.relative(index, xmbPrototypeVisualColumn)
-        local x = XmbLayout.horizontal_x(category_anchor_x, index, xmbPrototypeVisualColumn, 130)
-        local focus = XmbLayout.focus(relative)
+    XmbRender.each_category(xmb_prototype_columns, xmbPrototypeVisualColumn, category_anchor_x, 130, function(index, label, relative, x, focus)
         local label_color = Color.new(190 + math.floor(65 * focus), 205 + math.floor(50 * focus), 225 + math.floor(30 * focus), 145 + math.floor(110 * focus))
 
         local icon = xmb_prototype_category_icon(index)
         local scale = 0.82 + 0.33 * focus
         XmbRender.icon(icon, x, 166, scale, label_color)
         Font.print(fnt20, x - 42, 226, label, label_color)
-    end
+    end)
 
     Font.print(fnt22, 110, 150, xmb_prototype_columns[display_column], white)
     if showing_games then

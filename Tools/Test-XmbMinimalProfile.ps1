@@ -27,7 +27,7 @@ foreach ($entry in $forbidden) {
 }
 if ($text.Contains('SCE_CTRL_CIRCLE_MAP')) { throw 'Standalone XMB test must not rely on the legacy mapping variable.' }
 if ($text.Contains('draw_placeholder_card') -or $text.Contains('Graphics.fillRect(x, x + 52')) { throw 'Standalone XMB test must render icons without obsolete markers or cards.' }
-if ($text.IndexOf('local selected_option = selected_options[selected_column]') -gt $text.IndexOf('for column = 1, column_count do')) { throw 'Vertical objects must render before the fixed category axis.' }
+if ($text.IndexOf('local selected_option = selected_options[selected_column]') -gt $text.IndexOf('XmbRender.each_category(category_labels')) { throw 'Vertical objects must render before the fixed category axis.' }
 if (-not $text.Contains('local vertical_column = 5') -or -not $text.Contains('local pending_column = 5') -or -not $text.Contains('local vertical_fade_direction = 0') -or -not $text.Contains('local vertical_fade_delay = 0') -or -not $text.Contains('XmbTransition.update(visual_column, selected_column, vertical_alpha, vertical_fade_direction, vertical_fade_delay, vertical_column, pending_column)')) { throw 'Horizontal category changes must fully fade out, pause, then gently fade in the vertical object axis.' }
 if (-not $text.Contains('XmbLayout.vertical_y(296, option, visual_option, 66, 234)') -or $text.Contains('local arc = 1 - math.abs(1 + relative * 2)')) { throw 'The preceding object must move behind the fixed category icon without a lateral detour.' }
 if (-not $text.Contains('math.sin(glow_phase / 18)') -or -not $text.Contains('XmbRender.glowing_icon(category_icons[column]') -or -not $text.Contains('local text_color = Color.new')) { throw 'Focused icons and labels must use the persistent white XMB-style silhouette glow pulse.' }
@@ -42,7 +42,7 @@ foreach ($icon in @('xmb-setting-theme.png', 'xmb-setting-sound.png', 'xmb-setti
 }
 if (-not $text.Contains('app0:/DATA/xmb-object-trophy.png') -or -not $text.Contains('"System Apps", "Homebrew Apps"') -or -not $text.Contains('"LiveArea Apps", "Downloads", "Utilities"') -or -not $text.Contains('"Homebrew Apps", "Homebrew Utilities"')) { throw 'System Apps and Homebrew Apps must remain separate mockup categories, and Games must expose Trophy Collection.' }
 if (-not $text.Contains('"Sound Settings", "Network Settings", "System Settings", "Date and Time Settings"') -or -not $text.Contains('if column == 1 and option == 3 then object_icon = setting_icons.sound end')) { throw 'Settings icons must appear in the Settings column.' }
-if (-not $text.Contains('XmbLayout.horizontal_x(parent_x, column, visual_column, 130)')) { throw 'The horizontal category axis must interpolate around the submenu-adjusted XMB anchor.' }
+if (-not $text.Contains('XmbRender.each_category(category_labels, visual_column, parent_x, 130')) { throw 'The horizontal category axis must interpolate around the submenu-adjusted XMB anchor.' }
 foreach ($icon in @('settings','photo','music','video','games','network','apps')) {
     if (-not $text.Contains("app0:/DATA/xmb-icon-$icon.png")) { throw "Missing reviewed category icon: $icon" }
 }
