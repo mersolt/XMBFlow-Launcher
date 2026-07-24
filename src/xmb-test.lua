@@ -14,6 +14,10 @@ local pending_column = 5
 local vertical_alpha = 1
 local vertical_fade_direction = 0
 local vertical_fade_delay = 0
+local submenu_open = false
+local submenu_selection = 1
+local submenu_visual_selection = 1
+local submenu_alpha = 0
 local glow_phase = 0
 local held_direction = 0
 local navigation_repeat = 0
@@ -61,12 +65,27 @@ local object_labels = {
     {"LiveArea Apps", "Downloads", "Utilities"},
     {"Homebrew Apps", "Homebrew Utilities"}
 }
+local submenu_labels = {"Placeholder Action", "Preview Details", "More Options"}
 
 local function draw_wave(base_y, phase, color)
     for x = 0, width - 8, 8 do
         local y = math.floor(base_y + math.sin((x / 92) + phase) * 28)
         Graphics.fillRect(x, x + 8, y, y + 5, color)
     end
+end
+
+local function get_object_icon(column, option)
+    local object_icon = category_icons[column]
+    if column == 1 and option == 1 then object_icon = setting_icons.theme end
+    if column == 1 and option == 2 then object_icon = setting_icons.display end
+    if column == 1 and option == 3 then object_icon = setting_icons.sound end
+    if column == 1 and option == 4 then object_icon = setting_icons.network end
+    if column == 1 and option == 5 then object_icon = setting_icons.system end
+    if column == 1 and option == 6 then object_icon = setting_icons.time end
+    if column == 2 and option == 1 then object_icon = setting_icons.photoviewer end
+    if column == 5 and option == 4 then object_icon = setting_icons.trophy end
+    if column == 5 and option == 2 then object_icon = setting_icons.saved_data end
+    return object_icon
 end
 
 local function draw_vertical_options(column, alpha)
@@ -85,16 +104,7 @@ local function draw_vertical_options(column, alpha)
             local text_color = Color.new(text_brightness, text_brightness, text_brightness, math.floor((145 + 110 * focus) * alpha))
             local x = category_anchor_x
             local y = 296 + relative * 66
-            local object_icon = category_icons[column]
-            if column == 1 and option == 1 then object_icon = setting_icons.theme end
-            if column == 1 and option == 2 then object_icon = setting_icons.display end
-            if column == 1 and option == 3 then object_icon = setting_icons.sound end
-            if column == 1 and option == 4 then object_icon = setting_icons.network end
-            if column == 1 and option == 5 then object_icon = setting_icons.system end
-            if column == 1 and option == 6 then object_icon = setting_icons.time end
-            if column == 2 and option == 1 then object_icon = setting_icons.photoviewer end
-            if column == 5 and option == 4 then object_icon = setting_icons.trophy end
-            if column == 5 and option == 2 then object_icon = setting_icons.saved_data end
+            local object_icon = get_object_icon(column, option)
             if relative < 0 then
                 y = 296 + relative * 234
             end
@@ -105,6 +115,26 @@ local function draw_vertical_options(column, alpha)
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, object_icon, scale, scale, color)
             Font.print(font, x + 40, y - 10, object_labels[column][option], text_color)
         end
+    end
+end
+
+local function draw_submenu_options(column)
+    if submenu_alpha <= 0.01 then return end
+    submenu_visual_selection = submenu_visual_selection + (submenu_selection - submenu_visual_selection) * 0.18
+    for option = 1, #submenu_labels do
+        local relative = option - submenu_visual_selection
+        local focus = math.max(0, 1 - math.abs(relative))
+        local scale = 0.34 + 0.16 * focus
+        local y = 296 + relative * 66
+        if relative < 0 then y = 296 + relative * 234 end
+        local icon = get_object_icon(column, ((selected_options[column] + option - 1) % option_counts[column]) + 1)
+        local alpha = math.floor((130 + 125 * focus) * submenu_alpha)
+        if focus > 0.02 then
+            local glow_scale = scale + 0.04 * focus
+            Graphics.drawScaleImage(700 - 48 * glow_scale, y - 48 * glow_scale, icon, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((38 + 92 * focus) * submenu_alpha)))
+        end
+        Graphics.drawScaleImage(700 - 48 * scale, y - 48 * scale, icon, scale, scale, Color.new(255, 255, 255, alpha))
+        Font.print(font, 740, y - 10, submenu_labels[option], Color.new(255, 255, 255, alpha))
     end
 end
 
@@ -149,7 +179,14 @@ while running do
             if vertical_alpha == 1 then vertical_fade_direction = 0 end
         end
     end
-    draw_vertical_options(vertical_column, vertical_alpha)
+    if submenu_open then
+        submenu_alpha = math.min(1, submenu_alpha + 0.10)
+        draw_vertical_options(vertical_column, vertical_alpha * 0.48)
+        draw_submenu_options(vertical_column)
+    else
+        submenu_alpha = math.max(0, submenu_alpha - 0.14)
+        draw_vertical_options(vertical_column, vertical_alpha)
+    end
 
     for column = 1, column_count do
         local relative = column - visual_column
@@ -188,28 +225,54 @@ while running do
         held_direction = direction
         navigation_repeat = is_new_direction and 18 or 5
         if direction == -1 then
-            selected_column = selected_column - 1
-            if selected_column < 1 then selected_column = column_count end
-            pending_column = selected_column
-            if pending_column ~= vertical_column then vertical_fade_direction = -1 end
+            if submenu_open then
+                submenu_open = false
+            else
+                selected_column = selected_column - 1
+                if selected_column < 1 then selected_column = column_count end
+                pending_column = selected_column
+                if pending_column ~= vertical_column then vertical_fade_direction = -1 end
+            end
         elseif direction == 1 then
-            selected_column = selected_column + 1
-            if selected_column > column_count then selected_column = 1 end
-            pending_column = selected_column
-            if pending_column ~= vertical_column then vertical_fade_direction = -1 end
+            if not submenu_open then
+                selected_column = selected_column + 1
+                if selected_column > column_count then selected_column = 1 end
+                pending_column = selected_column
+                if pending_column ~= vertical_column then vertical_fade_direction = -1 end
+            end
         elseif direction == -2 then
-            selected_options[selected_column] = selected_options[selected_column] - 1
-            if selected_options[selected_column] < 1 then selected_options[selected_column] = option_counts[selected_column] end
+            if submenu_open then
+                submenu_selection = submenu_selection - 1
+                if submenu_selection < 1 then submenu_selection = #submenu_labels end
+            else
+                selected_options[selected_column] = selected_options[selected_column] - 1
+                if selected_options[selected_column] < 1 then selected_options[selected_column] = option_counts[selected_column] end
+            end
         elseif direction == 2 then
-            selected_options[selected_column] = selected_options[selected_column] + 1
-            if selected_options[selected_column] > option_counts[selected_column] then selected_options[selected_column] = 1 end
+            if submenu_open then
+                submenu_selection = submenu_selection + 1
+                if submenu_selection > #submenu_labels then submenu_selection = 1 end
+            else
+                selected_options[selected_column] = selected_options[selected_column] + 1
+                if selected_options[selected_column] > option_counts[selected_column] then selected_options[selected_column] = 1 end
+            end
         end
         Sound.play(navigation_click, NO_LOOP)
     else
         navigation_repeat = navigation_repeat - 1
     end
-    if Controls.check(pad, SCE_CTRL_CIRCLE) and not Controls.check(oldpad, SCE_CTRL_CIRCLE) then
-        running = false
+    if Controls.check(pad, SCE_CTRL_CROSS) and not Controls.check(oldpad, SCE_CTRL_CROSS) and not submenu_open then
+        submenu_open = true
+        submenu_selection = 1
+        submenu_visual_selection = 1
+        Sound.play(navigation_click, NO_LOOP)
+    elseif Controls.check(pad, SCE_CTRL_CIRCLE) and not Controls.check(oldpad, SCE_CTRL_CIRCLE) then
+        if submenu_open then
+            submenu_open = false
+            Sound.play(navigation_click, NO_LOOP)
+        else
+            running = false
+        end
     end
 
     Graphics.termBlend()
