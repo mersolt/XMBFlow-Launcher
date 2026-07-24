@@ -155,7 +155,7 @@
 
 -- FONTS
 
-	local font_default = "font-SawarabiGothic-Regular.woff"
+	local font_default = "font-SawarabiGothic-Regular.ttf"
 	local font_korean = "font-NotoSansCJKkr-Regular-Slim.otf"
 	local font_chinese_simplified = "font-NotoSansCJKsc-Regular-Slim.otf"
 	local font_chinese_traditional = "font-NotoSansCJKtc-Regular.otf"

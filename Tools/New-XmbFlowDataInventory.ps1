@@ -37,7 +37,7 @@ foreach ($match in [regex]::Matches((Get-Content -Raw -LiteralPath $indexPath), 
 }
 
 $fontNames = @(
-    'font-SawarabiGothic-Regular.woff',
+    'font-SawarabiGothic-Regular.ttf',
     'font-NotoSansCJKkr-Regular-Slim.otf',
     'font-NotoSansCJKsc-Regular-Slim.otf',
     'font-NotoSansCJKtc-Regular.otf'

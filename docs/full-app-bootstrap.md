@@ -27,10 +27,12 @@ language selects Korean, Simplified Chinese, or Traditional Chinese. The other
 151 tracked assets are deferred, lazy, or view-dependent; excluding them does
 not prove they may be omitted from a later full-feature package.
 
-The current placeholder generator supplies 21 of the 23 default boot files:
-19 original PNGs and the two original plane models. The remaining default
-inputs are the font and click sound, both deliberately unresolved pending
-separate source and licence records.
+The current placeholders supply all 23 default boot files: 19 original PNGs,
+two original plane models, and one original synthesized click. The default
+Sawarabi Gothic TTF is sourced unchanged from a pinned Google Fonts revision
+under OFL-1.1; its notice is retained at
+`assets/third-party-notices/SawarabiGothic-OFL.txt`. The CJK fonts remain
+conditional and unresolved.
 
 ## Package gate
 

@@ -16,6 +16,8 @@ if (Test-Path -LiteralPath $bootstrapManifestPath -PathType Leaf) {
     $bootstrapManifest = Get-Content -Raw -LiteralPath $bootstrapManifestPath | ConvertFrom-Json
     foreach ($file in $bootstrapManifest.generated_files) { $bootstrapAssets[$file.path] = $file }
 }
+$clickPath = Join-Path $BootstrapAssetDirectory 'DATA\click2.ogg'
+$fontPath = Join-Path $BootstrapAssetDirectory 'DATA\font-SawarabiGothic-Regular.ttf'
 
 # These assets are loaded unconditionally by the normal, English/default
 # startup path before the library renderer can reach the XMB overlay.
@@ -28,7 +30,7 @@ $defaultBootPaths = @(
     'DATA/hidden-small-on.png', 'DATA/hidden-large-on.png',
     'DATA/icon-cart.png', 'DATA/icon-cart-inserted.png',
     'DATA/planebg.obj', 'DATA/planefloor.obj',
-    'DATA/font-SawarabiGothic-Regular.woff'
+    'DATA/font-SawarabiGothic-Regular.ttf'
 )
 $conditionalFontPaths = @(
     'DATA/font-NotoSansCJKkr-Regular-Slim.otf',
@@ -52,17 +54,20 @@ $files = foreach ($asset in $inventory.assets | Sort-Object path) {
 
     $bootstrap = $bootstrapAssets[$asset.path]
     $isOriginalPlaceholder = $null -ne $bootstrap
+    $isOriginalClick = $asset.path -eq 'DATA/click2.ogg' -and (Test-Path -LiteralPath $clickPath -PathType Leaf)
+    $isThirdPartyFont = $asset.path -eq 'DATA/font-SawarabiGothic-Regular.ttf' -and (Test-Path -LiteralPath $fontPath -PathType Leaf)
+    $resolvedHash = if ($isOriginalPlaceholder) { $bootstrap.sha256 } elseif ($isOriginalClick) { (Get-FileHash -LiteralPath $clickPath -Algorithm SHA256).Hash.ToLowerInvariant() } elseif ($isThirdPartyFont) { (Get-FileHash -LiteralPath $fontPath -Algorithm SHA256).Hash.ToLowerInvariant() } else { $null }
     [ordered]@{
         package_path = $asset.path
         kind = $asset.kind
         source_references = @($asset.source_references)
         boot_class = $bootClass
-        source = if ($isOriginalPlaceholder) { "assets/bootstrap-placeholders/$($asset.path)" } else { $null }
-        copyright = if ($isOriginalPlaceholder) { 'Copyright XMBFlow contributors' } else { $null }
-        license = if ($isOriginalPlaceholder) { 'LicenseRef-XMBFlow-Original' } else { $null }
-        sha256 = if ($isOriginalPlaceholder) { $bootstrap.sha256 } else { $null }
-        transformation = if ($isOriginalPlaceholder) { 'Tools/New-XmbFlowBootstrapPlaceholders.ps1' } else { $null }
-        status = if ($isOriginalPlaceholder) { 'original-placeholder-traced' } else { 'unresolved-source-and-license' }
+        source = if ($isOriginalPlaceholder) { "assets/bootstrap-placeholders/$($asset.path)" } elseif ($isOriginalClick) { 'Original XMBFlow synthesized audio.' } elseif ($isThirdPartyFont) { 'https://raw.githubusercontent.com/google/fonts/9fab8b6cc7b2f20376914fd765d918c698c66d75/ofl/sawarabigothic/SawarabiGothic-Regular.ttf' } else { $null }
+        copyright = if ($isOriginalPlaceholder -or $isOriginalClick) { 'Copyright XMBFlow contributors' } elseif ($isThirdPartyFont) { 'Copyright 2016 The Sawarabi Gothic Project Authors' } else { $null }
+        license = if ($isOriginalPlaceholder -or $isOriginalClick) { 'LicenseRef-XMBFlow-Original' } elseif ($isThirdPartyFont) { 'OFL-1.1' } else { $null }
+        sha256 = $resolvedHash
+        transformation = if ($isOriginalPlaceholder) { 'Tools/New-XmbFlowBootstrapPlaceholders.ps1' } elseif ($isOriginalClick) { 'FFmpeg lavfi sine generator: 880 Hz, 0.06 s, fade-out, Vorbis.' } elseif ($isThirdPartyFont) { 'Downloaded unchanged from pinned Google Fonts revision; notice at assets/third-party-notices/SawarabiGothic-OFL.txt.' } else { $null }
+        status = if ($isOriginalPlaceholder -or $isOriginalClick) { 'original-placeholder-traced' } elseif ($isThirdPartyFont) { 'third-party-traced' } else { 'unresolved-source-and-license' }
     }
 }
 

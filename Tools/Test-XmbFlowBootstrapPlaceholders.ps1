@@ -12,7 +12,9 @@ $expected = @(
     'icon-cart-inserted.png', 'planebg.obj', 'planefloor.obj'
 )
 $actual = @(Get-ChildItem -LiteralPath $data -File | ForEach-Object Name | Sort-Object)
-if (($actual -join "`n") -ne (@($expected | Sort-Object) -join "`n")) { throw 'Bootstrap placeholder file set differs from the reviewed profile.' }
+$generated = @($manifest.generated_files | ForEach-Object { Split-Path $_.path -Leaf } | Sort-Object)
+if (($generated -join "`n") -ne (@($expected | Sort-Object) -join "`n")) { throw 'Bootstrap generator manifest differs from the reviewed placeholder profile.' }
+foreach ($name in $expected) { if ($actual -notcontains $name) { throw "Generated placeholder is absent: $name" } }
 if ($manifest.source.provenance -notmatch '^Original project artwork generated') { throw 'Wave source provenance is missing.' }
 foreach ($file in $manifest.generated_files) {
     $path = Join-Path $AssetDirectory ($file.path.Replace('/', '\\'))
@@ -24,4 +26,4 @@ foreach ($name in @('BG_Default.png', 'loading.png', 'floor.png')) {
     try { if ($image.Width -ne 960 -or $image.Height -ne 544) { throw "Unexpected canvas size for $name" } }
     finally { $image.Dispose() }
 }
-Write-Host "Bootstrap placeholder checks passed: $($actual.Count) traced original files."
+Write-Host "Bootstrap generator checks passed: $($generated.Count) generated placeholders; output contains $($actual.Count) boot inputs."

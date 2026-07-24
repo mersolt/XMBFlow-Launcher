@@ -202,12 +202,12 @@
                                                 "index.lua"
                                             ],
                       "boot_class":  "boot-required-default-profile",
-                      "source":  null,
-                      "copyright":  null,
-                      "license":  null,
-                      "sha256":  null,
-                      "transformation":  null,
-                      "status":  "unresolved-source-and-license"
+                      "source":  "Original XMBFlow synthesized audio.",
+                      "copyright":  "Copyright XMBFlow contributors",
+                      "license":  "LicenseRef-XMBFlow-Original",
+                      "sha256":  "1cc530d67bf74aa88d7ae966728cfc8e3c6c09d06c153558c623784c255cc8b2",
+                      "transformation":  "FFmpeg lavfi sine generator: 880 Hz, 0.06 s, fade-out, Vorbis.",
+                      "status":  "original-placeholder-traced"
                   },
                   {
                       "package_path":  "DATA/cover.obj",
@@ -714,18 +714,18 @@
                       "status":  "unresolved-source-and-license"
                   },
                   {
-                      "package_path":  "DATA/font-SawarabiGothic-Regular.woff",
-                      "kind":  "font",
+                      "package_path":  "DATA/font-SawarabiGothic-Regular.ttf",
+                      "kind":  "other",
                       "source_references":  [
                                                 "dynamic font selection"
                                             ],
                       "boot_class":  "boot-required-default-profile",
-                      "source":  null,
-                      "copyright":  null,
-                      "license":  null,
-                      "sha256":  null,
-                      "transformation":  null,
-                      "status":  "unresolved-source-and-license"
+                      "source":  "https://raw.githubusercontent.com/google/fonts/9fab8b6cc7b2f20376914fd765d918c698c66d75/ofl/sawarabigothic/SawarabiGothic-Regular.ttf",
+                      "copyright":  "Copyright 2016 The Sawarabi Gothic Project Authors",
+                      "license":  "OFL-1.1",
+                      "sha256":  "04f2f9111bb69cb8d3706c27b44879c2c0fac593a11edf5cfe8cec1efc92c789",
+                      "transformation":  "Downloaded unchanged from pinned Google Fonts revision; notice at assets/third-party-notices/SawarabiGothic-OFL.txt.",
+                      "status":  "third-party-traced"
                   },
                   {
                       "package_path":  "DATA/footer_gradient.png",

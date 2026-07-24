@@ -2776,7 +2776,7 @@ local img_path = ""
 
 -- Load fonts
 
-    fontname = "font-SawarabiGothic-Regular.woff"
+    fontname = "font-SawarabiGothic-Regular.ttf"
     font_buffer = Extended.loadFontIntoMemory("app0:/DATA/" .. fontname)
 
     fnt20 = Extended.loadFontFromMemory(font_buffer)
@@ -3928,7 +3928,7 @@ local lang_default =
 }
 
 -- Define fonts for languages
-font_default =                "font-SawarabiGothic-Regular.woff"
+font_default =                "font-SawarabiGothic-Regular.ttf"
 font_korean =                 "font-NotoSansCJKkr-Regular-Slim.otf"
 font_chinese_simplified =     "font-NotoSansCJKsc-Regular-Slim.otf"
 font_chinese_traditional =    "font-NotoSansCJKtc-Regular.otf"

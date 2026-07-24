@@ -406,8 +406,8 @@
                        "status":  "missing-replacement-required"
                    },
                    {
-                       "path":  "DATA/font-SawarabiGothic-Regular.woff",
-                       "kind":  "font",
+                       "path":  "DATA/font-SawarabiGothic-Regular.ttf",
+                       "kind":  "other",
                        "source_references":  [
                                                  "dynamic font selection"
                                              ],
