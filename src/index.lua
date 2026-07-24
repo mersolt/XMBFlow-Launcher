@@ -3083,8 +3083,8 @@ xmbPrototypeSystemAppsSelection = 1
 xmbPrototypeHomebrewAppsSelection = 1
 xmbPrototypeSystemAppsVisualSelection = 1
 xmbPrototypeHomebrewAppsVisualSelection = 1
-xmbPrototypeInertSelections = {[2] = 1, [6] = 1}
-xmbPrototypeInertVisualSelections = {[2] = 1, [6] = 1}
+xmbPrototypeInertSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
+xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
 xmbPrototypeGlowPhase = 0
 xmbPrototypeSubmenuAlpha = 0
 xmbPrototypeHeldDirection = 0
@@ -14326,15 +14326,31 @@ xmb_prototype_system_app_icon_paths = {
     ["ps store"] = "app0:/DATA/xmb-system-psstore.png",
     ["playstation store"] = "app0:/DATA/xmb-system-psstore.png",
     ["settings"] = "app0:/DATA/xmb-system-settings.png",
+    ["email"] = "app0:/DATA/xmb-system-email.png",
     ["trophies"] = "app0:/DATA/xmb-system-trophy.png",
     ["videos"] = "app0:/DATA/xmb-system-video.png",
     ["photos"] = "app0:/DATA/xmb-object-photoviewer.png"
 }
 xmb_prototype_inert_columns = {
+    [1] = {
+        {label = "Settings", icon_path = "app0:/DATA/xmb-system-settings.png", system_app = "NPXS10015"},
+        {label = "Parental Controls", icon_path = "app0:/DATA/xmb-setting-parental-controls.png", system_app = "NPXS10094"},
+        {label = "Return to LiveArea", icon_path = "app0:/DATA/xmb-object-return-livearea.png", action = "exit"}
+    },
     [2] = {
         {label = "Gallery", icon_path = "app0:/DATA/xmb-object-photoviewer.png"},
         {label = "Photos", icon_path = "app0:/DATA/xmb-icon-photo.png", system_app = "NPXS10004"},
         {label = "Panoramic Camera", icon_path = "app0:/DATA/xmb-object-panorama.png"}
+    },
+    [3] = {
+        {label = "Music Library", icon_path = "app0:/DATA/xmb-icon-music.png"},
+        {label = "Now Playing", icon_path = "app0:/DATA/xmb-icon-music.png"},
+        {label = "Internet Radio", icon_path = "app0:/DATA/xmb-icon-music.png"}
+    },
+    [4] = {
+        {label = "Video Library", icon_path = "app0:/DATA/xmb-icon-video.png"},
+        {label = "Remote Play", icon_path = "app0:/DATA/xmb-icon-video.png"},
+        {label = "Video Settings", icon_path = "app0:/DATA/xmb-icon-video.png"}
     },
     [6] = {
         {label = "Browser", icon_path = "app0:/DATA/xmb-system-browser.png", system_app = "NPXS10003"},
@@ -14345,10 +14361,13 @@ xmb_prototype_inert_columns = {
 -- These folder records are read-only pointers to existing RetroFlow data.
 -- They do not create a second library or save any new configuration.
 xmb_prototype_games_folders = {
+    {label = "Memory Stick"},
+    {label = "Saved Data Utility", xmb_icon_path = "app0:/DATA/xmb-object-saved-data.png"},
+    {label = "Game Settings"},
     {label = "COLLECTIONS", kind = "categories"},
     {label = "RETRO SYSTEMS", kind = "retro"},
     {label = "USER COLLECTIONS", kind = "collections"},
-    {label = "Trophies", system_app = "NPXS10008", icon_path = "app0:/DATA/xmb-system-trophy.png"}
+    {label = "Trophies", system_app = "NPXS10008", xmb_icon_path = "app0:/DATA/xmb-system-trophy.png"}
 }
 xmb_prototype_library_categories = {
     {label = "ALL GAMES", category = 0},
@@ -14493,8 +14512,8 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeHomebrewAppsSelection = 1
     xmbPrototypeSystemAppsVisualSelection = 1
     xmbPrototypeHomebrewAppsVisualSelection = 1
-    xmbPrototypeInertSelections = {[2] = 1, [6] = 1}
-    xmbPrototypeInertVisualSelections = {[2] = 1, [6] = 1}
+    xmbPrototypeInertSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
+    xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
     xmbPrototypeGlowPhase = 0
     xmbPrototypeSubmenuAlpha = 0
     xmbPrototypeHeldDirection = 0
@@ -14535,7 +14554,7 @@ local function xmb_prototype_current_read_only_apps_list(column)
         local entries = {}
         for _, entry in ipairs(data.category_rows(xmb_prototype_system_apps_category)) do
             local label = string.lower(entry.apptitle or entry.title or entry.name or "")
-            if label ~= "trophies" and label ~= "trophy collection" then
+            if label ~= "trophies" and label ~= "trophy collection" and label ~= "photos" and label ~= "browser" and label ~= "internet browser" and label ~= "settings" and label ~= "parental controls" then
                 table.insert(entries, entry)
             end
         end
@@ -14784,7 +14803,7 @@ local function draw_xmb_prototype()
             XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
-                local icon = xmb_prototype_object_icon(item.icon_path) or vertical_icon
+                local icon = xmb_prototype_object_icon(item.xmb_icon_path) or vertical_icon
                 xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1))
             end)
         end
@@ -14804,7 +14823,7 @@ local function draw_xmb_prototype()
             local label = xmb_prototype_read_only_item_label(item)
             xmb_prototype_draw_vertical_object(xmb_prototype_read_only_item_icon(display_column, item), category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
         end)
-    elseif display_column == 2 or display_column == 6 then
+    elseif xmb_prototype_inert_columns[display_column] ~= nil then
         local inert_list = xmb_prototype_current_inert_list(display_column)
         local selection = xmbPrototypeInertSelections[display_column]
         local visual_selection = XmbNavigation.approach(xmbPrototypeInertVisualSelections[display_column], selection, 0.18)
@@ -14851,7 +14870,7 @@ function xmb_prototype_move_direction(direction)
             xmb_prototype_move_games_selection(-1)
         elseif xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8 then
             xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, -1)
-        elseif xmbPrototypeColumn == 2 or xmbPrototypeColumn == 6 then
+        elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil then
             xmb_prototype_move_inert_selection(xmbPrototypeColumn, -1)
         end
     elseif direction == 2 then
@@ -14859,7 +14878,7 @@ function xmb_prototype_move_direction(direction)
             xmb_prototype_move_games_selection(1)
         elseif xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8 then
             xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, 1)
-        elseif xmbPrototypeColumn == 2 or xmbPrototypeColumn == 6 then
+        elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil then
             xmb_prototype_move_inert_selection(xmbPrototypeColumn, 1)
         end
     end
@@ -14910,6 +14929,10 @@ end
 function xmb_prototype_activate_inert_selection(column)
     local entry = xmb_prototype_current_inert_list(column)[xmbPrototypeInertSelections[column]]
     if entry == nil or type(entry.system_app) ~= "string" then
+        if entry and entry.action == "exit" then
+            System.exit()
+            return true
+        end
         return false
     end
     return xmb_prototype_start_system_app(entry.system_app)
@@ -22403,7 +22426,7 @@ while true do
                 end
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 xmb_prototype_activate_app_selection(xmbPrototypeColumn)
-            elseif (xmbPrototypeColumn == 2 or xmbPrototypeColumn == 6) and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+            elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 xmb_prototype_activate_inert_selection(xmbPrototypeColumn)
             end
         end

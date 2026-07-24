@@ -42,6 +42,10 @@ $required = @(
     '"NPXS10004"',
     '"NPXS10008"',
     '"app0:/DATA/xmb-object-panorama.png"',
+    '"app0:/DATA/xmb-setting-parental-controls.png"',
+    '"app0:/DATA/xmb-system-email.png"',
+    '"app0:/DATA/xmb-object-return-livearea.png"',
+    '"NPXS10094"',
     '"Online Manual"',
     'local function xmb_prototype_update_transition()',
     'local function xmb_prototype_reset_navigation()',
@@ -67,6 +71,9 @@ foreach ($removedPreviewFeature in @('xmb_prototype_existing_game_icon', 'xmb_pr
     if ($prototypeRenderer.Contains($removedPreviewFeature)) {
         throw "The XMB renderer must not retain the deferred cover-preview feature: $removedPreviewFeature"
     }
+}
+if (-not $prototypeRenderer.Contains('xmb_prototype_object_icon(item.xmb_icon_path) or vertical_icon')) {
+    throw 'The XMB Games renderer must use explicit XMB icon paths instead of RetroFlow cover paths.'
 }
 if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {
     throw 'XMB prototype selection must remain session-only.'
