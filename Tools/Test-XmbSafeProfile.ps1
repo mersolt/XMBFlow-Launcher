@@ -17,6 +17,9 @@ foreach ($required in @('function Setup_Adrenaline()', 'function AutoMakeBootBin
     $slice = $sourceText.Substring($start, [Math]::Min(260, $sourceText.Length - $start))
     if (-not $slice.Contains('if xmbSafeProfile then')) { throw "Safe profile must return before $required performs work." }
 }
+foreach ($required in @('function launch_vita_title(def_titleid)', 'if xmbSafeProfile then' + [Environment]::NewLine + '        if type(def_titleid) == "string" and string.match(def_titleid, "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$") then', 'System.launchApp(def_titleid)')) {
+    if (-not $sourceText.Contains($required)) { throw "Missing safe-profile native launch bridge: $required" }
+}
 foreach ($required in @('XmbSafeProfile = {}', 'function XmbSafeProfile.enable()', '"installVpk"', '"reboot"', '"copyFile"', '"deleteFile"', '"deleteDirectory"', '"rename"', '"createDirectory"')) {
     if (-not $guardText.Contains($required)) { throw "Missing safe-profile guard invariant: $required" }
 }

@@ -5929,6 +5929,20 @@ end
 
 function launch_vita_title(def_titleid)
 
+    -- The safe XMB profile cannot inspect ux0:/app, gro0:/app, or vs0:/app
+    -- to perform RetroFlow's legacy installation preflight.  Its entries are
+    -- already cached title records, so hand a well-formed Vita title ID to the
+    -- normal launcher service without touching cache, helper, or boot state.
+    -- The regular RetroFlow profile retains its existing preflight below.
+    if xmbSafeProfile then
+        if type(def_titleid) == "string" and string.match(def_titleid, "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$") then
+            System.launchApp(def_titleid)
+            System.exit()
+            return true
+        end
+        return false
+    end
+
     -- Cartidge games
     local cartridge_flag = xCatLookup(showCat)[p].cartridge
 
