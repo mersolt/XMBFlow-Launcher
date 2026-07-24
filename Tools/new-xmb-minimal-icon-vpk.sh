@@ -12,6 +12,7 @@ output_vpk=${3:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-minimal-icon-smoke
 title_id=${4:-XMBF00009}
 title=${5:-XMBFlow Lua Category Icons}
 lua_entry="$root_dir/src/xmb-test.lua"
+data_contract="$root_dir/src/addons/xmb-readonly-data.lua"
 
 sh "$root_dir/Tools/Inspect-VitaSdkToolchain.sh"
 
@@ -47,15 +48,17 @@ done
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/font-SawarabiGothic-Regular.ttf" ] || { echo 'Missing reviewed mockup font.' >&2; exit 1; }
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-cursor.ogg" ] || { echo 'Missing original navigation sound.' >&2; exit 1; }
 [ -f "$lua_entry" ] || { echo "Missing Lua entry source: $lua_entry" >&2; exit 1; }
+[ -f "$data_contract" ] || { echo "Missing XMB data contract: $data_contract" >&2; exit 1; }
 
 mkdir -p "$build_dir"
+cat "$data_contract" "$lua_entry" > "$build_dir/index.lua"
 "$bin_dir/vita-mksfoex" -d ATTRIBUTE=0 -d PARENTAL_LEVEL=1 \
     -s APP_VER=00.01 -s TITLE_ID="$title_id" \
     "$title" "$build_dir/param.sfo"
 "$bin_dir/vita-pack-vpk" \
     -s "$build_dir/param.sfo" \
     -b "$stage_dir/eboot.bin" \
-    -a "$lua_entry=index.lua" \
+    -a "$build_dir/index.lua=index.lua" \
     -a "$stage_dir/LICENSE=LICENSE" \
     -a "$stage_dir/sce_sys/icon0.png=sce_sys/icon0.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-settings.png=DATA/xmb-icon-settings.png" \

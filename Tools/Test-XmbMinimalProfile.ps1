@@ -1,7 +1,10 @@
 param([string]$Source = (Join-Path $PSScriptRoot '..\src\xmb-test.lua'))
 
+$contractTest = Join-Path $PSScriptRoot 'Test-XmbReadonlyDataContract.ps1'
+& $contractTest
+
 $text = Get-Content -Raw $Source
-$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'SCE_CTRL_UP', 'SCE_CTRL_DOWN', 'local option_counts = {7, 3, 3, 3, 6, 2, 3, 2}', 'local selected_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_column = 5', 'Graphics.drawScaleImage')
+$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'SCE_CTRL_UP', 'SCE_CTRL_DOWN', 'local option_counts = {7, 3, 3, 3, 6, 2, 3, 2}', 'local selected_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_options = {1, 1, 1, 1, 1, 1, 1, 1}', 'local visual_column = 5', 'Graphics.drawScaleImage', 'XmbReadOnlyData.create({', 'xmb_test_data.category_rows(column)[option]')
 foreach ($entry in $required) {
     if (-not $text.Contains($entry)) { throw "Missing minimal XMB profile invariant: $entry" }
 }

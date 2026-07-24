@@ -4,7 +4,7 @@
   "entry_source": "src/xmb-test.lua",
   "inputs": [
     {"path": "eboot.bin", "status": "candidate", "source": "packaging/candidate-runtime-safe-manifest.json", "license": "GPL-3.0-only candidate; compatibility review required."},
-    {"path": "index.lua", "status": "approved", "source": "src/xmb-test.lua at this repository revision, staged under the runtime-required entry name.", "license": "MIT; retain repository LICENSE and attributions."},
+    {"path": "index.lua", "status": "approved", "source": "Concatenation of src/addons/xmb-readonly-data.lua and src/xmb-test.lua at this repository revision, staged under the runtime-required entry name. Both sources are read-only and MIT-licensed project code.", "license": "MIT; retain repository LICENSE and attributions."},
     {"path": "sce_sys/**", "status": "candidate", "source": "packaging/candidate-sce_sys-fresh-manifest.json", "license": "Original project asset with indexed LiveArea PNGs, standard SFO permissions, and the fresh test-only title ID."},
     {"path": "LICENSE", "status": "approved", "source": "Repository root LICENSE.", "license": "MIT."}
   ],

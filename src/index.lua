@@ -15,6 +15,7 @@ end
 -- Not in recovery mode - continue loading
 
 dofile("app0:addons/threads.lua")
+dofile("app0:addons/xmb-readonly-data.lua")
 
 -- Speed related settings - MOVED EARLY for maximum performance impact
 local cpu_speed = 444 -- Was 333
@@ -14267,14 +14268,14 @@ end
 -- safe package entry a small, explicit contract: folders, collections, and
 -- category rows.  It must not scan, save, launch, or mutate legacy tables.
 local function xmb_prototype_read_only_data()
-    return {
+    return XmbReadOnlyData.create({
         folders = xmb_prototype_games_folders,
         retro_systems = xmb_prototype_retro_systems,
         collections = collection_files or {},
         category_rows = function(category)
             return xCatLookup(category) or {}
         end
-    }
+    })
 end
 
 local function xmb_prototype_active_column()

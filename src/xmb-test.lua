@@ -66,6 +66,13 @@ local object_labels = {
     {"Homebrew Apps", "Homebrew Utilities"}
 }
 local submenu_labels = {"Placeholder Action", "Preview Details", "More Options"}
+-- The packaged smoke entry is assembled with xmb-readonly-data.lua before
+-- this source. It supplies fixed rows only, with no Vita paths or file reads.
+local xmb_test_data = XmbReadOnlyData.create({
+    category_rows = function(column)
+        return object_labels[column] or {}
+    end
+})
 
 local function draw_wave(base_y, phase, color)
     for x = 0, width - 8, 8 do
@@ -113,7 +120,7 @@ local function draw_vertical_options(column, alpha, anchor_x)
                 Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, object_icon, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * alpha)))
             end
             Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, object_icon, scale, scale, color)
-            Font.print(font, x + 40, y - 10, object_labels[column][option], text_color)
+            Font.print(font, x + 40, y - 10, xmb_test_data.category_rows(column)[option], text_color)
         end
     end
 end

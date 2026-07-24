@@ -41,7 +41,9 @@ foreach ($item in $sceManifest.files) {
 $root = Resolve-Path (Join-Path $PSScriptRoot '..')
 New-Item -ItemType Directory -Path $OutputDirectory | Out-Null
 Copy-Item -LiteralPath $RuntimePath -Destination (Join-Path $OutputDirectory 'eboot.bin')
-Copy-Item -LiteralPath (Join-Path $root 'src\xmb-test.lua') -Destination (Join-Path $OutputDirectory 'index.lua')
+$contract = Get-Content -Raw (Join-Path $root 'src\addons\xmb-readonly-data.lua')
+$entry = Get-Content -Raw (Join-Path $root 'src\xmb-test.lua')
+Set-Content -LiteralPath (Join-Path $OutputDirectory 'index.lua') -Value ($contract + "`n" + $entry) -Encoding UTF8
 Copy-Item -LiteralPath (Join-Path $root 'LICENSE') -Destination (Join-Path $OutputDirectory 'LICENSE')
 Copy-Item -LiteralPath $SceSysRoot -Destination (Join-Path $OutputDirectory 'sce_sys') -Recurse
 
