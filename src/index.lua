@@ -10949,8 +10949,12 @@ function import_cached_DB()
     import_renamed_games()
     import_hidden_games()
 
-    -- Check if Official Adrenaline is installed, if a fork is installed, then disable PSP and PSX as the games can't be launched
-    Check_Adrenaline_Compatibility()
+    -- The compatibility audit queries installed applications and can lead to
+    -- helper setup.  The safe XMB profile neither uses nor modifies
+    -- Adrenaline, so leave the default incompatible state in place.
+    if not xmbSafeProfile then
+        Check_Adrenaline_Compatibility()
+    end
 
     import_cached_DB_tables("db_games.lua", games_table)
     if showHomebrews == 1 then

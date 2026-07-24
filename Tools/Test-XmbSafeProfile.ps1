@@ -8,7 +8,7 @@ $guardText = Get-Content -Raw $Guard
 foreach ($required in @('xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true', 'files_table = import_cached_DB()', 'xmbPrototypeEnabled = xmbSafeProfile')) {
     if (-not $sourceText.Contains($required)) { throw "Missing safe-profile entry invariant: $required" }
 }
-foreach ($required in @('if not xmbSafeProfile and string.match(System.getBootParams() or "", "recovery") then', 'System.setGpuXbarSpeed(166)')) {
+foreach ($required in @('if not xmbSafeProfile and string.match(System.getBootParams() or "", "recovery") then', 'System.setGpuXbarSpeed(166)', 'if not xmbSafeProfile then' + [Environment]::NewLine + '        Check_Adrenaline_Compatibility()')) {
     if (-not $sourceText.Contains($required)) { throw "Missing safe-profile startup gate: $required" }
 }
 foreach ($required in @('function Setup_Adrenaline()', 'function AutoMakeBootBin(', 'function launch_Adrenaline(')) {
