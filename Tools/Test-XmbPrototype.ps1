@@ -8,6 +8,7 @@ $required = @(
     'local xmb_prototype_system_apps_category = 42',
     'local xmb_prototype_homebrew_apps_category = 2',
     'local xmb_prototype_icon_paths = {',
+    'local function xmb_prototype_read_only_data()',
     'local function xmb_prototype_category_icon(column)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
@@ -28,6 +29,9 @@ if ($prototypeStart -lt 0 -or $prototypeEnd -le $prototypeStart) { throw 'Could 
 $prototypeRenderer = $text.Substring($prototypeStart, $prototypeEnd - $prototypeStart)
 foreach ($forbidden in @('launch_', 'System.installVpk', 'System.reboot', 'System.copyFile', 'System.deleteFile', 'System.deleteDirectory')) {
     if ($prototypeRenderer.Contains($forbidden)) { throw "Read-only XMB renderer must not contain: $forbidden" }
+}
+if ($prototypeRenderer -notmatch 'category_rows = function\(category\)' -or $prototypeRenderer -notmatch 'return xCatLookup\(category\) or \{\}') {
+    throw 'The XMB read-only data provider must expose category rows without a fallback scan.'
 }
 $gameIconStart = $prototypeRenderer.IndexOf('local function xmb_prototype_existing_game_icon(item)')
 $gameIconEnd = $prototypeRenderer.IndexOf("end`n", $gameIconStart)

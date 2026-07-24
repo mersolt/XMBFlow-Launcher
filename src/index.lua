@@ -14262,6 +14262,21 @@ for category_number = 5, 46 do
     end
 end
 
+-- This is the only bridge between the presentation-only XMB view and the
+-- legacy library state.  Keeping it as a read-only provider gives a future
+-- safe package entry a small, explicit contract: folders, collections, and
+-- category rows.  It must not scan, save, launch, or mutate legacy tables.
+local function xmb_prototype_read_only_data()
+    return {
+        folders = xmb_prototype_games_folders,
+        retro_systems = xmb_prototype_retro_systems,
+        collections = collection_files or {},
+        category_rows = function(category)
+            return xCatLookup(category) or {}
+        end
+    }
+end
+
 local function xmb_prototype_active_column()
     return xmbPrototypeColumn
 end
@@ -14312,14 +14327,15 @@ local function xmb_prototype_reset_navigation()
 end
 
 local function xmb_prototype_current_games_list()
+    local data = xmb_prototype_read_only_data()
     if xmbPrototypeGamesMode == "folders" then
-        return xmb_prototype_games_folders
+        return data.folders
     elseif xmbPrototypeGamesMode == "retro_systems" then
-        return xmb_prototype_retro_systems
+        return data.retro_systems
     elseif xmbPrototypeGamesMode == "collections" then
-        return collection_files or {}
+        return data.collections
     elseif xmbPrototypeGamesMode == "entries" then
-        return xCatLookup(xmbPrototypeGamesCategory) or {}
+        return data.category_rows(xmbPrototypeGamesCategory)
     end
 
     return {}
@@ -14343,10 +14359,11 @@ local function xmb_prototype_move_games_selection(direction)
 end
 
 local function xmb_prototype_current_read_only_apps_list(column)
+    local data = xmb_prototype_read_only_data()
     if column == 7 then
-        return xCatLookup(xmb_prototype_system_apps_category) or {}
+        return data.category_rows(xmb_prototype_system_apps_category)
     elseif column == 8 then
-        return xCatLookup(xmb_prototype_homebrew_apps_category) or {}
+        return data.category_rows(xmb_prototype_homebrew_apps_category)
     end
     return {}
 end
@@ -14372,8 +14389,9 @@ local function xmb_prototype_move_read_only_apps_selection(column, direction)
 end
 
 local function xmb_prototype_games_folder_detail(folder)
+    local data = xmb_prototype_read_only_data()
     if folder.category ~= nil then
-        local entries = xCatLookup(folder.category) or {}
+        local entries = data.category_rows(folder.category)
         return tostring(#entries) .. " items"
     elseif folder.kind == "retro" then
         return "Systems"
@@ -14456,13 +14474,14 @@ local function xmb_prototype_games_item_label(item)
 end
 
 local function xmb_prototype_games_item_detail(item, index)
+    local data = xmb_prototype_read_only_data()
     if xmbPrototypeGamesMode == "folders" then
         return xmb_prototype_games_folder_detail(item)
     elseif xmbPrototypeGamesMode == "retro_systems" then
-        local entries = xCatLookup(item.category) or {}
+        local entries = data.category_rows(item.category)
         return tostring(#entries) .. " items"
     elseif xmbPrototypeGamesMode == "collections" then
-        local entries = xCatLookup(49 + index) or {}
+        local entries = data.category_rows(49 + index)
         return tostring(#entries) .. " items"
     end
 
