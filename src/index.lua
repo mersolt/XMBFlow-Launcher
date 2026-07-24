@@ -3072,6 +3072,10 @@ xmbPrototypeGamesParentSelection = 1
 xmbPrototypeGamesGrandparentMode = nil
 xmbPrototypeGamesGrandparentList = nil
 xmbPrototypeGamesGrandparentSelection = 1
+xmbPrototypeGamesGrandparentStartOffset = 0
+xmbPrototypeGamesParentStartOffset = 0
+xmbPrototypeChildAxisOffset = 160
+xmbPrototypeChildAxisAlpha = 0
 xmbPrototypeGamesTitle = "GAMES"
 xmbPrototypeSystemAppsSelection = 1
 xmbPrototypeHomebrewAppsSelection = 1
@@ -14427,6 +14431,9 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeGamesGrandparentMode = nil
     xmbPrototypeGamesGrandparentList = nil
     xmbPrototypeGamesGrandparentSelection = 1
+    xmbPrototypeGamesGrandparentStartOffset = 0
+    xmbPrototypeGamesParentStartOffset = 0
+    xmbPrototypeChildAxisAlpha = 0
     xmbPrototypeGamesTitle = "GAMES"
     xmbPrototypeSystemAppsSelection = 1
     xmbPrototypeHomebrewAppsSelection = 1
@@ -14510,6 +14517,8 @@ local function xmb_prototype_open_games_submenu(mode, title, category)
     xmbPrototypeGamesGrandparentMode = xmbPrototypeGamesParentMode
     xmbPrototypeGamesGrandparentList = xmbPrototypeGamesParentList
     xmbPrototypeGamesGrandparentSelection = xmbPrototypeGamesParentSelection
+    xmbPrototypeGamesGrandparentStartOffset = xmbPrototypeGamesParentStartOffset
+    xmbPrototypeGamesParentStartOffset = xmbPrototypeGamesParentList ~= nil and xmbPrototypeChildAxisOffset or 0
     xmbPrototypeGamesParentList = xmb_prototype_current_games_list()
     xmbPrototypeGamesParentSelection = xmbPrototypeGamesSelection
     xmbPrototypeGamesParentMode = xmbPrototypeGamesMode
@@ -14517,6 +14526,8 @@ local function xmb_prototype_open_games_submenu(mode, title, category)
     xmbPrototypeGamesCategory = category
     xmbPrototypeGamesTitle = title
     xmbPrototypeGamesSelection = 1
+    xmbPrototypeGamesVisualSelection = 1
+    xmbPrototypeChildAxisAlpha = 0
 end
 
 local function xmb_prototype_open_entries(category, title)
@@ -14554,9 +14565,12 @@ local function xmb_prototype_go_back()
         xmbPrototypeGamesParentMode = xmbPrototypeGamesGrandparentMode
         xmbPrototypeGamesParentList = xmbPrototypeGamesGrandparentList
         xmbPrototypeGamesParentSelection = xmbPrototypeGamesGrandparentSelection
+        xmbPrototypeGamesParentStartOffset = xmbPrototypeGamesGrandparentStartOffset
         xmbPrototypeGamesGrandparentMode = nil
         xmbPrototypeGamesGrandparentList = nil
         xmbPrototypeGamesGrandparentSelection = 1
+        xmbPrototypeGamesGrandparentStartOffset = 0
+        xmbPrototypeGamesVisualSelection = xmbPrototypeGamesSelection
 
         if xmbPrototypeGamesMode == "folders" then
             xmbPrototypeGamesTitle = "GAMES"
@@ -14569,6 +14583,8 @@ local function xmb_prototype_go_back()
         xmbPrototypeGamesMode = "folders"
         xmbPrototypeGamesTitle = "GAMES"
         xmbPrototypeGamesSelection = 1
+        xmbPrototypeGamesVisualSelection = 1
+        xmbPrototypeGamesParentStartOffset = 0
     end
 end
 
@@ -14622,6 +14638,7 @@ local function draw_xmb_prototype()
     local games_list = xmb_prototype_current_games_list()
     local submenu_target = showing_games and xmbPrototypeGamesParentList ~= nil and 1 or 0
     xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha + (submenu_target - xmbPrototypeSubmenuAlpha) * 0.14
+    xmbPrototypeChildAxisAlpha = xmbPrototypeChildAxisAlpha + (submenu_target - xmbPrototypeChildAxisAlpha) * 0.14
 
     -- Original XMB-inspired backdrop and waves.  It deliberately uses no
     -- Sony-derived art or extracted theme data.
@@ -14655,25 +14672,27 @@ local function draw_xmb_prototype()
         xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, 0.18)
         local showing_child_axis = xmbPrototypeGamesParentList ~= nil
         local vertical_icon = xmb_prototype_category_icon(display_column)
-        local up_spacing = 234 - 168 * xmbPrototypeSubmenuAlpha
-        local child_axis_x = category_anchor_x + 160
+        local parent_axis_x = category_anchor_x + xmbPrototypeGamesParentStartOffset * (1 - xmbPrototypeChildAxisAlpha)
+        local child_axis_x = parent_axis_x + xmbPrototypeChildAxisOffset
+        local parent_up_spacing = 234
+        local child_up_spacing = 234 - 168 * xmbPrototypeChildAxisAlpha
         if showing_child_axis then
             local parent_list = xmbPrototypeGamesParentList
-            local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, up_spacing)
-            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, up_spacing, function(parent_index, _, parent_y, parent_focus)
-                xmb_prototype_draw_vertical_object(vertical_icon, category_anchor_x, parent_y, "", parent_focus, xmbPrototypeVerticalAlpha * 0.58)
+            local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, parent_up_spacing)
+            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, parent_up_spacing, function(parent_index, _, parent_y, parent_focus)
+                xmb_prototype_draw_vertical_object(vertical_icon, parent_axis_x, parent_y, "", parent_focus, xmbPrototypeVerticalAlpha * 0.58)
             end)
-            xmb_prototype_draw_submenu_indicator(category_anchor_x, child_axis_x, 296, xmbPrototypeVerticalAlpha * xmbPrototypeSubmenuAlpha)
+            xmb_prototype_draw_submenu_indicator(parent_axis_x, child_axis_x, 296, xmbPrototypeVerticalAlpha * xmbPrototypeChildAxisAlpha)
         end
         if #games_list == 0 then
             Font.print(fnt22, (showing_child_axis and child_axis_x or category_anchor_x + 40), 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeSubmenuAlpha or 1) * 180)))
         else
-            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, up_spacing)
+            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing)
 
-            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, up_spacing, function(index, _, y, focus)
+            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
-                xmb_prototype_draw_vertical_object(vertical_icon, showing_child_axis and child_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeSubmenuAlpha or 1))
+                xmb_prototype_draw_vertical_object(vertical_icon, showing_child_axis and child_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1))
             end)
         end
     elseif showing_read_only_apps then

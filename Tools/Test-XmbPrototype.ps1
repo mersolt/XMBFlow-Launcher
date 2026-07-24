@@ -27,6 +27,8 @@ $required = @(
     'Controls.readLeftAnalog()',
     'function xmb_prototype_move_direction(direction)',
     'xmbPrototypeGamesGrandparentList = nil',
+    'xmbPrototypeGamesParentStartOffset = 0',
+    'xmbPrototypeChildAxisAlpha = xmbPrototypeChildAxisAlpha +',
     'xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha +',
     'Sound.setVolume(xmbNavigationClick, 32767)',
     'local function xmb_prototype_update_transition()',
