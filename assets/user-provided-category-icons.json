@@ -1,0 +1,50 @@
+﻿{
+    "schema":  1,
+    "provenance":  "User-provided original XMBFlow category artwork; author asserted original work in project discussion on 2026-07-23.",
+    "license":  "LicenseRef-XMBFlow-Original",
+    "transformation":  "Tools/Import-XmbFlowOriginalCategoryIcons.ps1",
+    "files":  [
+                  {
+                      "input_name":  "icon-games.png",
+                      "input_sha256":  "17652ecbcbc4e69a44846c2015e5d5d80710ceee7d275c9cbb43b633bd432b26",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-icon-games.png",
+                      "output_sha256":  "54533829b8d4036d580797966393d9c93e271829921395b8c221c2736650bc9d",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "icon-music.png",
+                      "input_sha256":  "0b78340e1576283c39cb557f732bdaf3ae96f12b94791a905a206a091af366cb",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-icon-music.png",
+                      "output_sha256":  "a4d21d7b1f502462dc698d1ec3563b0ee00d47f85b8914e18a2df1b70b5127f0",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "icon-network.png",
+                      "input_sha256":  "4d6f2307438c91a4e6650584d684007c03d38140ba77c152f4ef03ce30b990fc",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-icon-network.png",
+                      "output_sha256":  "961dde1615d04fff5ffe8152509153e3654e1931e4f9da40bd0b5e3e675f5df0",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "icon-photo.png",
+                      "input_sha256":  "276e3f37162e8e2a9a81d6c56ef2cc0eadc0e2a7b1a5985dee3f7f4c88d72916",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-icon-photo.png",
+                      "output_sha256":  "84716c0c00f53104c763dbb9e5bd946fa5d930e20557743cee7e9ae5b8f32f5d",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "icon-settings.png",
+                      "input_sha256":  "9d865ce9ba7fcd1d571f2b4efa8794d5257ea9dc41740bdb46342a7f8f75b609",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-icon-settings.png",
+                      "output_sha256":  "a8b6201287aa68b9e00e62d9e3070e55bd94525e8c0feeb688b8e0d82abd10c1",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "icon-video.png",
+                      "input_sha256":  "a2f2569c5c10ee48b3ffb230b81a9b867f387b76a343f8ffc9c53c731b423098",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-icon-video.png",
+                      "output_sha256":  "a1563035950fef90c3547211898fb6bd0c67b1ddddafa387f243a0a19d3c4a16",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  }
+              ]
+}

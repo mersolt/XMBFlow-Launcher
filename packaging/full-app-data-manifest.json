@@ -2525,8 +2525,8 @@
                       "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-games.png",
                       "copyright":  "Copyright XMBFlow contributors",
                       "license":  "LicenseRef-XMBFlow-Original",
-                      "sha256":  "7eb99b93244eb04617094afeffa27f88d92c3c411818e82846875a66927c460b",
-                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "sha256":  "54533829b8d4036d580797966393d9c93e271829921395b8c221c2736650bc9d",
+                      "transformation":  "Tools/Import-XmbFlowOriginalCategoryIcons.ps1; provenance in assets/user-provided-category-icons.json.",
                       "status":  "original-placeholder-traced"
                   },
                   {
@@ -2539,8 +2539,8 @@
                       "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-music.png",
                       "copyright":  "Copyright XMBFlow contributors",
                       "license":  "LicenseRef-XMBFlow-Original",
-                      "sha256":  "9dc61049b75684ffb60c51527bb4eb795e14c9c0b65a5f614b4090bfe9c9553d",
-                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "sha256":  "a4d21d7b1f502462dc698d1ec3563b0ee00d47f85b8914e18a2df1b70b5127f0",
+                      "transformation":  "Tools/Import-XmbFlowOriginalCategoryIcons.ps1; provenance in assets/user-provided-category-icons.json.",
                       "status":  "original-placeholder-traced"
                   },
                   {
@@ -2553,8 +2553,8 @@
                       "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-photo.png",
                       "copyright":  "Copyright XMBFlow contributors",
                       "license":  "LicenseRef-XMBFlow-Original",
-                      "sha256":  "e09c7046e3a6110e2614d2f0180282baa54d4f7b5bc841651235ef9dcb43710b",
-                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "sha256":  "84716c0c00f53104c763dbb9e5bd946fa5d930e20557743cee7e9ae5b8f32f5d",
+                      "transformation":  "Tools/Import-XmbFlowOriginalCategoryIcons.ps1; provenance in assets/user-provided-category-icons.json.",
                       "status":  "original-placeholder-traced"
                   },
                   {
@@ -2567,8 +2567,8 @@
                       "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-settings.png",
                       "copyright":  "Copyright XMBFlow contributors",
                       "license":  "LicenseRef-XMBFlow-Original",
-                      "sha256":  "132a2cdba9922f8acc7c311961d57ef6a36509cd1e36b678c4ea29bd9116f2cd",
-                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "sha256":  "a8b6201287aa68b9e00e62d9e3070e55bd94525e8c0feeb688b8e0d82abd10c1",
+                      "transformation":  "Tools/Import-XmbFlowOriginalCategoryIcons.ps1; provenance in assets/user-provided-category-icons.json.",
                       "status":  "original-placeholder-traced"
                   },
                   {
@@ -2581,8 +2581,8 @@
                       "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-video.png",
                       "copyright":  "Copyright XMBFlow contributors",
                       "license":  "LicenseRef-XMBFlow-Original",
-                      "sha256":  "97207be51593bffec1decb55862d6e9e1a79fa29c6261159b8548d0e0587679e",
-                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "sha256":  "a1563035950fef90c3547211898fb6bd0c67b1ddddafa387f243a0a19d3c4a16",
+                      "transformation":  "Tools/Import-XmbFlowOriginalCategoryIcons.ps1; provenance in assets/user-provided-category-icons.json.",
                       "status":  "original-placeholder-traced"
                   }
               ]

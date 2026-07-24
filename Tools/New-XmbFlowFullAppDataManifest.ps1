@@ -27,6 +27,10 @@ $xmbIconPaths = @(
     'DATA/xmb-icon-settings.png', 'DATA/xmb-icon-photo.png', 'DATA/xmb-icon-music.png',
     'DATA/xmb-icon-video.png', 'DATA/xmb-icon-games.png', 'DATA/xmb-icon-apps.png'
 )
+$userProvidedXmbIconPaths = @(
+    'DATA/xmb-icon-settings.png', 'DATA/xmb-icon-photo.png', 'DATA/xmb-icon-music.png',
+    'DATA/xmb-icon-video.png', 'DATA/xmb-icon-games.png', 'DATA/xmb-icon-network.png'
+)
 
 # These assets are loaded unconditionally by the normal, English/default
 # startup path before the library renderer can reach the XMB overlay.
@@ -66,21 +70,22 @@ $files = foreach ($asset in $inventory.assets | Sort-Object path) {
     $isOriginalClick = $asset.path -eq 'DATA/click2.ogg' -and (Test-Path -LiteralPath $clickPath -PathType Leaf)
     $xmbIconPath = Join-Path $BootstrapAssetDirectory $asset.path
     $isOriginalXmbIcon = $xmbIconPaths -contains $asset.path -and (Test-Path -LiteralPath $xmbIconPath -PathType Leaf)
+    $isUserProvidedXmbIcon = $userProvidedXmbIconPaths -contains $asset.path -and (Test-Path -LiteralPath $xmbIconPath -PathType Leaf)
     $thirdPartyFont = $thirdPartyFonts[$asset.path]
     $thirdPartyFontPath = if ($null -ne $thirdPartyFont) { Join-Path $BootstrapAssetDirectory $asset.path } else { $null }
     $isThirdPartyFont = $null -ne $thirdPartyFont -and (Test-Path -LiteralPath $thirdPartyFontPath -PathType Leaf)
-    $resolvedHash = if ($isOriginalPlaceholder) { $bootstrap.sha256 } elseif ($isOriginalClick) { (Get-FileHash -LiteralPath $clickPath -Algorithm SHA256).Hash.ToLowerInvariant() } elseif ($isOriginalXmbIcon) { (Get-FileHash -LiteralPath $xmbIconPath -Algorithm SHA256).Hash.ToLowerInvariant() } elseif ($isThirdPartyFont) { (Get-FileHash -LiteralPath $thirdPartyFontPath -Algorithm SHA256).Hash.ToLowerInvariant() } else { $null }
+    $resolvedHash = if ($isOriginalPlaceholder) { $bootstrap.sha256 } elseif ($isOriginalClick) { (Get-FileHash -LiteralPath $clickPath -Algorithm SHA256).Hash.ToLowerInvariant() } elseif ($isOriginalXmbIcon -or $isUserProvidedXmbIcon) { (Get-FileHash -LiteralPath $xmbIconPath -Algorithm SHA256).Hash.ToLowerInvariant() } elseif ($isThirdPartyFont) { (Get-FileHash -LiteralPath $thirdPartyFontPath -Algorithm SHA256).Hash.ToLowerInvariant() } else { $null }
     [ordered]@{
         package_path = $asset.path
         kind = $asset.kind
         source_references = @($asset.source_references)
         boot_class = $bootClass
-        source = if ($isOriginalPlaceholder -or $isOriginalXmbIcon) { "assets/bootstrap-placeholders/$($asset.path)" } elseif ($isOriginalClick) { 'Original XMBFlow synthesized audio.' } elseif ($isThirdPartyFont) { $thirdPartyFont.source } else { $null }
-        copyright = if ($isOriginalPlaceholder -or $isOriginalClick -or $isOriginalXmbIcon) { 'Copyright XMBFlow contributors' } elseif ($isThirdPartyFont) { $thirdPartyFont.copyright } else { $null }
-        license = if ($isOriginalPlaceholder -or $isOriginalClick -or $isOriginalXmbIcon) { 'LicenseRef-XMBFlow-Original' } elseif ($isThirdPartyFont) { 'OFL-1.1' } else { $null }
+        source = if ($isOriginalPlaceholder -or $isOriginalXmbIcon -or $isUserProvidedXmbIcon) { "assets/bootstrap-placeholders/$($asset.path)" } elseif ($isOriginalClick) { 'Original XMBFlow synthesized audio.' } elseif ($isThirdPartyFont) { $thirdPartyFont.source } else { $null }
+        copyright = if ($isOriginalPlaceholder -or $isOriginalClick -or $isOriginalXmbIcon -or $isUserProvidedXmbIcon) { 'Copyright XMBFlow contributors' } elseif ($isThirdPartyFont) { $thirdPartyFont.copyright } else { $null }
+        license = if ($isOriginalPlaceholder -or $isOriginalClick -or $isOriginalXmbIcon -or $isUserProvidedXmbIcon) { 'LicenseRef-XMBFlow-Original' } elseif ($isThirdPartyFont) { 'OFL-1.1' } else { $null }
         sha256 = $resolvedHash
-        transformation = if ($isOriginalPlaceholder) { 'Tools/New-XmbFlowBootstrapPlaceholders.ps1' } elseif ($isOriginalClick) { 'FFmpeg lavfi sine generator: 880 Hz, 0.06 s, fade-out, Vorbis.' } elseif ($isOriginalXmbIcon) { 'Tools/New-XmbFlowCategoryIcons.ps1' } elseif ($isThirdPartyFont) { "$($thirdPartyFont.transformation) Notice at $($thirdPartyFont.notice)" } else { $null }
-        status = if ($isOriginalPlaceholder -or $isOriginalClick -or $isOriginalXmbIcon) { 'original-placeholder-traced' } elseif ($isThirdPartyFont) { 'third-party-traced' } else { 'unresolved-source-and-license' }
+        transformation = if ($isOriginalPlaceholder) { 'Tools/New-XmbFlowBootstrapPlaceholders.ps1' } elseif ($isOriginalClick) { 'FFmpeg lavfi sine generator: 880 Hz, 0.06 s, fade-out, Vorbis.' } elseif ($isUserProvidedXmbIcon) { 'Tools/Import-XmbFlowOriginalCategoryIcons.ps1; provenance in assets/user-provided-category-icons.json.' } elseif ($isOriginalXmbIcon) { 'Tools/New-XmbFlowCategoryIcons.ps1' } elseif ($isThirdPartyFont) { "$($thirdPartyFont.transformation) Notice at $($thirdPartyFont.notice)" } else { $null }
+        status = if ($isOriginalPlaceholder -or $isOriginalClick -or $isOriginalXmbIcon -or $isUserProvidedXmbIcon) { 'original-placeholder-traced' } elseif ($isThirdPartyFont) { 'third-party-traced' } else { 'unresolved-source-and-license' }
     }
 }
 
