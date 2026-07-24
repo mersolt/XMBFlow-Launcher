@@ -44,9 +44,8 @@ to the previous prototype folder. This includes Retro Systems, Collections,
 and the existing game entries within a selected folder. Selecting an actual
 game is still a no-op. Triangle, Square, Start, Select, analog, and touch
 actions are deliberately inert while the prototype is enabled. Settings,
-Photo, Music, and Video now have original geometric presentation cards that
-state their future role, but remain non-interactive: they cannot alter settings
-or scan/access media. Apps remains a read-only view over the existing scanned
+Photo, Music, and Video remain non-interactive: they cannot alter settings or
+scan/access media. Apps remains a read-only view over the existing scanned
 tables and does not guess or access Vita apps.
 
 The integrated renderer uses six original transparent category PNGs generated
@@ -56,10 +55,9 @@ in the blocked full-app DATA manifest. The generated atlas source at
 `packaging/bootstrap-source/xmbflow-category-icon-atlas-v1-chromakey.png` is
 an original project design reference, not a runtime package asset.
 
-The icon-only smoke package mirrors this geometry without loading `DATA` or
-the legacy application. Its six unlabelled category markers can be moved with
-Left/Right; selecting one of the first four shows the inert card shape. It is
-a runtime/rendering check only, not a test of the integrated library UI.
+The icon-only smoke package mirrors the category-icon axis with the same six
+original PNGs. Left/Right moves the selected enlarged icon; it is a
+runtime/rendering check only, not a test of the integrated library UI.
 
 ## Future hardware test
 

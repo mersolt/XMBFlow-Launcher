@@ -1,7 +1,7 @@
 param([string]$Source = (Join-Path $PSScriptRoot '..\src\xmb-test.lua'))
 
 $text = Get-Content -Raw $Source
-$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'local column_count = 6', 'local function draw_placeholder_card(column)')
+$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'local column_count = 6', 'Graphics.drawScaleImage')
 foreach ($entry in $required) {
     if (-not $text.Contains($entry)) { throw "Missing minimal XMB profile invariant: $entry" }
 }
@@ -15,6 +15,7 @@ foreach ($entry in $forbidden) {
     if ($text.Contains($entry)) { throw "Minimal XMB profile must not contain: $entry" }
 }
 if ($text.Contains('SCE_CTRL_CIRCLE_MAP')) { throw 'Standalone XMB test must not rely on the legacy mapping variable.' }
+if ($text.Contains('draw_placeholder_card') -or $text.Contains('Graphics.fillRect(x, x + 52')) { throw 'Standalone XMB test must render icons without obsolete markers or cards.' }
 foreach ($icon in @('settings','photo','music','video','games','apps')) {
     if (-not $text.Contains("app0:/DATA/xmb-icon-$icon.png")) { throw "Missing reviewed category icon: $icon" }
 }

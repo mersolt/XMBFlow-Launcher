@@ -27,17 +27,6 @@ local function draw_wave(base_y, phase, color)
     end
 end
 
-local function draw_placeholder_card(column)
-    if column > 4 then return end
-
-    -- Matches the integrated prototype's original, inert category-card
-    -- geometry without loading an asset or performing an application action.
-    Graphics.fillRect(92, 838, 248, 420, Color.new(20, 48, 84, 185))
-    Graphics.fillRect(112, 174, 276, 392, Color.new(96, 184, 238, 220))
-    Graphics.fillRect(190, 252, 276, 392, Color.new(58, 117, 191, 230))
-    Graphics.fillRect(268, 330, 276, 392, Color.new(32, 78, 143, 240))
-end
-
 while running do
     -- Lua Player Plus requires an explicit blend phase around 2D drawing.
     -- This matches the frame lifecycle used by the known-working export tool.
@@ -55,13 +44,9 @@ while running do
         local x = 90 + (column - 1) * 130
         local selected = column == selected_column
         local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 150)
-        local top = selected and 142 or 162
-        Graphics.fillRect(x, x + 52, top, top + 52, color)
-        Graphics.fillRect(x + 8, x + 44, top + 8, top + 44, Color.new(4, 10, 28, 230))
-        Graphics.drawImage(x - 22, top + 62, category_icons[column], color)
+        local scale = selected and 1.15 or 0.82
+        Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
     end
-
-    draw_placeholder_card(selected_column)
 
     local pad = Controls.read()
     if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then

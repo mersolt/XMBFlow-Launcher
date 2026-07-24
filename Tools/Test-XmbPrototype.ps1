@@ -5,8 +5,8 @@ $required = @(
     'local xmbPrototypeEnabled = false',
     '{label = "PLAYSTATION MOBILE", category = 39}',
     '{label = "SYSTEM APPS", category = 42}',
-    'local xmb_prototype_placeholder_columns = {',
-    'local function draw_xmb_prototype_placeholder_column(column)',
+    'local xmb_prototype_icon_paths = {',
+    'local function xmb_prototype_category_icon(column)',
     'local function xmb_prototype_current_apps_list()',
     'local function xmb_prototype_open_apps_selection()',
     'local function xmb_prototype_reset_navigation()',
@@ -24,8 +24,6 @@ if ($text -match 'xmb_prototype_open_apps_selection\(\).*launch_') {
 if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {
     throw 'XMB prototype selection must remain session-only.'
 }
-if ($text -match 'draw_xmb_prototype_placeholder_column\(.*Settings\.' -or $text -match 'draw_xmb_prototype_placeholder_column\(.*System\.') {
-    throw 'Placeholder columns must remain presentation-only.'
-}
+if ($text.Contains('draw_xmb_prototype_placeholder_column') -or $text.Contains('xmb_prototype_placeholder_columns')) { throw 'Prototype must not render obsolete category cards.' }
 
 Write-Host 'XMB prototype structural checks passed.'
