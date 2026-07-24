@@ -14528,12 +14528,11 @@ local function draw_xmb_prototype()
             local parent_list = xmbPrototypeGamesParentList
             local parent_first = math.max(1, xmbPrototypeGamesParentSelection - 3)
             local parent_last = math.min(#parent_list, xmbPrototypeGamesParentSelection + 3)
-            for parent_index = parent_first, parent_last do
+            XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 278, 42, 42, function(parent_index, _, parent_y)
                 local parent_item = parent_list[parent_index]
-                local parent_y = XmbLayout.vertical_y(278, parent_index, xmbPrototypeGamesParentSelection, 42, 42)
                 local parent_selected = parent_index == xmbPrototypeGamesParentSelection
                 Font.print(parent_selected and fnt22 or fnt20, 72, parent_y, xmb_prototype_games_item_label(parent_item), Color.new(190, 205, 225, parent_selected and 150 or 95))
-            end
+            end)
         end
         if #games_list == 0 then
             Font.print(fnt22, 112, 282, "No items in this folder", Color.new(210, 222, 240, 180))
@@ -14541,9 +14540,8 @@ local function draw_xmb_prototype()
             local first_item = math.max(1, xmbPrototypeGamesSelection - 3)
             local last_item = math.min(#games_list, xmbPrototypeGamesSelection + 3)
 
-            for index = first_item, last_item do
+            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 278, 42, 42, function(index, _, y)
                 local item = games_list[index]
-                local y = XmbLayout.vertical_y(278, index, xmbPrototypeGamesVisualSelection, 42, 42)
                 local is_selected = index == xmbPrototypeGamesSelection
                 local label = xmb_prototype_games_item_label(item)
                 local detail = xmb_prototype_games_item_detail(item, index)
@@ -14562,7 +14560,7 @@ local function draw_xmb_prototype()
                 else
                     Font.print(fnt22, list_x, y + 2, label, Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
                 end
-            end
+            end)
         end
     elseif showing_read_only_apps then
         local apps_list = xmb_prototype_current_read_only_apps_list(display_column)
@@ -14576,16 +14574,15 @@ local function draw_xmb_prototype()
         end
         local first_item = math.max(1, selection - 3)
         local last_item = math.min(#apps_list, selection + 3)
-        for index = first_item, last_item do
+        XmbRender.each_vertical(first_item, last_item, visual_selection, 278, 42, 42, function(index, _, y)
             local item = apps_list[index]
             local selected = index == selection
             local label = xmb_prototype_read_only_item_label(item)
-            local y = XmbLayout.vertical_y(278, index, visual_selection, 42, 42)
             if selected then
                 Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, math.floor(xmbPrototypeVerticalAlpha * 210)))
             end
             Font.print(selected and fnt25 or fnt22, 112, y, label, selected and Color.new(255, 255, 255, math.floor(xmbPrototypeVerticalAlpha * 255)) or Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
-        end
+        end)
     end
 
     Graphics.fillRect(0, 960, 496, 544, Color.new(10, 26, 48, 245))
