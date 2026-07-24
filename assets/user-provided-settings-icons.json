@@ -1,0 +1,22 @@
+﻿{
+    "schema":  1,
+    "provenance":  "User-provided original XMBFlow settings artwork; author asserted original work in project discussion on 2026-07-24.",
+    "license":  "LicenseRef-XMBFlow-Original",
+    "transformation":  "Tools/Import-XmbFlowOriginalSettingsIcons.ps1",
+    "files":  [
+                  {
+                      "input_name":  "network-settings.png",
+                      "input_sha256":  "d48392c0dca1bdc740b624a3cb9913b0e38975a4f538c962c8ce02eced2c2a8c",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-setting-network.png",
+                      "output_sha256":  "84c1388ecd3d7c179de925671ea369f28b8f24019c968794c63fef69a39c4de7",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "sound-settings.png",
+                      "input_sha256":  "05c0751b06ab23bcc786c0a4f3be6c7a9443d2491ac614b0c5fea982d1410c26",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-setting-sound.png",
+                      "output_sha256":  "dbf1afc653fafb04f217b18bc9b8d43b266f148a67a84088ade7098862a48980",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  }
+              ]
+}

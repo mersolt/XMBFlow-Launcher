@@ -21,7 +21,10 @@ if (-not $text.Contains('local vertical_column = 5') -or -not $text.Contains('lo
 if (-not $text.Contains('y = 296 + relative * 234') -or $text.Contains('local arc = 1 - math.abs(1 + relative * 2)')) { throw 'The preceding object must move behind the fixed category icon without a lateral detour.' }
 if (-not $text.Contains('math.sin(glow_phase / 18)') -or -not $text.Contains('category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255') -or -not $text.Contains('local text_color = Color.new')) { throw 'Focused icons and labels must use the persistent white XMB-style silhouette glow pulse.' }
 if (-not $text.Contains('Controls.readLeftAnalog()') -or -not $text.Contains('local navigation_repeat = 0') -or -not $text.Contains('analog_x < 96') -or -not $text.Contains('analog_y > 160')) { throw 'The standalone mockup must support held D-pad and left-analog navigation.' }
-if (-not $text.Contains('Sound.open("app0:/DATA/click2.ogg")') -or -not $text.Contains('Sound.play(navigation_click, false)') -or -not $text.Contains('Sound.close(navigation_click)')) { throw 'The standalone mockup must use only the reviewed original navigation sound.' }
+if (-not $text.Contains('Sound.init()') -or -not $text.Contains('Sound.open("app0:/DATA/click2.ogg")') -or -not $text.Contains('Sound.play(navigation_click, NO_LOOP)') -or -not $text.Contains('Sound.close(navigation_click)')) { throw 'The standalone mockup must use only the reviewed original navigation sound.' }
+foreach ($icon in @('xmb-setting-sound.png', 'xmb-setting-network.png')) {
+    if (-not $text.Contains("app0:/DATA/$icon")) { throw "Missing reviewed settings icon: $icon" }
+}
 if (-not $text.Contains('local x = category_anchor_x + relative * 130')) { throw 'The horizontal category axis must interpolate around the fixed XMB anchor.' }
 foreach ($icon in @('settings','photo','music','video','games','network','apps')) {
     if (-not $text.Contains("app0:/DATA/xmb-icon-$icon.png")) { throw "Missing reviewed category icon: $icon" }

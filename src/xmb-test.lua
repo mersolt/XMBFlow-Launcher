@@ -33,6 +33,11 @@ local category_icons = {
     Graphics.loadImage("app0:/DATA/xmb-icon-network.png"),
     Graphics.loadImage("app0:/DATA/xmb-icon-apps.png")
 }
+local setting_icons = {
+    sound = Graphics.loadImage("app0:/DATA/xmb-setting-sound.png"),
+    network = Graphics.loadImage("app0:/DATA/xmb-setting-network.png")
+}
+Sound.init()
 local navigation_click = Sound.open("app0:/DATA/click2.ogg")
 local font_buffer = Extended.loadFontIntoMemory("app0:/DATA/font-SawarabiGothic-Regular.ttf")
 local font = Extended.loadFontFromMemory(font_buffer)
@@ -71,14 +76,17 @@ local function draw_vertical_options(column, alpha)
             local text_color = Color.new(text_brightness, text_brightness, text_brightness, math.floor((145 + 110 * focus) * alpha))
             local x = category_anchor_x
             local y = 296 + relative * 66
+            local object_icon = category_icons[column]
+            if column == 3 and option == 4 then object_icon = setting_icons.sound end
+            if column == 6 and option == 3 then object_icon = setting_icons.network end
             if relative < 0 then
                 y = 296 + relative * 234
             end
             if focus > 0.02 then
                 local glow_scale = scale + 0.045 * focus
-                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * alpha)))
+                Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, object_icon, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * alpha)))
             end
-            Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[column], scale, scale, color)
+            Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, object_icon, scale, scale, color)
             Font.print(font, x + 40, y - 10, object_labels[column][option], text_color)
         end
     end
@@ -180,7 +188,7 @@ while running do
             selected_options[selected_column] = selected_options[selected_column] + 1
             if selected_options[selected_column] > option_counts[selected_column] then selected_options[selected_column] = 1 end
         end
-        Sound.play(navigation_click, false)
+        Sound.play(navigation_click, NO_LOOP)
     else
         navigation_repeat = navigation_repeat - 1
     end
