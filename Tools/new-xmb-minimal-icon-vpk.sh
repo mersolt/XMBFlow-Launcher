@@ -35,7 +35,7 @@ done
 
 mkdir -p "$build_dir"
 "$bin_dir/vita-mksfoex" -d ATTRIBUTE=0 -d PARENTAL_LEVEL=1 \
-    -s APP_VER=00.01 -s TITLE_ID=XMBF00006 \
+    -s APP_VER=00.01 -s TITLE_ID=XMBF00007 \
     'XMBFlow Lua Icon Smoke Test' "$build_dir/param.sfo"
 "$bin_dir/vita-pack-vpk" \
     -s "$build_dir/param.sfo" \

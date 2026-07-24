@@ -1,7 +1,7 @@
 param([string]$Source = (Join-Path $PSScriptRoot '..\src\xmb-test.lua'))
 
 $text = Get-Content -Raw $Source
-$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()')
+$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE')
 foreach ($entry in $required) {
     if (-not $text.Contains($entry)) { throw "Missing minimal XMB profile invariant: $entry" }
 }
@@ -14,5 +14,6 @@ $forbidden = @(
 foreach ($entry in $forbidden) {
     if ($text.Contains($entry)) { throw "Minimal XMB profile must not contain: $entry" }
 }
+if ($text.Contains('SCE_CTRL_CIRCLE_MAP')) { throw 'Standalone XMB test must not rely on the legacy mapping variable.' }
 
 Write-Host 'XMB minimal profile structural checks passed.'
