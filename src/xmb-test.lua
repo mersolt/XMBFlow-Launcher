@@ -11,6 +11,14 @@ local selected_column = 5
 local column_count = 6
 local oldpad = Controls.read()
 local running = true
+local category_icons = {
+    Graphics.loadImage("app0:/DATA/xmb-icon-settings.png"),
+    Graphics.loadImage("app0:/DATA/xmb-icon-photo.png"),
+    Graphics.loadImage("app0:/DATA/xmb-icon-music.png"),
+    Graphics.loadImage("app0:/DATA/xmb-icon-video.png"),
+    Graphics.loadImage("app0:/DATA/xmb-icon-games.png"),
+    Graphics.loadImage("app0:/DATA/xmb-icon-apps.png")
+}
 
 local function draw_wave(base_y, phase, color)
     for x = 0, width - 8, 8 do
@@ -50,6 +58,7 @@ while running do
         local top = selected and 142 or 162
         Graphics.fillRect(x, x + 52, top, top + 52, color)
         Graphics.fillRect(x + 8, x + 44, top + 8, top + 44, Color.new(4, 10, 28, 230))
+        Graphics.drawImage(x - 22, top + 62, category_icons[column], color)
     end
 
     draw_placeholder_card(selected_column)

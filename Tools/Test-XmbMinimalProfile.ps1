@@ -7,13 +7,16 @@ foreach ($entry in $required) {
 }
 
 $forbidden = @(
-    'app0:', 'ux0:', 'ur0:', 'vs0:', 'System.installVpk', 'System.reboot',
+    'ux0:', 'ur0:', 'vs0:', 'System.installVpk', 'System.reboot',
     'System.deleteFile', 'System.deleteDirectory', 'System.copyFile',
-    'dofile(', 'loadfile(', 'Sound.', 'Graphics.loadImage', 'Font.'
+    'dofile(', 'loadfile(', 'Sound.', 'Font.'
 )
 foreach ($entry in $forbidden) {
     if ($text.Contains($entry)) { throw "Minimal XMB profile must not contain: $entry" }
 }
 if ($text.Contains('SCE_CTRL_CIRCLE_MAP')) { throw 'Standalone XMB test must not rely on the legacy mapping variable.' }
+foreach ($icon in @('settings','photo','music','video','games','apps')) {
+    if (-not $text.Contains("app0:/DATA/xmb-icon-$icon.png")) { throw "Missing reviewed category icon: $icon" }
+}
 
 Write-Host 'XMB minimal profile structural checks passed.'

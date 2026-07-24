@@ -9,8 +9,8 @@ bin_dir="$vitasdk/bin"
 stage_dir=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-stage-fresh}
 build_dir=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-icon-build}
 output_vpk=${3:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-minimal-icon-smoke.vpk}
-title_id=${4:-XMBF00008}
-title=${5:-XMBFlow Lua Category Cards}
+title_id=${4:-XMBF00009}
+title=${5:-XMBFlow Lua Category Icons}
 lua_entry="$root_dir/src/xmb-test.lua"
 
 sh "$root_dir/Tools/Inspect-VitaSdkToolchain.sh"
@@ -33,6 +33,7 @@ fi
 for path in eboot.bin LICENSE sce_sys/icon0.png; do
     [ -f "$stage_dir/$path" ] || { echo "Missing staged file: $path" >&2; exit 1; }
 done
+[ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-settings.png" ] || { echo 'Missing reviewed XMB category icons.' >&2; exit 1; }
 [ -f "$lua_entry" ] || { echo "Missing Lua entry source: $lua_entry" >&2; exit 1; }
 
 mkdir -p "$build_dir"
@@ -45,6 +46,12 @@ mkdir -p "$build_dir"
     -a "$lua_entry=index.lua" \
     -a "$stage_dir/LICENSE=LICENSE" \
     -a "$stage_dir/sce_sys/icon0.png=sce_sys/icon0.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-settings.png=DATA/xmb-icon-settings.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-photo.png=DATA/xmb-icon-photo.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-music.png=DATA/xmb-icon-music.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-video.png=DATA/xmb-icon-video.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-games.png=DATA/xmb-icon-games.png" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-icon-apps.png=DATA/xmb-icon-apps.png" \
     "$output_vpk"
 
 echo "Created Lua icon-only XMB smoke test: $output_vpk"
