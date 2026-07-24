@@ -8,10 +8,9 @@ local oneLoopTimer = Timer.new()
 -- in the application global table instead of adding locals to this chunk.
 xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true
 
--- Open recovery mode if selected from the livearea
-local bootparam = System.getBootParams() or ""
-
-if not xmbSafeProfile and string.match(bootparam, "recovery") then
+-- Reading LiveArea boot parameters is an unsafe-mode API.  The safe profile
+-- deliberately has no recovery-entry path, so avoid calling it entirely.
+if not xmbSafeProfile and string.match(System.getBootParams() or "", "recovery") then
     dofile("app0:addons/recovery.lua")
     System.exit()
 end
@@ -32,10 +31,12 @@ end
 
 -- Speed related settings - MOVED EARLY for maximum performance impact
 local cpu_speed = 444 -- Was 333
-System.setBusSpeed(222)
-System.setGpuSpeed(222)
-System.setGpuXbarSpeed(166)
-System.setCpuSpeed(cpu_speed)
+if not xmbSafeProfile then
+    System.setBusSpeed(222)
+    System.setGpuSpeed(222)
+    System.setGpuXbarSpeed(166)
+    System.setCpuSpeed(cpu_speed)
+end
 
 -- Initialize sound system early for better performance
 Sound.init()
