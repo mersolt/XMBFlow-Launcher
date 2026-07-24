@@ -3089,6 +3089,7 @@ xmbPrototypeAppOptionsOpen = false
 xmbPrototypeAppOptionsAlpha = 0
 xmbPrototypeAppOptionsSelection = 1
 xmbPrototypeAppOptionsVisualSelection = 1
+xmbPrototypeAppOptionsHighlight = nil
 xmbPrototypeGlowPhase = 0
 xmbPrototypeSubmenuAlpha = 0
 xmbPrototypeHeldDirection = 0
@@ -14744,12 +14745,24 @@ end
 local xmb_prototype_app_options = {"Information", "Change category"}
 
 local function xmb_prototype_current_app_option_entry()
-    if xmbPrototypeColumn ~= 7 and xmbPrototypeColumn ~= 8 then
-        return nil
+    if xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8 then
+        local entries = xmb_prototype_current_read_only_apps_list(xmbPrototypeColumn)
+        local selection = xmbPrototypeColumn == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
+        return entries[selection]
     end
-    local entries = xmb_prototype_current_read_only_apps_list(xmbPrototypeColumn)
-    local selection = xmbPrototypeColumn == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
-    return entries[selection]
+    if xmbPrototypeColumn == 5 then
+        local entry = xmb_prototype_current_games_list()[xmbPrototypeGamesSelection]
+        if xmbPrototypeGamesMode == "entries" or (entry and entry.system_app) then
+            return entry
+        end
+    end
+    if xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil then
+        local entry = xmb_prototype_current_inert_list(xmbPrototypeColumn)[xmbPrototypeInertSelections[xmbPrototypeColumn]]
+        if entry and entry.system_app then
+            return entry
+        end
+    end
+    return nil
 end
 
 local function xmb_prototype_draw_app_options()
@@ -14763,28 +14776,29 @@ local function xmb_prototype_draw_app_options()
     local panel_x = math.floor(960 - 322 * alpha)
     local row_height = 58
     local anchor_y = 250
-    local title = xmb_prototype_read_only_item_label(xmb_prototype_current_app_option_entry() or {})
     xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(xmbPrototypeAppOptionsVisualSelection, xmbPrototypeAppOptionsSelection, 0.20)
     Graphics.fillRect(0, 960, 0, 544, Color.new(0, 0, 0, math.floor(96 * alpha)))
     Graphics.fillRect(panel_x, 960, 0, 544, Color.new(18, 42, 86, math.floor(224 * alpha)))
-    Font.print(fnt20, panel_x + 14, 118, title, Color.new(225, 238, 255, math.floor(220 * alpha)))
-
-    for step = 0, 19 do
-        local left = panel_x + math.floor((960 - panel_x) * step / 20)
-        local right = panel_x + math.floor((960 - panel_x) * (step + 1) / 20)
-        local bar_alpha = math.floor((188 - step * 8) * alpha)
-        Graphics.fillRect(left, right, anchor_y - math.floor(row_height / 2), anchor_y + math.ceil(row_height / 2), Color.new(118, 211, 255, bar_alpha))
+    if xmbPrototypeAppOptionsHighlight == nil then
+        local ok, texture = pcall(Graphics.loadImage, "app0:/DATA/xmb-app-options-highlight.png")
+        xmbPrototypeAppOptionsHighlight = ok and texture or false
+        if xmbPrototypeAppOptionsHighlight then
+            Graphics.setImageFilters(xmbPrototypeAppOptionsHighlight, FILTER_LINEAR, FILTER_LINEAR)
+        end
+    end
+    if xmbPrototypeAppOptionsHighlight then
+        Graphics.drawScaleImage(panel_x, anchor_y - math.floor(row_height / 2), xmbPrototypeAppOptionsHighlight, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
+    else
+        Graphics.fillRect(panel_x, 960, anchor_y - math.floor(row_height / 2), anchor_y + math.ceil(row_height / 2), Color.new(118, 211, 255, math.floor(188 * alpha)))
     end
     for index, label in ipairs(xmb_prototype_app_options) do
-        local y = math.floor(anchor_y + (index - xmbPrototypeAppOptionsVisualSelection) * row_height)
+        local y = math.floor(anchor_y + (index - xmbPrototypeAppOptionsVisualSelection) * row_height - 11)
         local focus = math.max(0, 1 - math.abs(index - xmbPrototypeAppOptionsVisualSelection))
         local text_x = panel_x + 14
         if focus > 0.02 then
             local glow_alpha = math.floor((42 + 58 * focus) * alpha)
-            Font.print(fnt22, text_x - 1, y - 1, label, Color.new(255, 255, 255, glow_alpha))
-            Font.print(fnt22, text_x + 1, y - 1, label, Color.new(255, 255, 255, glow_alpha))
-            Font.print(fnt22, text_x - 1, y + 1, label, Color.new(255, 255, 255, glow_alpha))
-            Font.print(fnt22, text_x + 1, y + 1, label, Color.new(255, 255, 255, glow_alpha))
+            Font.print(fnt22, text_x - 1, y, label, Color.new(255, 255, 255, glow_alpha))
+            Font.print(fnt22, text_x + 1, y, label, Color.new(255, 255, 255, glow_alpha))
         end
         Font.print(fnt22, text_x, y, label, Color.new(235, 245, 255, math.floor((180 + 75 * focus) * alpha)))
     end

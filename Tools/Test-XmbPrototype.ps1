@@ -38,6 +38,8 @@ $required = @(
     'local function xmb_prototype_draw_app_options()',
     '"Information", "Change category"',
     'xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(',
+    '"app0:/DATA/xmb-app-options-highlight.png"',
+    'Graphics.drawScaleImage(panel_x, anchor_y - math.floor(row_height / 2), xmbPrototypeAppOptionsHighlight, 1, 1',
     'xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha +',
     'Sound.setVolume(xmbNavigationClick, 32767)',
     '"app0:/DATA/xmb-system-browser.png"',
