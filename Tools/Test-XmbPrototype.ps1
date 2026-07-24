@@ -11,6 +11,8 @@ $required = @(
     'local function xmb_prototype_read_only_data()',
     'XmbNavigation.move(',
     'XmbNavigation.approach(',
+    'XmbLayout.horizontal_x(',
+    'XmbLayout.vertical_y(',
     'local function xmb_prototype_category_icon(column)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',

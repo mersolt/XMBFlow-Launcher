@@ -17,6 +17,7 @@ end
 dofile("app0:addons/threads.lua")
 dofile("app0:addons/xmb-readonly-data.lua")
 dofile("app0:addons/xmb-navigation.lua")
+dofile("app0:addons/xmb-layout.lua")
 
 -- Speed related settings - MOVED EARLY for maximum performance impact
 local cpu_speed = 444 -- Was 333
@@ -14522,9 +14523,9 @@ local function draw_xmb_prototype()
     -- showCat, caches, scanners, settings, or a launch target.
     local category_anchor_x = 480
     for index, label in ipairs(xmb_prototype_columns) do
-        local relative = index - xmbPrototypeVisualColumn
-        local x = category_anchor_x + relative * 130
-        local focus = math.max(0, 1 - math.abs(relative))
+        local relative = XmbLayout.relative(index, xmbPrototypeVisualColumn)
+        local x = XmbLayout.horizontal_x(category_anchor_x, index, xmbPrototypeVisualColumn, 130)
+        local focus = XmbLayout.focus(relative)
         local label_color = Color.new(190 + math.floor(65 * focus), 205 + math.floor(50 * focus), 225 + math.floor(30 * focus), 145 + math.floor(110 * focus))
 
         local icon = xmb_prototype_category_icon(index)
@@ -14551,7 +14552,7 @@ local function draw_xmb_prototype()
             local parent_last = math.min(#parent_list, xmbPrototypeGamesParentSelection + 3)
             for parent_index = parent_first, parent_last do
                 local parent_item = parent_list[parent_index]
-                local parent_y = 278 + (parent_index - xmbPrototypeGamesParentSelection) * 42
+                local parent_y = XmbLayout.vertical_y(278, parent_index, xmbPrototypeGamesParentSelection, 42, 42)
                 local parent_selected = parent_index == xmbPrototypeGamesParentSelection
                 Font.print(parent_selected and fnt22 or fnt20, 72, parent_y, xmb_prototype_games_item_label(parent_item), Color.new(190, 205, 225, parent_selected and 150 or 95))
             end
@@ -14564,7 +14565,7 @@ local function draw_xmb_prototype()
 
             for index = first_item, last_item do
                 local item = games_list[index]
-                local y = 278 + (index - xmbPrototypeGamesVisualSelection) * 42
+                local y = XmbLayout.vertical_y(278, index, xmbPrototypeGamesVisualSelection, 42, 42)
                 local is_selected = index == xmbPrototypeGamesSelection
                 local label = xmb_prototype_games_item_label(item)
                 local detail = xmb_prototype_games_item_detail(item, index)
@@ -14601,7 +14602,7 @@ local function draw_xmb_prototype()
             local item = apps_list[index]
             local selected = index == selection
             local label = xmb_prototype_read_only_item_label(item)
-            local y = 278 + (index - visual_selection) * 42
+            local y = XmbLayout.vertical_y(278, index, visual_selection, 42, 42)
             if selected then
                 Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, math.floor(xmbPrototypeVerticalAlpha * 210)))
             end

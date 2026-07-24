@@ -101,20 +101,17 @@ local function draw_vertical_options(column, alpha, anchor_x)
     visual_options[column] = XmbNavigation.approach(visual_options[column], selected_option, 0.18)
     local visual_option = visual_options[column]
     for option = 1, option_counts[column] do
-        local relative = option - visual_option
+        local relative = XmbLayout.relative(option, visual_option)
         do
-            local focus = math.max(0, 1 - math.abs(relative))
+            local focus = XmbLayout.focus(relative)
             local scale = 0.42 + 0.20 * focus
             local color = Color.new(255, 255, 255, math.floor((145 + 110 * focus) * alpha))
             local pulse = 0.50 + 0.50 * ((math.sin(glow_phase / 18) + 1) * 0.5)
             local text_brightness = math.floor(145 + 110 * focus * pulse)
             local text_color = Color.new(text_brightness, text_brightness, text_brightness, math.floor((145 + 110 * focus) * alpha))
             local x = anchor_x
-            local y = 296 + relative * 66
+            local y = XmbLayout.vertical_y(296, option, visual_option, 66, 234)
             local object_icon = get_object_icon(column, option)
-            if relative < 0 then
-                y = 296 + relative * 234
-            end
             if focus > 0.02 then
                 local glow_scale = scale + 0.045 * focus
                 Graphics.drawScaleImage(x - 48 * glow_scale, y - 48 * glow_scale, object_icon, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * alpha)))
@@ -129,11 +126,10 @@ local function draw_submenu_options(column, parent_x)
     if submenu_alpha <= 0.01 then return end
     submenu_visual_selection = XmbNavigation.approach(submenu_visual_selection, submenu_selection, 0.18)
     for option = 1, #submenu_labels do
-        local relative = option - submenu_visual_selection
-        local focus = math.max(0, 1 - math.abs(relative))
+        local relative = XmbLayout.relative(option, submenu_visual_selection)
+        local focus = XmbLayout.focus(relative)
         local scale = 0.34 + 0.16 * focus
-        local y = 296 + relative * 66
-        if relative < 0 then y = 296 + relative * 234 end
+        local y = XmbLayout.vertical_y(296, option, submenu_visual_selection, 66, 234)
         local icon = get_object_icon(column, ((selected_options[column] + option - 1) % option_counts[column]) + 1)
         local alpha = math.floor((130 + 125 * focus) * submenu_alpha)
         if focus > 0.02 then
@@ -193,9 +189,9 @@ while running do
     if submenu_alpha > 0.01 then draw_submenu_options(vertical_column, parent_x) end
 
     for column = 1, column_count do
-        local relative = column - visual_column
-        local x = parent_x + relative * 130
-        local focus = math.max(0, 1 - math.abs(relative))
+        local relative = XmbLayout.relative(column, visual_column)
+        local x = XmbLayout.horizontal_x(parent_x, column, visual_column, 130)
+        local focus = XmbLayout.focus(relative)
         local category_alpha = math.floor((150 + 105 * focus) * (column == selected_column and 1 or 1 - submenu_alpha))
         local color = Color.new(255, 255, 255, category_alpha)
         local pulse = 0.50 + 0.50 * ((math.sin(glow_phase / 18) + 1) * 0.5)
