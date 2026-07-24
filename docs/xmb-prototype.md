@@ -37,16 +37,22 @@ translations or icons.
 ## Important limitation
 
 The prototype now has its first navigation state: D-pad Left/Right moves the
-highlight across the six top-level categories and wraps at either end. In
-Games, D-pad Up/Down moves through a read-only folder list mapped to the
-existing RetroFlow categories. Cross opens read-only folders and Circle returns
-to the previous prototype folder. This includes Retro Systems, Collections,
-and the existing game entries within a selected folder. Selecting an actual
-game is still a no-op. Triangle, Square, Start, Select, analog, and touch
-actions are deliberately inert while the prototype is enabled. Settings,
-Photo, Music, and Video remain non-interactive: they cannot alter settings or
-scan/access media. Apps remains a read-only view over the existing scanned
-tables and does not guess or access Vita apps.
+highlight across eight top-level categories and wraps at either end. The axis
+interpolates around the fixed active category while the vertical list fades
+out, pauses, and then fades into the next category. In Games, D-pad Up/Down
+moves through a read-only folder list mapped to the existing RetroFlow
+categories. Cross opens read-only folders and Circle returns to the previous
+prototype folder. This includes Retro Systems, Collections, and the existing
+game entries within a selected folder. Selecting an actual game is still a
+no-op.
+
+System Apps and Homebrew Apps are separate read-only views of the existing
+RetroFlow categories 42 and 2. They do not enumerate Vita paths, create app
+folders, or launch selected titles. Settings, Photo, Music, Video, and Network
+remain non-interactive: they cannot alter settings or scan/access media.
+Triangle, Square, Start, Select, analog, and touch actions are deliberately
+inert while the prototype is enabled, apart from the documented Start + Select
+prototype toggle.
 
 The integrated renderer uses six original transparent category PNGs generated
 by `Tools/New-XmbFlowCategoryIcons.ps1`. They load lazily only while the XMB

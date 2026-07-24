@@ -4,11 +4,14 @@ $text = Get-Content -Raw $Source
 $required = @(
     'local xmbPrototypeEnabled = false',
     '{label = "PLAYSTATION MOBILE", category = 39}',
-    '{label = "SYSTEM APPS", category = 42}',
+    '"SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "NETWORK", "SYSTEM APPS", "HOMEBREW APPS"',
+    'local xmb_prototype_system_apps_category = 42',
+    'local xmb_prototype_homebrew_apps_category = 2',
     'local xmb_prototype_icon_paths = {',
     'local function xmb_prototype_category_icon(column)',
-    'local function xmb_prototype_current_apps_list()',
-    'local function xmb_prototype_open_apps_selection()',
+    'local function xmb_prototype_current_read_only_apps_list(column)',
+    'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
+    'local function xmb_prototype_update_transition()',
     'local function xmb_prototype_reset_navigation()',
     'local xmbPrototypeToggleChanged = false',
     'xmbPrototypeEnabled = not xmbPrototypeEnabled'
@@ -18,8 +21,12 @@ foreach ($entry in $required) {
     if (-not $text.Contains($entry)) { throw "Missing XMB prototype invariant: $entry" }
 }
 
-if ($text -match 'xmb_prototype_open_apps_selection\(\).*launch_') {
-    throw 'Apps prototype must not activate a launch adapter.'
+$prototypeStart = $text.IndexOf('-- XMB PROTOTYPE: presentation only.')
+$prototypeEnd = $text.IndexOf('-- Function to detect inserted Vita cartridge')
+if ($prototypeStart -lt 0 -or $prototypeEnd -le $prototypeStart) { throw 'Could not isolate the XMB prototype renderer for safety checks.' }
+$prototypeRenderer = $text.Substring($prototypeStart, $prototypeEnd - $prototypeStart)
+foreach ($forbidden in @('launch_', 'System.installVpk', 'System.reboot', 'System.copyFile', 'System.deleteFile', 'System.deleteDirectory')) {
+    if ($prototypeRenderer.Contains($forbidden)) { throw "Read-only XMB renderer must not contain: $forbidden" }
 }
 if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {
     throw 'XMB prototype selection must remain session-only.'

@@ -3034,15 +3034,22 @@ local showView = 0
 -- explicitly opts in; this flag is intentionally not saved to user settings.
 local xmbPrototypeEnabled = false
 local xmbPrototypeColumn = 5 -- GAMES
+local xmbPrototypeVisualColumn = 5
+local xmbPrototypeDisplayColumn = 5
+local xmbPrototypePendingColumn = 5
+local xmbPrototypeVerticalAlpha = 1
+local xmbPrototypeVerticalFadeDirection = 0
+local xmbPrototypeVerticalFadeDelay = 0
 local xmbPrototypeGamesMode = "folders"
 local xmbPrototypeGamesSelection = 1
+local xmbPrototypeGamesVisualSelection = 1
 local xmbPrototypeGamesCategory = nil
 local xmbPrototypeGamesParentMode = nil
 local xmbPrototypeGamesTitle = "GAMES"
-local xmbPrototypeAppsMode = "folders"
-local xmbPrototypeAppsSelection = 1
-local xmbPrototypeAppsCategory = nil
-local xmbPrototypeAppsTitle = "APPS"
+local xmbPrototypeSystemAppsSelection = 1
+local xmbPrototypeHomebrewAppsSelection = 1
+local xmbPrototypeSystemAppsVisualSelection = 1
+local xmbPrototypeHomebrewAppsVisualSelection = 1
 
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
@@ -14207,12 +14214,13 @@ end
 -- selection state, then draws an original text-and-shape XMB-style overlay.
 -- Input, scanning, caching, settings, and launch actions remain legacy code.
 local xmb_prototype_columns = {
-    "SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "APPS"
+    "SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "NETWORK", "SYSTEM APPS", "HOMEBREW APPS"
 }
 local xmb_prototype_icon_paths = {
     "app0:/DATA/xmb-icon-settings.png", "app0:/DATA/xmb-icon-photo.png",
     "app0:/DATA/xmb-icon-music.png", "app0:/DATA/xmb-icon-video.png",
-    "app0:/DATA/xmb-icon-games.png", "app0:/DATA/xmb-icon-apps.png"
+    "app0:/DATA/xmb-icon-games.png", "app0:/DATA/xmb-icon-apps.png",
+    "app0:/DATA/xmb-icon-apps.png", "app0:/DATA/xmb-icon-apps.png"
 }
 local xmb_prototype_icons = {}
 
@@ -14231,13 +14239,10 @@ local xmb_prototype_games_folders = {
     {label = "COLLECTIONS", kind = "collections"}
 }
 
--- Apps is a separate, read-only view over existing scanned tables. It does
--- not infer installed titles, write app folders, or invoke any launch path.
-local xmb_prototype_apps_folders = {
-    {label = "PS VITA", category = 1},
-    {label = "HOMEBREW", category = 2},
-    {label = "SYSTEM APPS", category = 42}
-}
+-- System and Homebrew Apps stay separate read-only views over the scanned
+-- RetroFlow tables. They neither enumerate Vita locations nor invoke titles.
+local xmb_prototype_system_apps_category = 42
+local xmb_prototype_homebrew_apps_category = 2
 
 local xmb_prototype_retro_systems = {}
 for category_number = 5, 46 do
@@ -14275,19 +14280,31 @@ local function xmb_prototype_move_column(direction)
     elseif xmbPrototypeColumn > #xmb_prototype_columns then
         xmbPrototypeColumn = 1
     end
+
+    xmbPrototypePendingColumn = xmbPrototypeColumn
+    if xmbPrototypePendingColumn ~= xmbPrototypeDisplayColumn then
+        xmbPrototypeVerticalFadeDirection = -1
+    end
 end
 
 local function xmb_prototype_reset_navigation()
     xmbPrototypeColumn = 5
+    xmbPrototypeVisualColumn = 5
+    xmbPrototypeDisplayColumn = 5
+    xmbPrototypePendingColumn = 5
+    xmbPrototypeVerticalAlpha = 1
+    xmbPrototypeVerticalFadeDirection = 0
+    xmbPrototypeVerticalFadeDelay = 0
     xmbPrototypeGamesMode = "folders"
     xmbPrototypeGamesSelection = 1
+    xmbPrototypeGamesVisualSelection = 1
     xmbPrototypeGamesCategory = nil
     xmbPrototypeGamesParentMode = nil
     xmbPrototypeGamesTitle = "GAMES"
-    xmbPrototypeAppsMode = "folders"
-    xmbPrototypeAppsSelection = 1
-    xmbPrototypeAppsCategory = nil
-    xmbPrototypeAppsTitle = "APPS"
+    xmbPrototypeSystemAppsSelection = 1
+    xmbPrototypeHomebrewAppsSelection = 1
+    xmbPrototypeSystemAppsVisualSelection = 1
+    xmbPrototypeHomebrewAppsVisualSelection = 1
 end
 
 local function xmb_prototype_current_games_list()
@@ -14321,45 +14338,32 @@ local function xmb_prototype_move_games_selection(direction)
     end
 end
 
-local function xmb_prototype_current_apps_list()
-    if xmbPrototypeAppsMode == "entries" then
-        return xCatLookup(xmbPrototypeAppsCategory) or {}
+local function xmb_prototype_current_read_only_apps_list(column)
+    if column == 7 then
+        return xCatLookup(xmb_prototype_system_apps_category) or {}
+    elseif column == 8 then
+        return xCatLookup(xmb_prototype_homebrew_apps_category) or {}
     end
-    return xmb_prototype_apps_folders
+    return {}
 end
 
-local function xmb_prototype_move_apps_selection(direction)
-    local list = xmb_prototype_current_apps_list()
-    if #list == 0 then xmbPrototypeAppsSelection = 0 return end
-    xmbPrototypeAppsSelection = xmbPrototypeAppsSelection + direction
-    if xmbPrototypeAppsSelection < 1 then
-        xmbPrototypeAppsSelection = #list
-    elseif xmbPrototypeAppsSelection > #list then
-        xmbPrototypeAppsSelection = 1
+local function xmb_prototype_move_read_only_apps_selection(column, direction)
+    local list = xmb_prototype_current_read_only_apps_list(column)
+    local selection = column == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
+    if #list == 0 then
+        selection = 0
+    else
+        selection = selection + direction
+        if selection < 1 then
+            selection = #list
+        elseif selection > #list then
+            selection = 1
+        end
     end
-end
-
-local function xmb_prototype_open_apps_selection()
-    if xmbPrototypeAppsMode ~= "folders" then
-        -- Entry activation remains deliberately disconnected until a reviewed
-        -- adapter can be tested with the packaged Lua runtime.
-        return
-    end
-    local selected = xmb_prototype_apps_folders[xmbPrototypeAppsSelection]
-    if selected then
-        xmbPrototypeAppsMode = "entries"
-        xmbPrototypeAppsCategory = selected.category
-        xmbPrototypeAppsTitle = selected.label
-        xmbPrototypeAppsSelection = 1
-    end
-end
-
-local function xmb_prototype_apps_go_back()
-    if xmbPrototypeAppsMode == "entries" then
-        xmbPrototypeAppsMode = "folders"
-        xmbPrototypeAppsCategory = nil
-        xmbPrototypeAppsTitle = "APPS"
-        xmbPrototypeAppsSelection = 1
+    if column == 7 then
+        xmbPrototypeSystemAppsSelection = selection
+    else
+        xmbPrototypeHomebrewAppsSelection = selection
     end
 end
 
@@ -14457,10 +14461,36 @@ local function xmb_prototype_games_item_detail(item, index)
     return "Preview only"
 end
 
+local function xmb_prototype_update_transition()
+    xmbPrototypeVisualColumn = xmbPrototypeVisualColumn + (xmbPrototypeColumn - xmbPrototypeVisualColumn) * 0.18
+    if xmbPrototypeVerticalFadeDirection < 0 then
+        xmbPrototypeVerticalAlpha = math.max(0, xmbPrototypeVerticalAlpha - 0.14)
+        if xmbPrototypeVerticalAlpha == 0 then
+            xmbPrototypeDisplayColumn = xmbPrototypePendingColumn
+            xmbPrototypeVerticalFadeDirection = 1
+            xmbPrototypeVerticalFadeDelay = 12
+        end
+    elseif xmbPrototypeVerticalFadeDirection > 0 then
+        if xmbPrototypeVerticalFadeDelay > 0 then
+            xmbPrototypeVerticalFadeDelay = xmbPrototypeVerticalFadeDelay - 1
+        else
+            xmbPrototypeVerticalAlpha = math.min(1, xmbPrototypeVerticalAlpha + 0.06)
+            if xmbPrototypeVerticalAlpha == 1 then
+                xmbPrototypeVerticalFadeDirection = 0
+            end
+        end
+    end
+end
+
+local function xmb_prototype_read_only_item_label(item)
+    return item.apptitle or item.title or item.name or "Untitled"
+end
+
 local function draw_xmb_prototype()
-    local active_column = xmb_prototype_active_column()
-    local showing_games = active_column == 5
-    local showing_apps = active_column == 6
+    xmb_prototype_update_transition()
+    local display_column = xmbPrototypeDisplayColumn
+    local showing_games = display_column == 5
+    local showing_read_only_apps = display_column == 7 or display_column == 8
     local games_list = xmb_prototype_current_games_list()
 
     -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
@@ -14469,33 +14499,33 @@ local function draw_xmb_prototype()
     Font.print(fnt25, 34, 28, "XMBFlow", white)
     Font.print(fnt20, 34, 57, "XMB prototype", Color.new(210, 225, 245, 220))
 
-    -- Horizontal columns are the XMB-style category axis. This is visual-only;
-    -- existing category controls still own showCat during the first prototype.
-    -- Keep all six labels inside the 960-pixel display. The previous spacing
-    -- placed the APPS column at the right edge, where its highlight could be
-    -- clipped. This only changes the prototype's presentation geometry.
-    local column_left = 48
-    local column_step = 150
+    -- The active category remains fixed while the complete horizontal axis
+    -- moves behind it. This state is presentation-only; it never changes
+    -- showCat, caches, scanners, settings, or a launch target.
+    local category_anchor_x = 480
     for index, label in ipairs(xmb_prototype_columns) do
-        local x = column_left + (index - 1) * column_step
-        local is_active = index == active_column
-        local label_color = is_active and white or Color.new(190, 205, 225, 145)
+        local relative = index - xmbPrototypeVisualColumn
+        local x = category_anchor_x + relative * 130
+        local focus = math.max(0, 1 - math.abs(relative))
+        local label_color = Color.new(190 + math.floor(65 * focus), 205 + math.floor(50 * focus), 225 + math.floor(30 * focus), 145 + math.floor(110 * focus))
 
         local icon = xmb_prototype_category_icon(index)
         if icon then
-            local scale = is_active and 1.15 or 0.82
-            Graphics.drawScaleImage(x + (48 - 48 * scale), 110 + (48 - 48 * scale), icon, scale, scale, label_color)
+            local scale = 0.82 + 0.33 * focus
+            Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, icon, scale, scale, label_color)
         end
+        Font.print(fnt20, x - 42, 226, label, label_color)
     end
 
-    Font.print(fnt22, 110, 150, xmb_prototype_columns[active_column], white)
+    Font.print(fnt22, 110, 150, xmb_prototype_columns[display_column], white)
     if showing_games then
         Font.print(fnt20, 110, 179, xmbPrototypeGamesTitle, Color.new(200, 215, 235, 190))
-    elseif showing_apps then
-        Font.print(fnt20, 110, 179, xmbPrototypeAppsTitle, Color.new(200, 215, 235, 190))
+    elseif showing_read_only_apps then
+        Font.print(fnt20, 110, 179, "READ-ONLY LIBRARY VIEW", Color.new(200, 215, 235, 190))
     end
 
     if showing_games then
+        xmbPrototypeGamesVisualSelection = xmbPrototypeGamesVisualSelection + (xmbPrototypeGamesSelection - xmbPrototypeGamesVisualSelection) * 0.18
         if #games_list == 0 then
             Font.print(fnt22, 112, 282, "No items in this folder", Color.new(210, 222, 240, 180))
         else
@@ -14504,33 +14534,42 @@ local function draw_xmb_prototype()
 
             for index = first_item, last_item do
                 local item = games_list[index]
-                local y = 278 + (index - xmbPrototypeGamesSelection) * 42
+                local y = 278 + (index - xmbPrototypeGamesVisualSelection) * 42
                 local is_selected = index == xmbPrototypeGamesSelection
                 local label = xmb_prototype_games_item_label(item)
                 local detail = xmb_prototype_games_item_detail(item, index)
 
+                local alpha = math.floor(xmbPrototypeVerticalAlpha * 210)
                 if is_selected then
-                    Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, 210))
-                    Font.print(fnt25, 112, y, label, white)
-                    Font.print(fnt20, 730, y + 4, detail, Color.new(225, 235, 250, 210))
+                    Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, alpha))
+                    Font.print(fnt25, 112, y, label, Color.new(255, 255, 255, alpha))
+                    Font.print(fnt20, 730, y + 4, detail, Color.new(225, 235, 250, alpha))
                 else
-                    Font.print(fnt22, 112, y + 2, label, Color.new(210, 222, 240, 165))
+                    Font.print(fnt22, 112, y + 2, label, Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
                 end
             end
         end
-    elseif active_column == 6 then
-        local apps_list = xmb_prototype_current_apps_list()
-        local first_item = math.max(1, xmbPrototypeAppsSelection - 3)
-        local last_item = math.min(#apps_list, xmbPrototypeAppsSelection + 3)
+    elseif showing_read_only_apps then
+        local apps_list = xmb_prototype_current_read_only_apps_list(display_column)
+        local selection = display_column == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
+        local visual_selection = display_column == 7 and xmbPrototypeSystemAppsVisualSelection or xmbPrototypeHomebrewAppsVisualSelection
+        visual_selection = visual_selection + (selection - visual_selection) * 0.18
+        if display_column == 7 then
+            xmbPrototypeSystemAppsVisualSelection = visual_selection
+        else
+            xmbPrototypeHomebrewAppsVisualSelection = visual_selection
+        end
+        local first_item = math.max(1, selection - 3)
+        local last_item = math.min(#apps_list, selection + 3)
         for index = first_item, last_item do
             local item = apps_list[index]
-            local selected = index == xmbPrototypeAppsSelection
-            local label = xmbPrototypeAppsMode == "entries" and (item.apptitle or item.title or item.name or "Untitled") or item.label
-            local y = 278 + (index - xmbPrototypeAppsSelection) * 42
+            local selected = index == selection
+            local label = xmb_prototype_read_only_item_label(item)
+            local y = 278 + (index - visual_selection) * 42
             if selected then
-                Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, 210))
+                Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, math.floor(xmbPrototypeVerticalAlpha * 210)))
             end
-            Font.print(selected and fnt25 or fnt22, 112, y, label, selected and white or Color.new(210, 222, 240, 165))
+            Font.print(selected and fnt25 or fnt22, 112, y, label, selected and Color.new(255, 255, 255, math.floor(xmbPrototypeVerticalAlpha * 255)) or Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
         end
     end
 
@@ -14545,6 +14584,8 @@ local function draw_xmb_prototype()
         else
             Font.print(fnt20, 564, 508, "Up / Down: Browse   Cross: Open   Circle: Back", Color.new(210, 225, 245, 210))
         end
+    elseif showing_read_only_apps then
+        Font.print(fnt20, 34, 508, "Up / Down: Browse   Cross: Preview only   Start + Select: Legacy UI", Color.new(210, 225, 245, 210))
     else
         Font.print(fnt20, 34, 508, "Left / Right: XMB categories   Start + Select: Legacy UI", Color.new(210, 225, 245, 210))
     end
@@ -22015,14 +22056,10 @@ while true do
                 xmb_prototype_open_games_selection()
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                 xmb_prototype_go_back()
-            elseif xmbPrototypeColumn == 6 and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
-                xmb_prototype_move_apps_selection(-1)
-            elseif xmbPrototypeColumn == 6 and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
-                xmb_prototype_move_apps_selection(1)
-            elseif xmbPrototypeColumn == 6 and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
-                xmb_prototype_open_apps_selection()
-            elseif xmbPrototypeColumn == 6 and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
-                xmb_prototype_apps_go_back()
+            elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
+                xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, -1)
+            elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
+                xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, 1)
             end
         end
 
