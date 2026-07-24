@@ -1263,6 +1263,10 @@ Network.init()
 
 -- Sound system already initialized early in file
 local click = Sound.open("app0:/DATA/click2.ogg")
+xmbNavigationClick = nil
+if xmbSafeProfile then
+    xmbNavigationClick = Sound.open("app0:/DATA/xmb-cursor.ogg")
+end
 local sndMusic = click--temp
 local imgCoverTmp = Graphics.loadImage("app0:/DATA/noimg.png")
 local backTmp = Graphics.loadImage("app0:/DATA/noimg.png")
@@ -3070,6 +3074,7 @@ xmbPrototypeHomebrewAppsSelection = 1
 xmbPrototypeSystemAppsVisualSelection = 1
 xmbPrototypeHomebrewAppsVisualSelection = 1
 xmbPrototypeGlowPhase = 0
+xmbPrototypeSubmenuAlpha = 0
 xmbPrototypeHeldDirection = 0
 xmbPrototypeNavigationRepeat = 0
 
@@ -14295,7 +14300,7 @@ xmb_prototype_columns = {
 xmb_prototype_icon_paths = {
     "app0:/DATA/xmb-icon-settings.png", "app0:/DATA/xmb-icon-photo.png",
     "app0:/DATA/xmb-icon-music.png", "app0:/DATA/xmb-icon-video.png",
-    "app0:/DATA/xmb-icon-games.png", "app0:/DATA/xmb-icon-apps.png",
+    "app0:/DATA/xmb-icon-games.png", "app0:/DATA/xmb-icon-network.png",
     "app0:/DATA/xmb-icon-apps.png", "app0:/DATA/xmb-icon-apps.png"
 }
 xmb_prototype_icons = {}
@@ -14412,6 +14417,7 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeSystemAppsVisualSelection = 1
     xmbPrototypeHomebrewAppsVisualSelection = 1
     xmbPrototypeGlowPhase = 0
+    xmbPrototypeSubmenuAlpha = 0
     xmbPrototypeHeldDirection = 0
     xmbPrototypeNavigationRepeat = 0
 end
@@ -14484,14 +14490,18 @@ local function xmb_prototype_games_folder_detail(folder)
     return ""
 end
 
-local function xmb_prototype_open_entries(category, title, parent_mode)
+local function xmb_prototype_open_games_submenu(mode, title, category)
     xmbPrototypeGamesParentList = xmb_prototype_current_games_list()
     xmbPrototypeGamesParentSelection = xmbPrototypeGamesSelection
-    xmbPrototypeGamesMode = "entries"
+    xmbPrototypeGamesParentMode = xmbPrototypeGamesMode
+    xmbPrototypeGamesMode = mode
     xmbPrototypeGamesCategory = category
     xmbPrototypeGamesTitle = title
-    xmbPrototypeGamesParentMode = parent_mode
     xmbPrototypeGamesSelection = 1
+end
+
+local function xmb_prototype_open_entries(category, title)
+    xmb_prototype_open_games_submenu("entries", title, category)
 end
 
 local function xmb_prototype_open_games_selection()
@@ -14504,33 +14514,27 @@ local function xmb_prototype_open_games_selection()
 
     if xmbPrototypeGamesMode == "folders" then
         if selected.kind == "categories" then
-            xmbPrototypeGamesMode = "categories"
-            xmbPrototypeGamesTitle = "COLLECTIONS"
-            xmbPrototypeGamesSelection = 1
+            xmb_prototype_open_games_submenu("categories", "COLLECTIONS")
         elseif selected.kind == "retro" then
-            xmbPrototypeGamesMode = "retro_systems"
-            xmbPrototypeGamesTitle = "RETRO SYSTEMS"
-            xmbPrototypeGamesSelection = 1
+            xmb_prototype_open_games_submenu("retro_systems", "RETRO SYSTEMS")
         elseif selected.kind == "collections" then
-            xmbPrototypeGamesMode = "collections"
-            xmbPrototypeGamesTitle = "COLLECTIONS"
-            xmbPrototypeGamesSelection = 1
+            xmb_prototype_open_games_submenu("collections", "COLLECTIONS")
         end
     elseif xmbPrototypeGamesMode == "categories" or xmbPrototypeGamesMode == "retro_systems" then
-        xmb_prototype_open_entries(selected.category, selected.label, xmbPrototypeGamesMode)
+        xmb_prototype_open_entries(selected.category, selected.label)
     elseif xmbPrototypeGamesMode == "collections" then
-        xmb_prototype_open_entries(49 + xmbPrototypeGamesSelection, selected.display_name or selected.table_name or "COLLECTION", "collections")
+        xmb_prototype_open_entries(49 + xmbPrototypeGamesSelection, selected.display_name or selected.table_name or "COLLECTION")
     end
 end
 
 local function xmb_prototype_go_back()
-    if xmbPrototypeGamesMode == "entries" then
+    if xmbPrototypeGamesParentList ~= nil then
         xmbPrototypeGamesMode = xmbPrototypeGamesParentMode or "folders"
         xmbPrototypeGamesCategory = nil
         xmbPrototypeGamesParentMode = nil
         xmbPrototypeGamesParentList = nil
+        xmbPrototypeGamesSelection = xmbPrototypeGamesParentSelection
         xmbPrototypeGamesParentSelection = 1
-        xmbPrototypeGamesSelection = 1
 
         if xmbPrototypeGamesMode == "folders" then
             xmbPrototypeGamesTitle = "GAMES"
@@ -14594,6 +14598,8 @@ local function draw_xmb_prototype()
     local showing_games = display_column == 5
     local showing_read_only_apps = display_column == 7 or display_column == 8
     local games_list = xmb_prototype_current_games_list()
+    local submenu_target = showing_games and xmbPrototypeGamesParentList ~= nil and 1 or 0
+    xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha + (submenu_target - xmbPrototypeSubmenuAlpha) * 0.14
 
     -- Original XMB-inspired backdrop and waves.  It deliberately uses no
     -- Sony-derived art or extracted theme data.
@@ -14605,7 +14611,7 @@ local function draw_xmb_prototype()
     -- The active category remains fixed while the complete horizontal axis
     -- moves behind it. This state is presentation-only; it never changes
     -- showCat, caches, scanners, settings, or a launch target.
-    local category_anchor_x = 480
+    local category_anchor_x = 480 - 390 * xmbPrototypeSubmenuAlpha
     XmbRender.each_category(xmb_prototype_columns, xmbPrototypeVisualColumn, category_anchor_x, 130, function(index, label, relative, x, focus)
         local pulse = 0.50 + 0.50 * ((math.sin(xmbPrototypeGlowPhase / 18) + 1) * 0.5)
         local category_alpha = math.floor(150 + 105 * focus)
@@ -14619,30 +14625,30 @@ local function draw_xmb_prototype()
         else
             XmbRender.icon(icon, x, 166, scale, Color.new(255, 255, 255, category_alpha))
         end
-        Font.print(fnt20, x - 42, 226, label, label_color)
+        Font.print(fnt20, x - Font.getTextWidth(fnt20, label) / 2, 226, label, label_color)
     end)
 
     if showing_games and xmbPrototypeVerticalAlpha > 0.01 then
         xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, 0.18)
-        local showing_child_axis = xmbPrototypeGamesMode == "entries" and xmbPrototypeGamesParentList ~= nil
+        local showing_child_axis = xmbPrototypeGamesParentList ~= nil
         local vertical_icon = xmb_prototype_category_icon(display_column)
         if showing_child_axis then
             local parent_list = xmbPrototypeGamesParentList
             local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, 234)
             XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, 234, function(parent_index, _, parent_y, parent_focus)
                 local parent_item = parent_list[parent_index]
-                xmb_prototype_draw_vertical_object(vertical_icon, 90, parent_y, xmb_prototype_games_item_label(parent_item), parent_focus, xmbPrototypeVerticalAlpha * 0.58)
+                xmb_prototype_draw_vertical_object(vertical_icon, category_anchor_x, parent_y, xmb_prototype_games_item_label(parent_item), parent_focus, xmbPrototypeVerticalAlpha * 0.58)
             end)
         end
         if #games_list == 0 then
-            Font.print(fnt22, showing_child_axis and 360 or 520, 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 180)))
+            Font.print(fnt22, (showing_child_axis and category_anchor_x + 220 or category_anchor_x + 40), 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 180)))
         else
             local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, 234)
 
             XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, 234, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
-                xmb_prototype_draw_vertical_object(vertical_icon, showing_child_axis and 360 or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
+                xmb_prototype_draw_vertical_object(vertical_icon, showing_child_axis and category_anchor_x + 220 or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
             end)
         end
     elseif showing_read_only_apps then
@@ -22207,6 +22213,9 @@ while true do
                 xmbPrototypeHeldDirection = xmbPrototypeDirection
                 xmbPrototypeNavigationRepeat = xmbPrototypeDirectionIsNew and 18 or 5
                 xmb_prototype_move_direction(xmbPrototypeDirection)
+                if setSounds == 1 and xmbNavigationClick then
+                    Sound.play(xmbNavigationClick, NO_LOOP)
+                end
             else
                 xmbPrototypeNavigationRepeat = xmbPrototypeNavigationRepeat - 1
             end
@@ -22216,9 +22225,15 @@ while true do
                     xmb_prototype_focus_legacy_selection()
                 else
                     xmb_prototype_open_games_selection()
+                    if setSounds == 1 and xmbNavigationClick then
+                        Sound.play(xmbNavigationClick, NO_LOOP)
+                    end
                 end
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                 xmb_prototype_go_back()
+                if setSounds == 1 and xmbNavigationClick then
+                    Sound.play(xmbNavigationClick, NO_LOOP)
+                end
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
                 xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, -1)
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
