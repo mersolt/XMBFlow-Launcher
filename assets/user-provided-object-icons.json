@@ -1,0 +1,36 @@
+﻿{
+    "schema":  1,
+    "provenance":  "User-provided original XMBFlow object artwork; author asserted original work in project discussion on 2026-07-24.",
+    "license":  "LicenseRef-XMBFlow-Original",
+    "transformation":  "Tools/Import-XmbFlowOriginalObjectIcons.ps1",
+    "files":  [
+                  {
+                      "input_name":  "display-settings.png",
+                      "input_sha256":  "33a0d939c52d2d7fd554f44d9be161135a456d1a33b60c09ef0d2a1ae714b658",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-setting-display.png",
+                      "output_sha256":  "97964ee25a9db8cb6ff3f9a0f2da27a229fa2932c40f995b5f387e4d3ddaf792",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "system-settings.png",
+                      "input_sha256":  "a712841e86a9b0b87460ce94c23d2f6839dc5943232a83e9a55429be5c0a795f",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-setting-system.png",
+                      "output_sha256":  "3f1bc9059d3321f21f6657dc85c008282469f85bfc55e803b3aa303396bee8b5",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "time-settings.png",
+                      "input_sha256":  "ddabfa4ecaddde9123faafa244bdf50b445d099c403898e2fd15374819e35c1c",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-setting-time.png",
+                      "output_sha256":  "99e08eed88df2229df315426ff9b359a2782207866ef6ddadee889fce3ed4e84",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  },
+                  {
+                      "input_name":  "photoviewer.png",
+                      "input_sha256":  "3754d61b3c26c88767dd65a739186fff62922cdc4ce746b8c1bb8c89aa6e7c75",
+                      "output_path":  "assets/bootstrap-placeholders/DATA/xmb-object-photoviewer.png",
+                      "output_sha256":  "bbf88aefb146a62d9f8c7fa185ebc973bf7dcd23123e8c395b45db79248c9346",
+                      "canvas":  "96x96 transparent PNG; centred aspect-fit to 76px maximum content extent."
+                  }
+              ]
+}

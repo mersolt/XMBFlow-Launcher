@@ -1,7 +1,7 @@
 param([string]$Source = (Join-Path $PSScriptRoot '..\src\xmb-test.lua'))
 
 $text = Get-Content -Raw $Source
-$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'SCE_CTRL_UP', 'SCE_CTRL_DOWN', 'local option_counts = {4, 3, 4, 3, 5, 3, 3}', 'local selected_options = {1, 1, 1, 1, 1, 1, 1}', 'local visual_options = {1, 1, 1, 1, 1, 1, 1}', 'local visual_column = 5', 'Graphics.drawScaleImage')
+$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'SCE_CTRL_UP', 'SCE_CTRL_DOWN', 'local option_counts = {6, 3, 3, 3, 5, 2, 3}', 'local selected_options = {1, 1, 1, 1, 1, 1, 1}', 'local visual_options = {1, 1, 1, 1, 1, 1, 1}', 'local visual_column = 5', 'Graphics.drawScaleImage')
 foreach ($entry in $required) {
     if (-not $text.Contains($entry)) { throw "Missing minimal XMB profile invariant: $entry" }
 }
@@ -22,9 +22,10 @@ if (-not $text.Contains('y = 296 + relative * 234') -or $text.Contains('local ar
 if (-not $text.Contains('math.sin(glow_phase / 18)') -or -not $text.Contains('category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255') -or -not $text.Contains('local text_color = Color.new')) { throw 'Focused icons and labels must use the persistent white XMB-style silhouette glow pulse.' }
 if (-not $text.Contains('Controls.readLeftAnalog()') -or -not $text.Contains('local navigation_repeat = 0') -or -not $text.Contains('analog_x < 96') -or -not $text.Contains('analog_y > 160')) { throw 'The standalone mockup must support held D-pad and left-analog navigation.' }
 if (-not $text.Contains('Sound.init()') -or -not $text.Contains('Sound.open("app0:/DATA/click2.ogg")') -or -not $text.Contains('Sound.play(navigation_click, NO_LOOP)') -or -not $text.Contains('Sound.close(navigation_click)')) { throw 'The standalone mockup must use only the reviewed original navigation sound.' }
-foreach ($icon in @('xmb-setting-sound.png', 'xmb-setting-network.png')) {
+foreach ($icon in @('xmb-setting-sound.png', 'xmb-setting-network.png', 'xmb-setting-display.png', 'xmb-setting-system.png', 'xmb-setting-time.png', 'xmb-object-photoviewer.png')) {
     if (-not $text.Contains("app0:/DATA/$icon")) { throw "Missing reviewed settings icon: $icon" }
 }
+if (-not $text.Contains('"Sound Settings", "Network Settings", "System Settings", "Date and Time Settings"') -or -not $text.Contains('if column == 1 and option == 3 then object_icon = setting_icons.sound end')) { throw 'Settings icons must appear in the Settings column.' }
 if (-not $text.Contains('local x = category_anchor_x + relative * 130')) { throw 'The horizontal category axis must interpolate around the fixed XMB anchor.' }
 foreach ($icon in @('settings','photo','music','video','games','network','apps')) {
     if (-not $text.Contains("app0:/DATA/xmb-icon-$icon.png")) { throw "Missing reviewed category icon: $icon" }

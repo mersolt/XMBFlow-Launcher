@@ -19,7 +19,7 @@ local held_direction = 0
 local navigation_repeat = 0
 local column_count = 7
 local category_anchor_x = 480
-local option_counts = {4, 3, 4, 3, 5, 3, 3}
+local option_counts = {6, 3, 3, 3, 5, 2, 3}
 local selected_options = {1, 1, 1, 1, 1, 1, 1}
 local visual_options = {1, 1, 1, 1, 1, 1, 1}
 local oldpad = Controls.read()
@@ -35,7 +35,11 @@ local category_icons = {
 }
 local setting_icons = {
     sound = Graphics.loadImage("app0:/DATA/xmb-setting-sound.png"),
-    network = Graphics.loadImage("app0:/DATA/xmb-setting-network.png")
+    network = Graphics.loadImage("app0:/DATA/xmb-setting-network.png"),
+    display = Graphics.loadImage("app0:/DATA/xmb-setting-display.png"),
+    system = Graphics.loadImage("app0:/DATA/xmb-setting-system.png"),
+    time = Graphics.loadImage("app0:/DATA/xmb-setting-time.png"),
+    photoviewer = Graphics.loadImage("app0:/DATA/xmb-object-photoviewer.png")
 }
 Sound.init()
 local navigation_click = Sound.open("app0:/DATA/click2.ogg")
@@ -44,12 +48,12 @@ local font = Extended.loadFontFromMemory(font_buffer)
 Font.setPixelSizes(font, 18)
 local category_labels = {"Settings", "Photo", "Music", "Video", "Games", "Network", "Apps"}
 local object_labels = {
-    {"Theme Settings", "Display Settings", "Power Settings", "System Information"},
+    {"Theme Settings", "Display Settings", "Sound Settings", "Network Settings", "System Settings", "Date and Time Settings"},
     {"Photo Viewer", "Camera", "Slideshow"},
-    {"Music Library", "Now Playing", "Internet Radio", "Sound Settings"},
+    {"Music Library", "Now Playing", "Internet Radio"},
     {"Video Library", "Remote Play", "Video Settings"},
     {"Memory Stick", "Saved Data Utility", "Game Settings", "Retro Systems", "Collections"},
-    {"Internet Browser", "Online Manual", "Network Settings"},
+    {"Internet Browser", "Online Manual"},
     {"Downloads", "Utilities", "XMBFlow Settings"}
 }
 
@@ -77,8 +81,12 @@ local function draw_vertical_options(column, alpha)
             local x = category_anchor_x
             local y = 296 + relative * 66
             local object_icon = category_icons[column]
-            if column == 3 and option == 4 then object_icon = setting_icons.sound end
-            if column == 6 and option == 3 then object_icon = setting_icons.network end
+            if column == 1 and option == 2 then object_icon = setting_icons.display end
+            if column == 1 and option == 3 then object_icon = setting_icons.sound end
+            if column == 1 and option == 4 then object_icon = setting_icons.network end
+            if column == 1 and option == 5 then object_icon = setting_icons.system end
+            if column == 1 and option == 6 then object_icon = setting_icons.time end
+            if column == 2 and option == 1 then object_icon = setting_icons.photoviewer end
             if relative < 0 then
                 y = 296 + relative * 234
             end
