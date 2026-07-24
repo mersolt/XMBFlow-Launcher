@@ -88,7 +88,7 @@ local function get_object_icon(column, option)
     return object_icon
 end
 
-local function draw_vertical_options(column, alpha)
+local function draw_vertical_options(column, alpha, anchor_x)
     if alpha <= 0.01 then return end
     local selected_option = selected_options[column]
     visual_options[column] = visual_options[column] + (selected_option - visual_options[column]) * 0.18
@@ -102,7 +102,7 @@ local function draw_vertical_options(column, alpha)
             local pulse = 0.50 + 0.50 * ((math.sin(glow_phase / 18) + 1) * 0.5)
             local text_brightness = math.floor(145 + 110 * focus * pulse)
             local text_color = Color.new(text_brightness, text_brightness, text_brightness, math.floor((145 + 110 * focus) * alpha))
-            local x = category_anchor_x
+            local x = anchor_x
             local y = 296 + relative * 66
             local object_icon = get_object_icon(column, option)
             if relative < 0 then
@@ -118,7 +118,7 @@ local function draw_vertical_options(column, alpha)
     end
 end
 
-local function draw_submenu_options(column)
+local function draw_submenu_options(column, parent_x)
     if submenu_alpha <= 0.01 then return end
     submenu_visual_selection = submenu_visual_selection + (submenu_selection - submenu_visual_selection) * 0.18
     for option = 1, #submenu_labels do
@@ -131,10 +131,10 @@ local function draw_submenu_options(column)
         local alpha = math.floor((130 + 125 * focus) * submenu_alpha)
         if focus > 0.02 then
             local glow_scale = scale + 0.04 * focus
-            Graphics.drawScaleImage(700 - 48 * glow_scale, y - 48 * glow_scale, icon, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((38 + 92 * focus) * submenu_alpha)))
+            Graphics.drawScaleImage(parent_x + 220 - 48 * glow_scale, y - 48 * glow_scale, icon, glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((38 + 92 * focus) * submenu_alpha)))
         end
-        Graphics.drawScaleImage(700 - 48 * scale, y - 48 * scale, icon, scale, scale, Color.new(255, 255, 255, alpha))
-        Font.print(font, 740, y - 10, submenu_labels[option], Color.new(255, 255, 255, alpha))
+        Graphics.drawScaleImage(parent_x + 220 - 48 * scale, y - 48 * scale, icon, scale, scale, Color.new(255, 255, 255, alpha))
+        Font.print(font, parent_x + 260, y - 10, submenu_labels[option], Color.new(255, 255, 255, alpha))
     end
 end
 
@@ -179,27 +179,25 @@ while running do
             if vertical_alpha == 1 then vertical_fade_direction = 0 end
         end
     end
-    if submenu_open then
-        submenu_alpha = math.min(1, submenu_alpha + 0.10)
-        draw_vertical_options(vertical_column, vertical_alpha * 0.48)
-        draw_submenu_options(vertical_column)
-    else
-        submenu_alpha = math.max(0, submenu_alpha - 0.14)
-        draw_vertical_options(vertical_column, vertical_alpha)
-    end
+    local submenu_target = submenu_open and 1 or 0
+    submenu_alpha = submenu_alpha + (submenu_target - submenu_alpha) * 0.14
+    local parent_x = category_anchor_x - 390 * submenu_alpha
+    draw_vertical_options(vertical_column, vertical_alpha * (1 - 0.52 * submenu_alpha), parent_x)
+    if submenu_alpha > 0.01 then draw_submenu_options(vertical_column, parent_x) end
 
     for column = 1, column_count do
         local relative = column - visual_column
-        local x = category_anchor_x + relative * 130
+        local x = parent_x + relative * 130
         local focus = math.max(0, 1 - math.abs(relative))
-        local color = Color.new(255, 255, 255, math.floor(150 + 105 * focus))
+        local category_alpha = math.floor((150 + 105 * focus) * (column == selected_column and 1 or 1 - submenu_alpha))
+        local color = Color.new(255, 255, 255, category_alpha)
         local pulse = 0.50 + 0.50 * ((math.sin(glow_phase / 18) + 1) * 0.5)
         local text_brightness = math.floor(145 + 110 * focus * pulse)
-        local text_color = Color.new(text_brightness, text_brightness, text_brightness, math.floor(150 + 105 * focus))
+        local text_color = Color.new(text_brightness, text_brightness, text_brightness, category_alpha)
         local scale = 0.82 + 0.33 * focus
         if focus > 0.02 then
             local glow_scale = scale + 0.045 * focus
-            Graphics.drawScaleImage(x - 48 * glow_scale, 166 - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255, math.floor(40 + 100 * focus * pulse)))
+            Graphics.drawScaleImage(x - 48 * glow_scale, 166 - 48 * glow_scale, category_icons[column], glow_scale, glow_scale, Color.new(255, 255, 255, math.floor((40 + 100 * focus * pulse) * (column == selected_column and 1 or 1 - submenu_alpha))))
         end
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
         Font.print(font, x - 30, 226, category_labels[column], text_color)
