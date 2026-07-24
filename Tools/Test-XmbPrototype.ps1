@@ -5,7 +5,7 @@ $required = @(
     'xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true',
     'xmbPrototypeEnabled = xmbSafeProfile',
     '{label = "PLAYSTATION MOBILE", category = 39}',
-    '"Settings", "Photo", "Music", "Video", "Games", "Network", "System Apps", "Homebrew Apps"',
+    '"Settings", "Photo", "Music", "Video", "Games", "Network", "System Apps", "Homebrew"',
     'xmb_prototype_system_apps_category = 46',
     'xmb_prototype_homebrew_apps_category = 2',
     'xmb_prototype_icon_paths = {',
@@ -32,6 +32,7 @@ $required = @(
     'xmbPrototypeGamesGrandparentList = nil',
     'xmbPrototypeGamesParentStartOffset = 0',
     'xmbPrototypeChildAxisAlpha = xmbPrototypeChildAxisAlpha +',
+    'xmbPrototypeReturningToNestedParent = true',
     'xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha +',
     'Sound.setVolume(xmbNavigationClick, 32767)',
     '"app0:/DATA/xmb-system-browser.png"',
@@ -82,6 +83,9 @@ if (-not $prototypeRenderer.Contains('showCat = category') -or -not $prototypeRe
 }
 if (-not $text.Contains('xmb_prototype_activate_app_selection(xmbPrototypeColumn)')) {
     throw 'The System and Homebrew Apps columns must activate their selected entry from XMB.'
+}
+if (-not $text.Contains('xmb_prototype_activate_inert_selection(xmbPrototypeColumn)')) {
+    throw 'The Photo and Network shortcut columns must activate their mapped system apps from XMB.'
 }
 if ($text.Contains('xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_UP)')) {
     throw 'Apps navigation must use the shared XMB direction handler exactly once.'

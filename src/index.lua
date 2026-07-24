@@ -3076,6 +3076,8 @@ xmbPrototypeGamesGrandparentStartOffset = 0
 xmbPrototypeGamesParentStartOffset = 0
 xmbPrototypeChildAxisOffset = 160
 xmbPrototypeChildAxisAlpha = 0
+xmbPrototypeReturningToNestedParent = false
+xmbPrototypeReturnAxisAlpha = 1
 xmbPrototypeGamesTitle = "GAMES"
 xmbPrototypeSystemAppsSelection = 1
 xmbPrototypeHomebrewAppsSelection = 1
@@ -14305,7 +14307,7 @@ end
 -- selection state, then draws an original text-and-shape XMB-style overlay.
 -- Input, scanning, caching, settings, and launch actions remain legacy code.
 xmb_prototype_columns = {
-    "Settings", "Photo", "Music", "Video", "Games", "Network", "System Apps", "Homebrew Apps"
+    "Settings", "Photo", "Music", "Video", "Games", "Network", "System Apps", "Homebrew"
 }
 xmb_prototype_icon_paths = {
     "app0:/DATA/xmb-icon-settings.png", "app0:/DATA/xmb-icon-photo.png",
@@ -14331,11 +14333,11 @@ xmb_prototype_system_app_icon_paths = {
 xmb_prototype_inert_columns = {
     [2] = {
         {label = "Gallery", icon_path = "app0:/DATA/xmb-object-photoviewer.png"},
-        {label = "Camera", icon_path = "app0:/DATA/xmb-icon-photo.png"},
+        {label = "Photos", icon_path = "app0:/DATA/xmb-icon-photo.png", system_app = "Photos"},
         {label = "Panoramic Camera", icon_path = "app0:/DATA/xmb-icon-photo.png"}
     },
     [6] = {
-        {label = "Internet Browser", icon_path = "app0:/DATA/xmb-system-browser.png"},
+        {label = "Browser", icon_path = "app0:/DATA/xmb-system-browser.png", system_app = "Browser"},
         {label = "Online Manual", icon_path = "app0:/DATA/xmb-icon-network.png"}
     }
 }
@@ -14345,7 +14347,8 @@ xmb_prototype_inert_columns = {
 xmb_prototype_games_folders = {
     {label = "COLLECTIONS", kind = "categories"},
     {label = "RETRO SYSTEMS", kind = "retro"},
-    {label = "USER COLLECTIONS", kind = "collections"}
+    {label = "USER COLLECTIONS", kind = "collections"},
+    {label = "Trophies", system_app = "Trophies", icon_path = "app0:/DATA/xmb-system-trophy.png"}
 }
 xmb_prototype_library_categories = {
     {label = "ALL GAMES", category = 0},
@@ -14483,6 +14486,8 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeGamesGrandparentStartOffset = 0
     xmbPrototypeGamesParentStartOffset = 0
     xmbPrototypeChildAxisAlpha = 0
+    xmbPrototypeReturningToNestedParent = false
+    xmbPrototypeReturnAxisAlpha = 1
     xmbPrototypeGamesTitle = "GAMES"
     xmbPrototypeSystemAppsSelection = 1
     xmbPrototypeHomebrewAppsSelection = 1
@@ -14527,7 +14532,14 @@ end
 local function xmb_prototype_current_read_only_apps_list(column)
     local data = xmb_prototype_read_only_data()
     if column == 7 then
-        return data.category_rows(xmb_prototype_system_apps_category)
+        local entries = {}
+        for _, entry in ipairs(data.category_rows(xmb_prototype_system_apps_category)) do
+            local label = string.lower(entry.apptitle or entry.title or entry.name or "")
+            if label ~= "trophies" and label ~= "trophy collection" then
+                table.insert(entries, entry)
+            end
+        end
+        return entries
     elseif column == 8 then
         return data.category_rows(xmb_prototype_homebrew_apps_category)
     end
@@ -14604,6 +14616,11 @@ local function xmb_prototype_open_games_selection()
         return
     end
 
+    if type(selected.system_app) == "string" then
+        xmb_prototype_start_system_app(selected.system_app)
+        return
+    end
+
     if xmbPrototypeGamesMode == "folders" then
         if selected.kind == "categories" then
             xmb_prototype_open_games_submenu("categories", "COLLECTIONS")
@@ -14636,6 +14653,8 @@ local function xmb_prototype_go_back()
         xmbPrototypeGamesVisualSelection = xmbPrototypeGamesSelection
         if returning_to_nested_parent then
             xmbPrototypeChildAxisAlpha = 0
+            xmbPrototypeReturningToNestedParent = true
+            xmbPrototypeReturnAxisAlpha = 0
         end
 
         if xmbPrototypeGamesMode == "folders" then
@@ -14705,6 +14724,9 @@ local function draw_xmb_prototype()
     local submenu_target = showing_games and xmbPrototypeGamesParentList ~= nil and 1 or 0
     xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha + (submenu_target - xmbPrototypeSubmenuAlpha) * 0.14
     xmbPrototypeChildAxisAlpha = xmbPrototypeChildAxisAlpha + (submenu_target - xmbPrototypeChildAxisAlpha) * 0.14
+    if xmbPrototypeReturningToNestedParent then
+        xmbPrototypeReturnAxisAlpha = xmbPrototypeReturnAxisAlpha + (1 - xmbPrototypeReturnAxisAlpha) * 0.14
+    end
 
     -- Original XMB-inspired backdrop and waves.  It deliberately uses no
     -- Sony-derived art or extracted theme data.
@@ -14740,6 +14762,10 @@ local function draw_xmb_prototype()
         local vertical_icon = xmb_prototype_category_icon(display_column)
         local parent_axis_x = category_anchor_x + xmbPrototypeGamesParentStartOffset * (1 - xmbPrototypeChildAxisAlpha)
         local child_axis_x = parent_axis_x + xmbPrototypeChildAxisOffset
+        local current_axis_x = child_axis_x
+        if xmbPrototypeReturningToNestedParent then
+            current_axis_x = parent_axis_x + xmbPrototypeChildAxisOffset * xmbPrototypeReturnAxisAlpha
+        end
         local parent_up_spacing = 234
         local child_up_spacing = showing_child_axis and (234 - 168 * xmbPrototypeChildAxisAlpha) or 234
         if showing_child_axis then
@@ -14748,7 +14774,7 @@ local function draw_xmb_prototype()
             XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, parent_up_spacing, function(parent_index, _, parent_y, parent_focus)
                 xmb_prototype_draw_vertical_object(vertical_icon, parent_axis_x, parent_y, "", parent_focus, xmbPrototypeVerticalAlpha * 0.58)
             end)
-            xmb_prototype_draw_submenu_indicator(parent_axis_x, child_axis_x, 296, xmbPrototypeVerticalAlpha * xmbPrototypeChildAxisAlpha)
+            xmb_prototype_draw_submenu_indicator(parent_axis_x, current_axis_x, 296, xmbPrototypeVerticalAlpha * xmbPrototypeChildAxisAlpha)
         end
         if #games_list == 0 then
             Font.print(fnt22, (showing_child_axis and child_axis_x or category_anchor_x + 40), 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeSubmenuAlpha or 1) * 180)))
@@ -14758,7 +14784,8 @@ local function draw_xmb_prototype()
             XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
-                xmb_prototype_draw_vertical_object(vertical_icon, showing_child_axis and child_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1))
+                local icon = xmb_prototype_object_icon(item.icon_path) or vertical_icon
+                xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1))
             end)
         end
     elseif showing_read_only_apps then
@@ -14787,6 +14814,11 @@ local function draw_xmb_prototype()
             local item = inert_list[index]
             xmb_prototype_draw_vertical_object(xmb_prototype_object_icon(item.icon_path), category_anchor_x, y, item.label, focus, xmbPrototypeVerticalAlpha)
         end)
+    end
+
+    if xmbPrototypeReturningToNestedParent and xmbPrototypeReturnAxisAlpha >= 0.99 then
+        xmbPrototypeReturningToNestedParent = false
+        xmbPrototypeReturnAxisAlpha = 1
     end
 
     xmb_prototype_draw_status()
@@ -14873,6 +14905,18 @@ function xmb_prototype_activate_app_selection(column)
         return launch_vita_sysapp(entry.name)
     end
     return launch_vita_title(entry.name)
+end
+
+function xmb_prototype_activate_inert_selection(column)
+    local entry = xmb_prototype_current_inert_list(column)[xmbPrototypeInertSelections[column]]
+    if entry == nil or type(entry.system_app) ~= "string" then
+        return false
+    end
+    return xmb_prototype_start_system_app(entry.system_app)
+end
+
+function xmb_prototype_start_system_app(titleid)
+    return launch_vita_sysapp(titleid)
 end
 
 function get_inserted_cartridge_titleid()
@@ -22359,6 +22403,8 @@ while true do
                 end
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 xmb_prototype_activate_app_selection(xmbPrototypeColumn)
+            elseif (xmbPrototypeColumn == 2 or xmbPrototypeColumn == 6) and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+                xmb_prototype_activate_inert_selection(xmbPrototypeColumn)
             end
         end
 
