@@ -14461,6 +14461,12 @@ local function xmb_prototype_games_item_detail(item, index)
     return "Preview only"
 end
 
+-- The XMB renderer never queues artwork or opens a path itself. It may only
+-- reuse the image handle the legacy renderer has already loaded for this item.
+local function xmb_prototype_existing_game_icon(item)
+    return item.ricon or item.icon
+end
+
 local function xmb_prototype_update_transition()
     xmbPrototypeVisualColumn = xmbPrototypeVisualColumn + (xmbPrototypeColumn - xmbPrototypeVisualColumn) * 0.18
     if xmbPrototypeVerticalFadeDirection < 0 then
@@ -14544,6 +14550,11 @@ local function draw_xmb_prototype()
                     Graphics.fillRect(92, 838, y - 7, y + 29, Color.new(75, 135, 205, alpha))
                     Font.print(fnt25, 112, y, label, Color.new(255, 255, 255, alpha))
                     Font.print(fnt20, 730, y + 4, detail, Color.new(225, 235, 250, alpha))
+                    local icon = xmb_prototype_existing_game_icon(item)
+                    if icon then
+                        Graphics.setImageFilters(icon, FILTER_LINEAR, FILTER_LINEAR)
+                        Graphics.drawScaleImage(810, 242, icon, 0.34, 0.34, Color.new(255, 255, 255, alpha))
+                    end
                 else
                     Font.print(fnt22, 112, y + 2, label, Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
                 end

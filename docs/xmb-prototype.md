@@ -54,6 +54,10 @@ Triangle, Square, Start, Select, analog, and touch actions are deliberately
 inert while the prototype is enabled, apart from the documented Start + Select
 prototype toggle.
 
+When a Games entry already has an image handle loaded by the legacy renderer,
+the selected entry can show that handle as a small preview. The prototype never
+loads artwork, queues artwork work, or reads an artwork path itself.
+
 The integrated renderer uses six original transparent category PNGs generated
 by `Tools/New-XmbFlowCategoryIcons.ps1`. They load lazily only while the XMB
 prototype is shown, retain the legacy fallback if unavailable, and are traced

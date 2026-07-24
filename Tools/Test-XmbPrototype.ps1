@@ -11,6 +11,7 @@ $required = @(
     'local function xmb_prototype_category_icon(column)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
+    'local function xmb_prototype_existing_game_icon(item)',
     'local function xmb_prototype_update_transition()',
     'local function xmb_prototype_reset_navigation()',
     'local xmbPrototypeToggleChanged = false',
@@ -27,6 +28,13 @@ if ($prototypeStart -lt 0 -or $prototypeEnd -le $prototypeStart) { throw 'Could 
 $prototypeRenderer = $text.Substring($prototypeStart, $prototypeEnd - $prototypeStart)
 foreach ($forbidden in @('launch_', 'System.installVpk', 'System.reboot', 'System.copyFile', 'System.deleteFile', 'System.deleteDirectory')) {
     if ($prototypeRenderer.Contains($forbidden)) { throw "Read-only XMB renderer must not contain: $forbidden" }
+}
+$gameIconStart = $prototypeRenderer.IndexOf('local function xmb_prototype_existing_game_icon(item)')
+$gameIconEnd = $prototypeRenderer.IndexOf("end`n", $gameIconStart)
+if ($gameIconStart -lt 0 -or $gameIconEnd -le $gameIconStart) { throw 'Could not isolate the XMB game-art helper.' }
+$gameIconHelper = $prototypeRenderer.Substring($gameIconStart, $gameIconEnd - $gameIconStart)
+if ($gameIconHelper.Contains('Graphics.loadImage') -or $gameIconHelper.Contains('Threads.addTask')) {
+    throw 'The XMB game-art helper must reuse loaded handles and must not load or queue artwork.'
 }
 if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {
     throw 'XMB prototype selection must remain session-only.'
