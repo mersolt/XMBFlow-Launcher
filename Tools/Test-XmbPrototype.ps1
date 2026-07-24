@@ -41,6 +41,8 @@ $required = @(
     'local function xmb_prototype_draw_information_card()',
     'local function xmb_prototype_information_entry(entry)',
     'local function xmb_prototype_information_size(entry)',
+    'if type(entry.game_path) == "string" then table.insert(paths, entry.game_path) end',
+    '"ux0:/app/" .. titleid',
     'local function xmb_prototype_information_type(entry, source)',
     '"Information", "Change category"',
     'xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(',

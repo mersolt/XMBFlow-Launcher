@@ -14788,15 +14788,25 @@ local function xmb_prototype_information_entry(entry)
 end
 
 local function xmb_prototype_information_size(entry)
-    local path = entry and entry.game_path
-    if type(path) ~= "string" or path == "" then return "Not reported" end
-    if System.doesDirExist(path) then return getAppSize(path) end
-    if System.doesFileExist(path) then
-        local file = System.openFile(path, FREAD)
-        if file then
-            local size = System.sizeFile(file)
-            System.closeFile(file)
-            return formatSize(size)
+    if entry == nil then return "Not reported" end
+    local paths = {}
+    if type(entry.game_path) == "string" then table.insert(paths, entry.game_path) end
+    if type(entry.path) == "string" then table.insert(paths, entry.path) end
+    local titleid = entry.titleid or entry.name
+    if type(titleid) == "string" and string.len(titleid) == 9 and (entry.app_type == 0 or entry.app_type == 1 or entry.app_type_default == 0 or entry.app_type_default == 1) then
+        table.insert(paths, "ux0:/app/" .. titleid)
+    end
+    for _, path in ipairs(paths) do
+        if type(path) == "string" and path ~= "" then
+            if System.doesDirExist(path) then return getAppSize(path) end
+            if System.doesFileExist(path) then
+                local file = System.openFile(path, FREAD)
+                if file then
+                    local size = System.sizeFile(file)
+                    System.closeFile(file)
+                    return formatSize(size)
+                end
+            end
         end
     end
     return "Not reported"
