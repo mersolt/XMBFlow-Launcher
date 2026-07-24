@@ -14547,7 +14547,7 @@ end
 
 local function xmb_prototype_games_item_label(item)
     if xmbPrototypeGamesMode == "entries" then
-        return item.apptitle or item.title or item.name or "Untitled"
+        return item.apptitle or item.title or item.name or item.label or item.display_name or "Untitled"
     elseif xmbPrototypeGamesMode == "collections" then
         return item.display_name or item.table_name or "Collection"
     end
@@ -14592,7 +14592,7 @@ local function draw_xmb_prototype()
     local games_list = xmb_prototype_current_games_list()
 
     -- A quiet, original backdrop. It intentionally uses no copied XMB assets.
-    Graphics.fillRect(0, 960, 0, 544, Color.new(8, 18, 38, 235))
+    Graphics.fillRect(0, 960, 0, 544, Color.new(8, 18, 38, 255))
 
     -- The active category remains fixed while the complete horizontal axis
     -- moves behind it. This state is presentation-only; it never changes
@@ -14612,8 +14612,7 @@ local function draw_xmb_prototype()
         local showing_child_axis = xmbPrototypeGamesMode == "entries" and xmbPrototypeGamesParentList ~= nil
         if showing_child_axis then
             local parent_list = xmbPrototypeGamesParentList
-            local parent_first = 1
-            local parent_last = #parent_list
+            local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, 234)
             XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, 234, function(parent_index, _, parent_y)
                 local parent_item = parent_list[parent_index]
                 local parent_selected = parent_index == xmbPrototypeGamesParentSelection
@@ -14623,8 +14622,7 @@ local function draw_xmb_prototype()
         if #games_list == 0 then
             Font.print(fnt22, 112, 282, "No items in this folder", Color.new(210, 222, 240, 180))
         else
-            local first_item = 1
-            local last_item = #games_list
+            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, 234)
 
             XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, 234, function(index, _, y)
                 local item = games_list[index]
@@ -14658,8 +14656,7 @@ local function draw_xmb_prototype()
         else
             xmbPrototypeHomebrewAppsVisualSelection = visual_selection
         end
-        local first_item = 1
-        local last_item = #apps_list
+        local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, 66, 234)
         XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, _, y)
             local item = apps_list[index]
             local selected = index == selection
@@ -14671,9 +14668,30 @@ local function draw_xmb_prototype()
         end)
     end
 
+    xmb_prototype_draw_status()
+
 end
 
 -- Function to detect inserted Vita cartridge
+function xmb_prototype_visible_vertical_range(item_count, visual_selection, anchor_y, down_spacing, up_spacing)
+    local first = math.max(1, math.floor(visual_selection + (-96 - anchor_y) / up_spacing))
+    local last = math.min(item_count, math.ceil(visual_selection + (640 - anchor_y) / down_spacing))
+    return first, last
+end
+
+function xmb_prototype_draw_status()
+    local hour, minute = System.getTime()
+    local battery = System.getBatteryPercentage()
+    Font.print(fnt20, 726, 34, string.format("%02d:%02d", hour, minute), white)
+    Font.print(fnt20, 840, 34, battery .. "%", white)
+    if System.isBatteryCharging() then
+        Graphics.drawImage(888, 39, imgBatteryCharging)
+    else
+        Graphics.drawImage(888, 39, imgBattery)
+        Graphics.fillRect(891, 891 + (battery / 5.2), 43, 51, white)
+    end
+end
+
 function xmb_prototype_activate_app_selection(column)
     local entries = xmb_prototype_current_read_only_apps_list(column)
     local selection = column == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
