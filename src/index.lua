@@ -3070,6 +3070,8 @@ xmbPrototypeHomebrewAppsSelection = 1
 xmbPrototypeSystemAppsVisualSelection = 1
 xmbPrototypeHomebrewAppsVisualSelection = 1
 xmbPrototypeGlowPhase = 0
+xmbPrototypeHeldDirection = 0
+xmbPrototypeNavigationRepeat = 0
 
 -- Cartridge runtime polling state
 local last_inserted_titleid = nil
@@ -14288,7 +14290,7 @@ end
 -- selection state, then draws an original text-and-shape XMB-style overlay.
 -- Input, scanning, caching, settings, and launch actions remain legacy code.
 xmb_prototype_columns = {
-    "SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "NETWORK", "SYSTEM APPS", "HOMEBREW APPS"
+    "Settings", "Photo", "Music", "Video", "Games", "Network", "System Apps", "Homebrew Apps"
 }
 xmb_prototype_icon_paths = {
     "app0:/DATA/xmb-icon-settings.png", "app0:/DATA/xmb-icon-photo.png",
@@ -14392,6 +14394,8 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeSystemAppsVisualSelection = 1
     xmbPrototypeHomebrewAppsVisualSelection = 1
     xmbPrototypeGlowPhase = 0
+    xmbPrototypeHeldDirection = 0
+    xmbPrototypeNavigationRepeat = 0
 end
 
 local function xmb_prototype_current_games_list()
@@ -14557,27 +14561,6 @@ local function xmb_prototype_games_item_label(item)
     return item.label or "Untitled"
 end
 
-local function xmb_prototype_games_item_detail(item, index)
-    local data = xmb_prototype_read_only_data()
-    if xmbPrototypeGamesMode == "folders" then
-        return xmb_prototype_games_folder_detail(item)
-    elseif xmbPrototypeGamesMode == "retro_systems" then
-        local entries = data.category_rows(item.category)
-        return tostring(#entries) .. " items"
-    elseif xmbPrototypeGamesMode == "collections" then
-        local entries = data.category_rows(49 + index)
-        return tostring(#entries) .. " items"
-    end
-
-    return "Preview only"
-end
-
--- The XMB renderer never queues artwork or opens a path itself. It may only
--- reuse the image handle the legacy renderer has already loaded for this item.
-local function xmb_prototype_existing_game_icon(item)
-    return item.ricon or item.icon
-end
-
 local function xmb_prototype_update_transition()
     xmbPrototypeVisualColumn, xmbPrototypeVerticalAlpha, xmbPrototypeVerticalFadeDirection, xmbPrototypeVerticalFadeDelay, xmbPrototypeDisplayColumn = XmbTransition.update(xmbPrototypeVisualColumn, xmbPrototypeColumn, xmbPrototypeVerticalAlpha, xmbPrototypeVerticalFadeDirection, xmbPrototypeVerticalFadeDelay, xmbPrototypeDisplayColumn, xmbPrototypePendingColumn)
 end
@@ -14621,7 +14604,7 @@ local function draw_xmb_prototype()
         Font.print(fnt20, x - 42, 226, label, label_color)
     end)
 
-    if showing_games then
+    if showing_games and xmbPrototypeVerticalAlpha > 0.01 then
         xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, 0.18)
         local showing_child_axis = xmbPrototypeGamesMode == "entries" and xmbPrototypeGamesParentList ~= nil
         if showing_child_axis then
@@ -14642,19 +14625,12 @@ local function draw_xmb_prototype()
                 local item = games_list[index]
                 local is_selected = index == xmbPrototypeGamesSelection
                 local label = xmb_prototype_games_item_label(item)
-                local detail = xmb_prototype_games_item_detail(item, index)
 
                 local alpha = math.floor(xmbPrototypeVerticalAlpha * 210)
                 local list_x = showing_child_axis and 390 or 112
                 if is_selected then
                     Graphics.fillRect(list_x - 20, 838, y - 7, y + 29, Color.new(75, 135, 205, alpha))
                     Font.print(fnt25, list_x, y, label, Color.new(255, 255, 255, alpha))
-                    Font.print(fnt20, 730, y + 4, detail, Color.new(225, 235, 250, alpha))
-                    local icon = xmb_prototype_existing_game_icon(item)
-                    if icon then
-                        Graphics.setImageFilters(icon, FILTER_LINEAR, FILTER_LINEAR)
-                        Graphics.drawScaleImage(810, 242, icon, 0.34, 0.34, Color.new(255, 255, 255, alpha))
-                    end
                 else
                     Font.print(fnt22, list_x, y + 2, label, Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * 165)))
                 end
@@ -14684,6 +14660,42 @@ local function draw_xmb_prototype()
 
     xmb_prototype_draw_status()
 
+end
+
+function xmb_prototype_read_direction(pad)
+    local analog_x, analog_y = Controls.readLeftAnalog()
+
+    if Controls.check(pad, SCE_CTRL_LEFT) or analog_x < 96 then
+        return -1
+    elseif Controls.check(pad, SCE_CTRL_RIGHT) or analog_x > 160 then
+        return 1
+    elseif Controls.check(pad, SCE_CTRL_UP) or analog_y < 96 then
+        return -2
+    elseif Controls.check(pad, SCE_CTRL_DOWN) or analog_y > 160 then
+        return 2
+    end
+
+    return 0
+end
+
+function xmb_prototype_move_direction(direction)
+    if direction == -1 then
+        xmb_prototype_move_column(-1)
+    elseif direction == 1 then
+        xmb_prototype_move_column(1)
+    elseif direction == -2 then
+        if xmbPrototypeColumn == 5 then
+            xmb_prototype_move_games_selection(-1)
+        elseif xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8 then
+            xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, -1)
+        end
+    elseif direction == 2 then
+        if xmbPrototypeColumn == 5 then
+            xmb_prototype_move_games_selection(1)
+        elseif xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8 then
+            xmb_prototype_move_read_only_apps_selection(xmbPrototypeColumn, 1)
+        end
+    end
 end
 
 -- Function to detect inserted Vita cartridge
@@ -22180,15 +22192,20 @@ while true do
         end
 
         if xmbPrototypeEnabled and not xmbPrototypeToggleChanged then
-            if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then
-                xmb_prototype_move_column(-1)
-            elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
-                xmb_prototype_move_column(1)
-            elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
-                xmb_prototype_move_games_selection(-1)
-            elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
-                xmb_prototype_move_games_selection(1)
-            elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+            xmbPrototypeDirection = xmb_prototype_read_direction(pad)
+            if xmbPrototypeDirection == 0 then
+                xmbPrototypeHeldDirection = 0
+                xmbPrototypeNavigationRepeat = 0
+            elseif xmbPrototypeDirection ~= xmbPrototypeHeldDirection or xmbPrototypeNavigationRepeat <= 0 then
+                xmbPrototypeDirectionIsNew = xmbPrototypeDirection ~= xmbPrototypeHeldDirection
+                xmbPrototypeHeldDirection = xmbPrototypeDirection
+                xmbPrototypeNavigationRepeat = xmbPrototypeDirectionIsNew and 18 or 5
+                xmb_prototype_move_direction(xmbPrototypeDirection)
+            else
+                xmbPrototypeNavigationRepeat = xmbPrototypeNavigationRepeat - 1
+            end
+
+            if xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 if xmbPrototypeGamesMode == "entries" then
                     xmb_prototype_focus_legacy_selection()
                 else
