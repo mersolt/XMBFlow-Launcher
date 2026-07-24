@@ -42,7 +42,7 @@ for icon in xmb-setting-display xmb-setting-system xmb-setting-time xmb-object-p
     [ -f "$root_dir/assets/bootstrap-placeholders/DATA/$icon.png" ] || { echo "Missing reviewed object icon: $icon" >&2; exit 1; }
 done
 [ -f "$root_dir/assets/bootstrap-placeholders/DATA/font-SawarabiGothic-Regular.ttf" ] || { echo 'Missing reviewed mockup font.' >&2; exit 1; }
-[ -f "$root_dir/assets/bootstrap-placeholders/DATA/click2.ogg" ] || { echo 'Missing original navigation sound.' >&2; exit 1; }
+[ -f "$root_dir/assets/bootstrap-placeholders/DATA/xmb-cursor.ogg" ] || { echo 'Missing original navigation sound.' >&2; exit 1; }
 [ -f "$lua_entry" ] || { echo "Missing Lua entry source: $lua_entry" >&2; exit 1; }
 
 mkdir -p "$build_dir"
@@ -68,7 +68,7 @@ mkdir -p "$build_dir"
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-system.png=DATA/xmb-setting-system.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-setting-time.png=DATA/xmb-setting-time.png" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-object-photoviewer.png=DATA/xmb-object-photoviewer.png" \
-    -a "$root_dir/assets/bootstrap-placeholders/DATA/click2.ogg=DATA/click2.ogg" \
+    -a "$root_dir/assets/bootstrap-placeholders/DATA/xmb-cursor.ogg=DATA/xmb-cursor.ogg" \
     -a "$root_dir/assets/bootstrap-placeholders/DATA/font-SawarabiGothic-Regular.ttf=DATA/font-SawarabiGothic-Regular.ttf" \
     -a "$root_dir/assets/third-party-notices/SawarabiGothic-OFL.txt=THIRD-PARTY-NOTICES/SawarabiGothic-OFL.txt" \
     "$output_vpk"

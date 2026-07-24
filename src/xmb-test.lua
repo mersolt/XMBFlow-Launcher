@@ -42,7 +42,7 @@ local setting_icons = {
     photoviewer = Graphics.loadImage("app0:/DATA/xmb-object-photoviewer.png")
 }
 Sound.init()
-local navigation_click = Sound.open("app0:/DATA/click2.ogg")
+local navigation_click = Sound.open("app0:/DATA/xmb-cursor.ogg")
 local font_buffer = Extended.loadFontIntoMemory("app0:/DATA/font-SawarabiGothic-Regular.ttf")
 local font = Extended.loadFontFromMemory(font_buffer)
 Font.setPixelSizes(font, 18)
@@ -71,7 +71,7 @@ local function draw_vertical_options(column, alpha)
     local visual_option = visual_options[column]
     for option = 1, option_counts[column] do
         local relative = option - visual_option
-        if relative >= -1 and relative <= 2 then
+        do
             local focus = math.max(0, 1 - math.abs(relative))
             local scale = 0.42 + 0.20 * focus
             local color = Color.new(255, 255, 255, math.floor((145 + 110 * focus) * alpha))
