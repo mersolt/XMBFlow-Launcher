@@ -8,7 +8,7 @@
 local width = 960
 local height = 544
 local selected_column = 5
-local column_count = 7
+local column_count = 6
 local oldpad = Controls.read()
 local running = true
 
@@ -17,6 +17,17 @@ local function draw_wave(base_y, phase, color)
         local y = math.floor(base_y + math.sin((x / 92) + phase) * 28)
         Graphics.fillRect(x, x + 8, y, y + 5, color)
     end
+end
+
+local function draw_placeholder_card(column)
+    if column > 4 then return end
+
+    -- Matches the integrated prototype's original, inert category-card
+    -- geometry without loading an asset or performing an application action.
+    Graphics.fillRect(92, 838, 248, 420, Color.new(20, 48, 84, 185))
+    Graphics.fillRect(112, 174, 276, 392, Color.new(96, 184, 238, 220))
+    Graphics.fillRect(190, 252, 276, 392, Color.new(58, 117, 191, 230))
+    Graphics.fillRect(268, 330, 276, 392, Color.new(32, 78, 143, 240))
 end
 
 while running do
@@ -40,6 +51,8 @@ while running do
         Graphics.fillRect(x, x + 52, top, top + 52, color)
         Graphics.fillRect(x + 8, x + 44, top + 8, top + 44, Color.new(4, 10, 28, 230))
     end
+
+    draw_placeholder_card(selected_column)
 
     local pad = Controls.read()
     if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then

@@ -9,6 +9,8 @@ bin_dir="$vitasdk/bin"
 stage_dir=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-stage-fresh}
 build_dir=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-icon-build}
 output_vpk=${3:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-minimal-icon-smoke.vpk}
+title_id=${4:-XMBF00008}
+title=${5:-XMBFlow Lua Category Cards}
 lua_entry="$root_dir/src/xmb-test.lua"
 
 sh "$root_dir/Tools/Inspect-VitaSdkToolchain.sh"
@@ -35,8 +37,8 @@ done
 
 mkdir -p "$build_dir"
 "$bin_dir/vita-mksfoex" -d ATTRIBUTE=0 -d PARENTAL_LEVEL=1 \
-    -s APP_VER=00.01 -s TITLE_ID=XMBF00007 \
-    'XMBFlow Lua Icon Smoke Test' "$build_dir/param.sfo"
+    -s APP_VER=00.01 -s TITLE_ID="$title_id" \
+    "$title" "$build_dir/param.sfo"
 "$bin_dir/vita-pack-vpk" \
     -s "$build_dir/param.sfo" \
     -b "$stage_dir/eboot.bin" \

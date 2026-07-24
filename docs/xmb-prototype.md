@@ -49,6 +49,11 @@ state their future role, but remain non-interactive: they cannot alter settings
 or scan/access media. Apps remains a read-only view over the existing scanned
 tables and does not guess or access Vita apps.
 
+The icon-only smoke package mirrors this geometry without loading `DATA` or
+the legacy application. Its six unlabelled category markers can be moved with
+Left/Right; selecting one of the first four shows the inert card shape. It is
+a runtime/rendering check only, not a test of the integrated library UI.
+
 ## Future hardware test
 
 Do not enable the flag or install a test package yet. Once packaging Gate 1 is
