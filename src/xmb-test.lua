@@ -9,6 +9,8 @@ local width = 960
 local height = 544
 local selected_column = 5
 local column_count = 6
+local option_counts = {4, 3, 4, 3, 5, 3}
+local selected_options = {1, 1, 1, 1, 1, 1}
 local oldpad = Controls.read()
 local running = true
 local category_icons = {
@@ -48,6 +50,22 @@ while running do
         Graphics.drawScaleImage(x - 48 * scale, 166 - 48 * scale, category_icons[column], scale, scale, color)
     end
 
+    -- The vertical XMB object axis belongs to the selected category. These
+    -- are presentation-only stand-ins: Up/Down changes focus and does not
+    -- invoke an action.
+    local selected_option = selected_options[selected_column]
+    for option = 1, option_counts[selected_column] do
+        local offset = option - selected_option
+        if offset >= -2 and offset <= 2 then
+            local selected = option == selected_option
+            local scale = selected and 0.62 or 0.42
+            local color = selected and Color.new(105, 235, 255, 255) or Color.new(120, 160, 205, 145)
+            local x = 90 + (selected_column - 1) * 130
+            local y = 296 + offset * 66
+            Graphics.drawScaleImage(x - 48 * scale, y - 48 * scale, category_icons[selected_column], scale, scale, color)
+        end
+    end
+
     local pad = Controls.read()
     if Controls.check(pad, SCE_CTRL_LEFT) and not Controls.check(oldpad, SCE_CTRL_LEFT) then
         selected_column = selected_column - 1
@@ -55,6 +73,12 @@ while running do
     elseif Controls.check(pad, SCE_CTRL_RIGHT) and not Controls.check(oldpad, SCE_CTRL_RIGHT) then
         selected_column = selected_column + 1
         if selected_column > column_count then selected_column = 1 end
+    elseif Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
+        selected_options[selected_column] = selected_options[selected_column] - 1
+        if selected_options[selected_column] < 1 then selected_options[selected_column] = option_counts[selected_column] end
+    elseif Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
+        selected_options[selected_column] = selected_options[selected_column] + 1
+        if selected_options[selected_column] > option_counts[selected_column] then selected_options[selected_column] = 1 end
     elseif Controls.check(pad, SCE_CTRL_CIRCLE) and not Controls.check(oldpad, SCE_CTRL_CIRCLE) then
         running = false
     end

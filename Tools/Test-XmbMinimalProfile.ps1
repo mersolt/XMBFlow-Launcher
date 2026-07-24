@@ -1,7 +1,7 @@
 param([string]$Source = (Join-Path $PSScriptRoot '..\src\xmb-test.lua'))
 
 $text = Get-Content -Raw $Source
-$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'local column_count = 6', 'Graphics.drawScaleImage')
+$required = @('Controls.read()', 'Screen.clear(', 'Screen.flip()', 'System.exit()', 'SCE_CTRL_CIRCLE', 'SCE_CTRL_UP', 'SCE_CTRL_DOWN', 'local option_counts = {4, 3, 4, 3, 5, 3}', 'Graphics.drawScaleImage')
 foreach ($entry in $required) {
     if (-not $text.Contains($entry)) { throw "Missing minimal XMB profile invariant: $entry" }
 }
