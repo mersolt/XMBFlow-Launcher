@@ -49,6 +49,13 @@ state their future role, but remain non-interactive: they cannot alter settings
 or scan/access media. Apps remains a read-only view over the existing scanned
 tables and does not guess or access Vita apps.
 
+The integrated renderer uses six original transparent category PNGs generated
+by `Tools/New-XmbFlowCategoryIcons.ps1`. They load lazily only while the XMB
+prototype is shown, retain the legacy fallback if unavailable, and are traced
+in the blocked full-app DATA manifest. The generated atlas source at
+`packaging/bootstrap-source/xmbflow-category-icon-atlas-v1-chromakey.png` is
+an original project design reference, not a runtime package asset.
+
 The icon-only smoke package mirrors this geometry without loading `DATA` or
 the legacy application. Its six unlabelled category markers can be moved with
 Left/Right; selecting one of the first four shows the inert card shape. It is

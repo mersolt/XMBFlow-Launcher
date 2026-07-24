@@ -1430,6 +1430,54 @@
                                                  "index.lua"
                                              ],
                        "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-icon-apps.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "index.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-icon-games.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "index.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-icon-music.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "index.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-icon-photo.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "index.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-icon-settings.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "index.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
+                   },
+                   {
+                       "path":  "DATA/xmb-icon-video.png",
+                       "kind":  "image",
+                       "source_references":  [
+                                                 "index.lua"
+                                             ],
+                       "status":  "missing-replacement-required"
                    }
                ]
 }

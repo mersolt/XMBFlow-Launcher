@@ -2500,6 +2500,90 @@
                       "sha256":  "2731b7788571d25ec2c29e582bca3553dcbda73f8ccf3a75d90e82a650370c50",
                       "transformation":  "Tools/New-XmbFlowBootstrapPlaceholders.ps1",
                       "status":  "original-placeholder-traced"
+                  },
+                  {
+                      "package_path":  "DATA/xmb-icon-apps.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-apps.png",
+                      "copyright":  "Copyright XMBFlow contributors",
+                      "license":  "LicenseRef-XMBFlow-Original",
+                      "sha256":  "4e8bcb87dc2e248dae3bc55a5c7849057f6569002a296810755db8be962cf2f9",
+                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "status":  "original-placeholder-traced"
+                  },
+                  {
+                      "package_path":  "DATA/xmb-icon-games.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-games.png",
+                      "copyright":  "Copyright XMBFlow contributors",
+                      "license":  "LicenseRef-XMBFlow-Original",
+                      "sha256":  "7eb99b93244eb04617094afeffa27f88d92c3c411818e82846875a66927c460b",
+                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "status":  "original-placeholder-traced"
+                  },
+                  {
+                      "package_path":  "DATA/xmb-icon-music.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-music.png",
+                      "copyright":  "Copyright XMBFlow contributors",
+                      "license":  "LicenseRef-XMBFlow-Original",
+                      "sha256":  "9dc61049b75684ffb60c51527bb4eb795e14c9c0b65a5f614b4090bfe9c9553d",
+                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "status":  "original-placeholder-traced"
+                  },
+                  {
+                      "package_path":  "DATA/xmb-icon-photo.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-photo.png",
+                      "copyright":  "Copyright XMBFlow contributors",
+                      "license":  "LicenseRef-XMBFlow-Original",
+                      "sha256":  "e09c7046e3a6110e2614d2f0180282baa54d4f7b5bc841651235ef9dcb43710b",
+                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "status":  "original-placeholder-traced"
+                  },
+                  {
+                      "package_path":  "DATA/xmb-icon-settings.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-settings.png",
+                      "copyright":  "Copyright XMBFlow contributors",
+                      "license":  "LicenseRef-XMBFlow-Original",
+                      "sha256":  "132a2cdba9922f8acc7c311961d57ef6a36509cd1e36b678c4ea29bd9116f2cd",
+                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "status":  "original-placeholder-traced"
+                  },
+                  {
+                      "package_path":  "DATA/xmb-icon-video.png",
+                      "kind":  "image",
+                      "source_references":  [
+                                                "index.lua"
+                                            ],
+                      "boot_class":  "deferred-lazy-or-view-dependent",
+                      "source":  "assets/bootstrap-placeholders/DATA/xmb-icon-video.png",
+                      "copyright":  "Copyright XMBFlow contributors",
+                      "license":  "LicenseRef-XMBFlow-Original",
+                      "sha256":  "97207be51593bffec1decb55862d6e9e1a79fa29c6261159b8548d0e0587679e",
+                      "transformation":  "Tools/New-XmbFlowCategoryIcons.ps1",
+                      "status":  "original-placeholder-traced"
                   }
               ]
 }

@@ -14209,6 +14209,12 @@ end
 local xmb_prototype_columns = {
     "SETTINGS", "PHOTO", "MUSIC", "VIDEO", "GAMES", "APPS"
 }
+local xmb_prototype_icon_paths = {
+    "app0:/DATA/xmb-icon-settings.png", "app0:/DATA/xmb-icon-photo.png",
+    "app0:/DATA/xmb-icon-music.png", "app0:/DATA/xmb-icon-video.png",
+    "app0:/DATA/xmb-icon-games.png", "app0:/DATA/xmb-icon-apps.png"
+}
+local xmb_prototype_icons = {}
 
 -- These are intentional presentation-only columns. They make the XMB axis
 -- readable without borrowing legacy settings/media workflows before each has
@@ -14261,6 +14267,14 @@ end
 
 local function xmb_prototype_active_column()
     return xmbPrototypeColumn
+end
+
+local function xmb_prototype_category_icon(column)
+    if xmb_prototype_icons[column] == nil then
+        local ok, icon = pcall(Graphics.loadImage, xmb_prototype_icon_paths[column])
+        xmb_prototype_icons[column] = ok and icon or false
+    end
+    return xmb_prototype_icons[column] or nil
 end
 
 local function xmb_prototype_move_column(direction)
@@ -14496,7 +14510,8 @@ local function draw_xmb_prototype()
         if is_active then
             Graphics.fillRect(x - 8, x + 128, 104, 107, white)
         end
-
+        local icon = xmb_prototype_category_icon(index)
+        if icon then Graphics.drawImage(x + 22, 108, icon, label_color) end
         Font.print(fnt20, x, 82, label, label_color)
     end
 
