@@ -9,6 +9,7 @@ bin_dir="$vitasdk/bin"
 stage_dir=${1:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-stage-fresh}
 build_dir=${2:-/mnt/c/Users/Hound/AppData/Local/Temp/xmbflow-minimal-icon-build}
 output_vpk=${3:-/mnt/c/Users/Hound/AppData/Local/Temp/XMBFlow-minimal-icon-smoke.vpk}
+lua_entry="$root_dir/src/xmb-test.lua"
 
 sh "$root_dir/Tools/Inspect-VitaSdkToolchain.sh"
 
@@ -27,18 +28,19 @@ if [ "$actual_runtime_hash" != "$expected_runtime_hash" ]; then
     echo 'Runtime hash does not match the recorded safe candidate.' >&2
     exit 1
 fi
-for path in eboot.bin index.lua LICENSE sce_sys/icon0.png; do
+for path in eboot.bin LICENSE sce_sys/icon0.png; do
     [ -f "$stage_dir/$path" ] || { echo "Missing staged file: $path" >&2; exit 1; }
 done
+[ -f "$lua_entry" ] || { echo "Missing Lua entry source: $lua_entry" >&2; exit 1; }
 
 mkdir -p "$build_dir"
 "$bin_dir/vita-mksfoex" -d ATTRIBUTE=0 -d PARENTAL_LEVEL=1 \
-    -s APP_VER=00.01 -s TITLE_ID=XMBF00004 \
+    -s APP_VER=00.01 -s TITLE_ID=XMBF00006 \
     'XMBFlow Lua Icon Smoke Test' "$build_dir/param.sfo"
 "$bin_dir/vita-pack-vpk" \
     -s "$build_dir/param.sfo" \
     -b "$stage_dir/eboot.bin" \
-    -a "$stage_dir/index.lua=index.lua" \
+    -a "$lua_entry=index.lua" \
     -a "$stage_dir/LICENSE=LICENSE" \
     -a "$stage_dir/sce_sys/icon0.png=sce_sys/icon0.png" \
     "$output_vpk"

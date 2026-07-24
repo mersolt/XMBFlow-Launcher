@@ -10,6 +10,7 @@ local height = 544
 local selected_column = 5
 local column_count = 7
 local oldpad = Controls.read()
+local running = true
 
 local function draw_wave(base_y, phase, color)
     for x = 0, width - 8, 8 do
@@ -18,8 +19,12 @@ local function draw_wave(base_y, phase, color)
     end
 end
 
-while true do
-    Screen.clear(Color.new(4, 10, 28))
+while running do
+    -- Lua Player Plus requires an explicit blend phase around 2D drawing.
+    -- This matches the frame lifecycle used by the known-working export tool.
+    Graphics.initBlend()
+    Screen.clear()
+    Graphics.fillRect(0, width, 0, height, Color.new(4, 10, 28, 255))
 
     -- Original XMB-inspired geometry, drawn at runtime rather than loaded from
     -- a Sony-derived image or from a legacy DATA folder.
@@ -44,10 +49,12 @@ while true do
         selected_column = selected_column + 1
         if selected_column > column_count then selected_column = 1 end
     elseif Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
-        break
+        running = false
     end
 
+    Graphics.termBlend()
     Screen.flip()
+    Screen.waitVblankStart()
     oldpad = pad
 end
 
