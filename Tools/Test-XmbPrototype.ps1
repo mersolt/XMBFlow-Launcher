@@ -18,7 +18,9 @@ $required = @(
     'XmbRender.each_category(',
     'XmbRender.each_vertical(',
     'local function xmb_prototype_category_icon(column)',
-    'local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alpha)',
+    'local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alpha, app_icon)',
+    'function xmb_prototype_all_games()',
+    'if not xmbPrototypeDebugOpen then return end',
     'local function xmb_prototype_draw_submenu_indicator(parent_x, child_x, y, alpha)',
     'local function xmb_prototype_current_read_only_apps_list(column)',
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
@@ -124,7 +126,7 @@ foreach ($button in @('SCE_CTRL_TRIANGLE', 'SCE_CTRL_START', 'SCE_CTRL_SELECT', 
         throw "The legacy $button handler must be disabled while the XMB prototype owns input."
     }
 }
-if (-not $prototypeRenderer.Contains('showCat = category') -or -not $prototypeRenderer.Contains('xmbPrototypeEnabled = false')) {
+if (-not $prototypeRenderer.Contains('showCat = selected.xmb_source_category or category') -or -not $prototypeRenderer.Contains('xmbPrototypeEnabled = false')) {
     throw 'The XMB entry handoff must select the existing legacy category and return to the legacy renderer.'
 }
 if (-not $text.Contains('xmb_prototype_activate_app_selection(xmbPrototypeColumn)')) {

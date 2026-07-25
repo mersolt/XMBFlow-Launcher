@@ -27,7 +27,9 @@ function XmbRender.each_category(columns, visual_index, anchor_x, spacing, draw_
 end
 
 function XmbRender.each_vertical(first_index, last_index, visual_index, anchor_y, down_spacing, up_spacing, draw_item)
-    for index = first_index, last_index do
+    -- Draw from bottom to top so an item's square artwork stays in front of
+    -- the next object below it instead of being covered by that object.
+    for index = last_index, first_index, -1 do
         local relative = XmbLayout.relative(index, visual_index)
         local y = XmbLayout.vertical_y(anchor_y, index, visual_index, down_spacing, up_spacing)
         draw_item(index, relative, y, XmbLayout.focus(relative))

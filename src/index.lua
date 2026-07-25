@@ -14362,6 +14362,7 @@ xmb_prototype_icon_paths = {
 xmb_prototype_icons = {}
 xmb_prototype_object_icons = {}
 xmbPrototypeInstalledIconPaths = {}
+xmbPrototypeInstalledIconLoadsThisFrame = 0
 xmb_prototype_system_app_icon_paths = {
     ["browser"] = "app0:/DATA/xmb-system-browser.png",
     ["friends"] = "app0:/DATA/xmb-system-friends.png",
@@ -14379,6 +14380,7 @@ xmb_prototype_system_app_icon_paths = {
 xmb_prototype_inert_columns = {
     [1] = {
         {label = "Settings", icon_path = "app0:/DATA/xmb-system-settings.png", system_app = "NPXS10015"},
+        {label = "XMBFlow Settings", icon_path = "app0:/DATA/xmb-icon-settings.png"},
         {label = "Parental Controls", icon_path = "app0:/DATA/xmb-setting-parental-controls.png", system_app = "NPXS10094"},
         {label = "Return to LiveArea", icon_path = "app0:/DATA/xmb-object-return-livearea.png", action = "exit"}
     },
@@ -14419,7 +14421,6 @@ xmb_prototype_library_folders = {
 xmb_prototype_library_categories = {
     {label = "All Games", category = 0},
     {label = "PS Vita", category = 1},
-    {label = "Homebrew", category = 2},
     {label = "PSP", category = 3},
     {label = "PlayStation", category = 4},
     {label = "PlayStation Mobile", category = 39},
@@ -14480,6 +14481,30 @@ local function xmb_prototype_combined_collections()
     return entries
 end
 
+-- All Games is a temporary XMB view over the three existing read-only title
+-- tables.  Each copied record keeps its source category so selecting it still
+-- hands off to the same legacy launch adapter as its original list.
+function xmb_prototype_all_games()
+    if xmbPrototypeAllGames ~= nil then return xmbPrototypeAllGames end
+    local entries, seen = {}, {}
+    for _, category in ipairs({1, 2, 46}) do
+        for index, item in ipairs(xCatLookup(category) or {}) do
+            local titleid = item.titleid or item.name
+            if titleid == nil or not seen[titleid] then
+                if titleid ~= nil then seen[titleid] = true end
+                local copy = {}
+                for key, value in pairs(item) do copy[key] = value end
+                copy.xmb_source_category = category
+                copy.xmb_source_selection = index
+                table.insert(entries, copy)
+            end
+        end
+    end
+    table.sort(entries, function(a, b) return string.lower(a.apptitle or a.title or a.name or "") < string.lower(b.apptitle or b.title or b.name or "") end)
+    xmbPrototypeAllGames = entries
+    return entries
+end
+
 local function xmb_prototype_active_column()
     return xmbPrototypeColumn
 end
@@ -14514,6 +14539,8 @@ function xmb_prototype_installed_app_icon(item)
     end
     local path = xmbPrototypeInstalledIconPaths[titleid]
     if not path then return nil end
+    if xmb_prototype_object_icons[path] == nil and xmbPrototypeInstalledIconLoadsThisFrame >= 1 then return nil end
+    if xmb_prototype_object_icons[path] == nil then xmbPrototypeInstalledIconLoadsThisFrame = xmbPrototypeInstalledIconLoadsThisFrame + 1 end
     return xmb_prototype_object_icon(path)
 end
 
@@ -14528,7 +14555,7 @@ end
 -- Draw one object on the XMB vertical axis. The active object is positioned
 -- at the cross intersection; the shared layout helper moves its neighbours
 -- above and below it. This only changes presentation, never library data.
-local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alpha)
+local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alpha, app_icon)
     local scale = 0.42 + 0.20 * focus
     local pulse = 0.50 + 0.50 * ((math.sin(xmbPrototypeGlowPhase / 18) + 1) * 0.5)
     local icon_alpha = math.floor((145 + 110 * focus) * alpha)
@@ -14540,7 +14567,7 @@ local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alph
     else
         XmbRender.icon(icon, x, y, scale, Color.new(255, 255, 255, icon_alpha))
     end
-    Font.print(focus > 0.50 and fnt22 or fnt20, x + 40, y - 10, label, Color.new(text_brightness, text_brightness, text_brightness, text_alpha))
+    Font.print(focus > 0.50 and fnt22 or fnt20, x + (app_icon and 78 or 40), y - 15, label, Color.new(text_brightness, text_brightness, text_brightness, text_alpha))
 end
 
 local function xmb_prototype_draw_submenu_indicator(parent_x, child_x, y, alpha)
@@ -14618,6 +14645,7 @@ local function xmb_prototype_current_games_list()
     elseif xmbPrototypeGamesMode == "collections" then
         return xmb_prototype_combined_collections()
     elseif xmbPrototypeGamesMode == "entries" then
+        if xmbPrototypeGamesCategory == 0 then return xmb_prototype_all_games() end
         return data.category_rows(xmbPrototypeGamesCategory)
     end
 
@@ -14791,13 +14819,14 @@ local function xmb_prototype_focus_legacy_selection(category, selection)
         return false
     end
 
-    local entries = xCatLookup(category) or {}
+    local entries = category == 0 and xmb_prototype_all_games() or xCatLookup(category) or {}
     if entries[selection] == nil then
         return false
     end
 
-    showCat = category
-    p = selection
+    local selected = entries[selection]
+    showCat = selected.xmb_source_category or category
+    p = selected.xmb_source_selection or selection
     master_index = p
     GetNameAndAppTypeSelected()
     xmbPrototypeEnabled = false
@@ -15221,6 +15250,7 @@ local function xmb_prototype_rescan_private_library()
     end
 
     games_table, homebrews_table, sysapps_table = scanned_games, scanned_homebrews, scanned_sysapps
+    xmbPrototypeAllGames = nil
     table.sort(games_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
     table.sort(homebrews_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
     table.sort(sysapps_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
@@ -15232,7 +15262,7 @@ local function xmb_prototype_rescan_private_library()
 end
 
 local function xmb_prototype_draw_debug_menu()
-    if xmbPrototypeDebugOpen == false then return end
+    if not xmbPrototypeDebugOpen then return end
     Graphics.fillRect(92, 868, 96, 448, Color.new(4, 10, 28, 236))
     Font.print(fnt25, 122, 128, "XMBFlow Debug", Color.new(245, 250, 255, 255))
     Font.print(fnt20, 122, 168, "Private XMBFlow library only", Color.new(195, 215, 238, 230))
@@ -15250,6 +15280,7 @@ end
 local function draw_xmb_prototype()
     xmb_prototype_update_transition()
     xmbPrototypeGlowPhase = xmbPrototypeGlowPhase + 1
+    xmbPrototypeInstalledIconLoadsThisFrame = 0
     local display_column = xmbPrototypeDisplayColumn
     local showing_games = display_column == 5
     local showing_read_only_apps = display_column == 7 or display_column == 8
@@ -15314,11 +15345,13 @@ local function draw_xmb_prototype()
         else
             local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing)
 
-            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing, function(index, _, y, focus)
+            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing, function(index, relative, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
                 local icon = xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon
-                xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1))
+                local app_icon = xmbPrototypeGamesMode == "entries" and (item.app_type == 0 or item.app_type == 1 or item.app_type_default == 0 or item.app_type_default == 1)
+                if app_icon then y = y + (relative < 0 and -12 or relative > 0 and 12 or 0) end
+                xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1), app_icon)
             end)
         end
     elseif showing_read_only_apps then
@@ -15332,10 +15365,12 @@ local function draw_xmb_prototype()
             xmbPrototypeHomebrewAppsVisualSelection = visual_selection
         end
         local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, 66, 234)
-        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, _, y, focus)
+        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, relative, y, focus)
             local item = apps_list[index]
             local label = xmb_prototype_read_only_item_label(item)
-            xmb_prototype_draw_vertical_object(xmb_prototype_read_only_item_icon(display_column, item), category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha)
+            local app_icon = display_column == 8
+            if app_icon then y = y + (relative < 0 and -12 or relative > 0 and 12 or 0) end
+            xmb_prototype_draw_vertical_object(xmb_prototype_read_only_item_icon(display_column, item), category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha, app_icon)
         end)
     elseif xmb_prototype_inert_columns[display_column] ~= nil then
         local inert_list = xmb_prototype_current_inert_list(display_column)
