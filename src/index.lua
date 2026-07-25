@@ -14533,12 +14533,17 @@ end
 local function xmb_prototype_combined_collections()
     local entries = {}
     for _, category in ipairs(xmb_prototype_library_categories) do
-        table.insert(entries, {label = category.label, category = category.category})
+        table.insert(entries, {
+            label = category.label,
+            category = category.category,
+            xmb_icon_path = category.xmb_icon_path
+        })
     end
     for index, collection in ipairs(collection_files or {}) do
         table.insert(entries, {
             label = collection.display_name or collection.table_name or "Collection",
-            category = 49 + index
+            category = 49 + index,
+            xmb_icon_path = "app0:/DATA/folder.png"
         })
     end
     return entries
@@ -14934,7 +14939,10 @@ local function xmb_prototype_go_back()
         xmbPrototypeGamesGreatGrandparentStartOffset = 0
         xmbPrototypeGamesVisualSelection = xmbPrototypeGamesSelection
         if returning_to_nested_parent then
-            xmbPrototypeChildAxisAlpha = 0
+            -- The returned list began as the visible parent of the deeper
+            -- child. Keep that axis settled, then slide it right into its
+            -- child-column position; resetting it here cancels the motion.
+            xmbPrototypeChildAxisAlpha = 1
             xmbPrototypeReturningToNestedParent = true
             xmbPrototypeReturnAxisAlpha = 0
         end
