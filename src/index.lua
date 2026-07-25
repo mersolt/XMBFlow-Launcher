@@ -11142,8 +11142,11 @@ function import_cached_DB()
     total_recently_played = #recently_played_table
     
     if adrenaline_compatibilty == true then
-        -- Setup Adrenaline (CRC validation and VPK installation) - moved here to only run during scanning
-        Setup_Adrenaline()
+        -- The safe XMB profile may explicitly rebuild its read-only library
+        -- cache, but must never enter RetroFlow's Adrenaline setup path.
+        if xmbSafeProfile == false then
+            Setup_Adrenaline()
+        end
     end
     
     return return_table
@@ -14548,6 +14551,8 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeInformationAlpha = 0
     xmbPrototypeInformationEntry = nil
     xmbPrototypeInformationSize = "Not reported"
+    xmbPrototypeDebugOpen = false
+    xmbPrototypeDebugSelection = 1
     xmbPrototypeGlowPhase = 0
     xmbPrototypeSubmenuAlpha = 0
     xmbPrototypeHeldDirection = 0
@@ -14971,6 +14976,42 @@ local function xmb_prototype_draw_information_card()
     Font.print(fnt20, 454, 488, "O  Back", Color.new(235, 245, 255, text_alpha))
 end
 
+-- Temporary diagnostic menu.  It has one intentionally narrow operation:
+-- rebuild RetroFlow's title inventory on demand.  The scan reads installed
+-- titles and game folders, then refreshes RetroFlow's existing cache; it does
+-- not install, copy, delete, reboot, or change Vita system/app content.
+local function xmb_prototype_rescan_titles()
+    count_loading_tasks()
+    files_table = Full_Game_Scan()
+    files_table = import_cached_DB()
+    import_collections()
+    xmb_prototype_reset_navigation()
+end
+
+local function xmb_prototype_draw_debug_menu()
+    if xmbPrototypeDebugOpen == false then
+        return
+    end
+
+    Graphics.fillRect(92, 868, 96, 448, Color.new(4, 10, 28, 236))
+    Graphics.fillRect(92, 868, 96, 98, Color.new(180, 222, 255, 215))
+    Font.print(fnt25, 122, 128, "XMBFlow Debug", Color.new(245, 250, 255, 255))
+    Font.print(fnt20, 122, 164, "Refreshes XMBFlow's library cache only.", Color.new(195, 215, 238, 230))
+
+    local options = {"Rescan title library", "Close"}
+    for index, label in ipairs(options) do
+        local y = 230 + (index - 1) * 52
+        local focus = index == xmbPrototypeDebugSelection
+        if focus then
+            Graphics.fillRect(112, 846, y - 5, y + 37, Color.new(106, 202, 255, 190))
+        end
+        Font.print(focus and fnt22 or fnt20, 132, y, label, focus and Color.new(255, 255, 255, 255) or Color.new(190, 210, 232, 225))
+    end
+
+    Font.print(fnt20, 122, 396, "X  Select", Color.new(215, 230, 245, 235))
+    Font.print(fnt20, 266, 396, "O  Back", Color.new(215, 230, 245, 235))
+end
+
 local function draw_xmb_prototype()
     xmb_prototype_update_transition()
     xmbPrototypeGlowPhase = xmbPrototypeGlowPhase + 1
@@ -15081,6 +15122,7 @@ local function draw_xmb_prototype()
     xmb_prototype_draw_app_options()
     xmb_prototype_draw_information_card()
     xmb_prototype_draw_status()
+    xmb_prototype_draw_debug_menu()
 
 end
 
@@ -22657,21 +22699,44 @@ while true do
         end
 
         if xmbPrototypeEnabled and not xmbPrototypeToggleChanged then
-            xmbPrototypeDirection = xmb_prototype_read_direction(pad)
-            if xmbPrototypeDirection == 0 then
-                xmbPrototypeHeldDirection = 0
-                xmbPrototypeNavigationRepeat = 0
-            elseif xmbPrototypeDirection ~= xmbPrototypeHeldDirection or xmbPrototypeNavigationRepeat <= 0 then
-                xmbPrototypeDirectionIsNew = xmbPrototypeDirection ~= xmbPrototypeHeldDirection
-                xmbPrototypeHeldDirection = xmbPrototypeDirection
-                xmbPrototypeNavigationRepeat = xmbPrototypeDirectionIsNew and 18 or 5
-                xmb_prototype_move_direction(xmbPrototypeDirection)
-                if setSounds == 1 and xmbNavigationClick then
-                    Sound.play(xmbNavigationClick, NO_LOOP)
+            if xmbPrototypeDebugOpen then
+                if Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
+                    xmbPrototypeDebugSelection = 1
+                    if setSounds == 1 and xmbNavigationClick then Sound.play(xmbNavigationClick, NO_LOOP) end
+                elseif Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
+                    xmbPrototypeDebugSelection = 2
+                    if setSounds == 1 and xmbNavigationClick then Sound.play(xmbNavigationClick, NO_LOOP) end
+                elseif (Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP)) or (Controls.check(pad, SCE_CTRL_SELECT) and not Controls.check(oldpad, SCE_CTRL_SELECT)) then
+                    xmbPrototypeDebugOpen = false
+                    if setSounds == 1 and xmbNavigationClick then Sound.play(xmbNavigationClick, NO_LOOP) end
+                elseif Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+                    if xmbPrototypeDebugSelection == 1 then
+                        xmb_prototype_rescan_titles()
+                    else
+                        xmbPrototypeDebugOpen = false
+                    end
+                    if setSounds == 1 and xmbNavigationClick then Sound.play(xmbNavigationClick, NO_LOOP) end
                 end
+            elseif Controls.check(pad, SCE_CTRL_SELECT) and not Controls.check(oldpad, SCE_CTRL_SELECT) then
+                xmbPrototypeDebugOpen = true
+                xmbPrototypeDebugSelection = 1
+                if setSounds == 1 and xmbNavigationClick then Sound.play(xmbNavigationClick, NO_LOOP) end
             else
-                xmbPrototypeNavigationRepeat = xmbPrototypeNavigationRepeat - 1
-            end
+                xmbPrototypeDirection = xmb_prototype_read_direction(pad)
+                if xmbPrototypeDirection == 0 then
+                    xmbPrototypeHeldDirection = 0
+                    xmbPrototypeNavigationRepeat = 0
+                elseif xmbPrototypeDirection ~= xmbPrototypeHeldDirection or xmbPrototypeNavigationRepeat <= 0 then
+                    xmbPrototypeDirectionIsNew = xmbPrototypeDirection ~= xmbPrototypeHeldDirection
+                    xmbPrototypeHeldDirection = xmbPrototypeDirection
+                    xmbPrototypeNavigationRepeat = xmbPrototypeDirectionIsNew and 18 or 5
+                    xmb_prototype_move_direction(xmbPrototypeDirection)
+                    if setSounds == 1 and xmbNavigationClick then
+                        Sound.play(xmbNavigationClick, NO_LOOP)
+                    end
+                else
+                    xmbPrototypeNavigationRepeat = xmbPrototypeNavigationRepeat - 1
+                end
 
             if xmbPrototypeInformationOpen then
                 if Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
@@ -22720,6 +22785,7 @@ while true do
                 xmb_prototype_activate_app_selection(xmbPrototypeColumn)
             elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 xmb_prototype_activate_inert_selection(xmbPrototypeColumn)
+            end
             end
         end
 
