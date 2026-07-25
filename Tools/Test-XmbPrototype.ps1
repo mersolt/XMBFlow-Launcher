@@ -115,7 +115,7 @@ foreach ($removedPreviewFeature in @('xmb_prototype_existing_game_icon', 'xmb_pr
         throw "The XMB renderer must not retain the deferred cover-preview feature: $removedPreviewFeature"
     }
 }
-if (-not $prototypeRenderer.Contains('xmb_prototype_item_icon(item, vertical_icon)')) {
+if (-not $prototypeRenderer.Contains('xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon')) {
     throw 'The XMB Games renderer must use explicit XMB paths or installed app icons, not RetroFlow cover paths.'
 }
 if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {

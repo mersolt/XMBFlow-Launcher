@@ -3108,6 +3108,15 @@ xmbPrototypeInertSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
 xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
 xmbPrototypeInertNavigation = {}
 xmbPrototypeMotionRate = 0.12
+xmbPrototypeTheme = "Blue"
+xmbPrototypeThemeColors = {
+    ["Blue"] = {background = {6, 16, 44}, wave1 = {44, 104, 185}, wave2 = {25, 70, 145}, wave3 = {15, 48, 112}, panel = {18, 42, 86}, highlight = {118, 211, 255}},
+    ["Crimson"] = {background = {48, 7, 18}, wave1 = {205, 54, 83}, wave2 = {144, 28, 55}, wave3 = {94, 18, 41}, panel = {90, 22, 39}, highlight = {255, 126, 151}},
+    ["Emerald"] = {background = {5, 36, 31}, wave1 = {41, 181, 144}, wave2 = {21, 122, 101}, wave3 = {10, 78, 68}, panel = {14, 77, 67}, highlight = {102, 240, 201}},
+    ["Violet"] = {background = {29, 13, 55}, wave1 = {145, 85, 215}, wave2 = {92, 43, 160}, wave3 = {59, 26, 103}, panel = {60, 32, 112}, highlight = {205, 151, 255}},
+    ["Amber"] = {background = {51, 28, 5}, wave1 = {222, 153, 45}, wave2 = {160, 97, 22}, wave3 = {104, 59, 10}, panel = {99, 60, 15}, highlight = {255, 215, 116}},
+    ["Slate"] = {background = {18, 25, 37}, wave1 = {102, 141, 183}, wave2 = {61, 95, 134}, wave3 = {36, 62, 91}, panel = {46, 66, 90}, highlight = {164, 205, 244}}
+}
 xmbPrototypeAppOptionsOpen = false
 xmbPrototypeAppOptionsAlpha = 0
 xmbPrototypeAppOptionsSelection = 1
@@ -14389,7 +14398,16 @@ xmb_prototype_system_app_icon_paths = {
 xmb_prototype_inert_columns = {
     [1] = {
         {label = "Settings", icon_path = "app0:/DATA/xmb-system-settings.png", system_app = "NPXS10015"},
-        {label = "XMBFlow Settings", icon_path = "app0:/DATA/xmb-icon-settings.png"},
+        {label = "XMBFlow Settings", icon_path = "app0:/DATA/xmb-icon-settings.png", children = {
+            {label = "Theme Color", icon_path = "app0:/DATA/xmb-setting-theme.png", children = {
+                {label = "Blue", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Blue"},
+                {label = "Crimson", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Crimson"},
+                {label = "Emerald", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Emerald"},
+                {label = "Violet", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Violet"},
+                {label = "Amber", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Amber"},
+                {label = "Slate", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Slate"}
+            }}
+        }},
         {label = "Parental Controls", icon_path = "app0:/DATA/xmb-setting-parental-controls.png", system_app = "NPXS10094"},
         {label = "Return to LiveArea", icon_path = "app0:/DATA/xmb-object-return-livearea.png", action = "exit"}
     },
@@ -14605,7 +14623,7 @@ local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alph
     else
         XmbRender.icon(icon, x, y, scale, Color.new(255, 255, 255, icon_alpha))
     end
-    Font.print(focus > 0.50 and fnt22 or fnt20, x + (app_icon and 68 or 40), y - 10, label, Color.new(text_brightness, text_brightness, text_brightness, text_alpha))
+    Font.print(focus > 0.50 and fnt22 or fnt20, x + (app_icon and 68 or 40), y - (app_icon and 14 or 10), label, Color.new(text_brightness, text_brightness, text_brightness, text_alpha))
 end
 
 local function xmb_prototype_draw_submenu_indicator(parent_x, child_x, y, alpha)
@@ -15088,6 +15106,7 @@ local function xmb_prototype_draw_app_options()
     local panel_x = math.floor(960 - 322 * alpha)
     local row_height = 58
     local anchor_y = 250
+    local theme = xmbPrototypeThemeColors[xmbPrototypeTheme] or xmbPrototypeThemeColors["Blue"]
     xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(xmbPrototypeAppOptionsVisualSelection, xmbPrototypeAppOptionsSelection, 0.20)
     Graphics.fillRect(0, 960, 0, 544, Color.new(0, 0, 0, math.floor(96 * alpha)))
     if xmbPrototypeAppOptionsPanel == nil then
@@ -15097,10 +15116,10 @@ local function xmb_prototype_draw_app_options()
             Graphics.setImageFilters(xmbPrototypeAppOptionsPanel, FILTER_LINEAR, FILTER_LINEAR)
         end
     end
-    if xmbPrototypeAppOptionsPanel then
+    if xmbPrototypeAppOptionsPanel and xmbPrototypeTheme == "Blue" then
         Graphics.drawScaleImage(panel_x, 0, xmbPrototypeAppOptionsPanel, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
     else
-        Graphics.fillRect(panel_x, 960, 0, 544, Color.new(18, 42, 86, math.floor(224 * alpha)))
+        Graphics.fillRect(panel_x, 960, 0, 544, Color.new(theme.panel[1], theme.panel[2], theme.panel[3], math.floor(224 * alpha)))
     end
     if xmbPrototypeAppOptionsHighlight == nil then
         local ok, texture = pcall(Graphics.loadImage, "app0:/DATA/xmb-app-options-highlight.png")
@@ -15109,10 +15128,10 @@ local function xmb_prototype_draw_app_options()
             Graphics.setImageFilters(xmbPrototypeAppOptionsHighlight, FILTER_LINEAR, FILTER_LINEAR)
         end
     end
-    if xmbPrototypeAppOptionsHighlight then
+    if xmbPrototypeAppOptionsHighlight and xmbPrototypeTheme == "Blue" then
         Graphics.drawScaleImage(panel_x, anchor_y - math.floor(row_height / 2), xmbPrototypeAppOptionsHighlight, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
     else
-        Graphics.fillRect(panel_x, 960, anchor_y - math.floor(row_height / 2), anchor_y + math.ceil(row_height / 2), Color.new(118, 211, 255, math.floor(188 * alpha)))
+        Graphics.fillRect(panel_x, 960, anchor_y - math.floor(row_height / 2), anchor_y + math.ceil(row_height / 2), Color.new(theme.highlight[1], theme.highlight[2], theme.highlight[3], math.floor(188 * alpha)))
     end
     local options = xmb_prototype_app_options_for(xmb_prototype_current_app_option_entry())
     for index, label in ipairs(options) do
@@ -15393,6 +15412,24 @@ local function xmb_prototype_draw_debug_menu()
     Font.print(fnt20, 122, 396, "X  Select     O  Back", Color.new(215, 230, 245, 235))
 end
 
+function xmb_prototype_draw_categories(display_column, category_anchor_x)
+    XmbRender.each_category(xmb_prototype_columns, xmbPrototypeVisualColumn, category_anchor_x, 130, function(index, label, relative, x, focus)
+        local pulse = 0.50 + 0.50 * ((math.sin(xmbPrototypeGlowPhase / 18) + 1) * 0.5)
+        local submenu_visibility = index == display_column and 1 or 1 - xmbPrototypeSubmenuAlpha
+        local category_alpha = math.floor((150 + 105 * focus) * submenu_visibility)
+        local label_brightness = math.floor(145 + 110 * focus * pulse)
+        local label_color = Color.new(label_brightness, label_brightness, label_brightness, category_alpha)
+        local icon = xmb_prototype_category_icon(index)
+        local scale = 0.82 + 0.33 * focus
+        if focus > 0.02 then
+            XmbRender.glowing_icon(icon, x, 166, scale, scale + 0.045 * focus, Color.new(255, 255, 255, category_alpha), Color.new(255, 255, 255, math.floor(40 + 100 * focus * pulse)))
+        else
+            XmbRender.icon(icon, x, 166, scale, Color.new(255, 255, 255, category_alpha))
+        end
+        Font.print(fnt20, x - Font.getTextWidth(fnt20, label) / 2, 226, label, label_color)
+    end)
+end
+
 local function draw_xmb_prototype()
     xmb_prototype_update_transition()
     xmbPrototypeGlowPhase = xmbPrototypeGlowPhase + 1
@@ -15411,32 +15448,16 @@ local function draw_xmb_prototype()
 
     -- Original XMB-inspired backdrop and waves.  It deliberately uses no
     -- Sony-derived art or extracted theme data.
-    Graphics.fillRect(0, 960, 0, 544, Color.new(6, 16, 44, 255))
-    xmb_prototype_draw_wave(346, xmbPrototypeGlowPhase / 38, Color.new(44, 104, 185, 115))
-    xmb_prototype_draw_wave(390, xmbPrototypeGlowPhase / 48 + 1.6, Color.new(25, 70, 145, 80))
-    xmb_prototype_draw_wave(438, xmbPrototypeGlowPhase / 58 + 3.1, Color.new(15, 48, 112, 65))
+    local theme = xmbPrototypeThemeColors[xmbPrototypeTheme] or xmbPrototypeThemeColors["Blue"]
+    Graphics.fillRect(0, 960, 0, 544, Color.new(theme.background[1], theme.background[2], theme.background[3], 255))
+    xmb_prototype_draw_wave(346, xmbPrototypeGlowPhase / 38, Color.new(theme.wave1[1], theme.wave1[2], theme.wave1[3], 115))
+    xmb_prototype_draw_wave(390, xmbPrototypeGlowPhase / 48 + 1.6, Color.new(theme.wave2[1], theme.wave2[2], theme.wave2[3], 80))
+    xmb_prototype_draw_wave(438, xmbPrototypeGlowPhase / 58 + 3.1, Color.new(theme.wave3[1], theme.wave3[2], theme.wave3[3], 65))
 
     -- The active category remains fixed while the complete horizontal axis
     -- moves behind it. This state is presentation-only; it never changes
     -- showCat, caches, scanners, settings, or a launch target.
     local category_anchor_x = 480 - 390 * xmbPrototypeSubmenuAlpha
-    XmbRender.each_category(xmb_prototype_columns, xmbPrototypeVisualColumn, category_anchor_x, 130, function(index, label, relative, x, focus)
-        local pulse = 0.50 + 0.50 * ((math.sin(xmbPrototypeGlowPhase / 18) + 1) * 0.5)
-        local submenu_visibility = index == display_column and 1 or 1 - xmbPrototypeSubmenuAlpha
-        local category_alpha = math.floor((150 + 105 * focus) * submenu_visibility)
-        local label_brightness = math.floor(145 + 110 * focus * pulse)
-        local label_color = Color.new(label_brightness, label_brightness, label_brightness, category_alpha)
-
-        local icon = xmb_prototype_category_icon(index)
-        local scale = 0.82 + 0.33 * focus
-        if focus > 0.02 then
-            XmbRender.glowing_icon(icon, x, 166, scale, scale + 0.045 * focus, Color.new(255, 255, 255, category_alpha), Color.new(255, 255, 255, math.floor(40 + 100 * focus * pulse)))
-        else
-            XmbRender.icon(icon, x, 166, scale, Color.new(255, 255, 255, category_alpha))
-        end
-        Font.print(fnt20, x - Font.getTextWidth(fnt20, label) / 2, 226, label, label_color)
-    end)
-
     if showing_games and xmbPrototypeVerticalAlpha > 0.01 then
         xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, xmbPrototypeMotionRate)
         local showing_child_axis = xmbPrototypeGamesParentList ~= nil
@@ -15468,7 +15489,7 @@ local function draw_xmb_prototype()
             XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, game_down_spacing, game_up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
-                local icon = xmb_prototype_item_icon(item, vertical_icon)
+                local icon = xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon
                 local app_icon = xmbPrototypeGamesMode == "entries" and (item.app_type == 0 or item.app_type == 1 or item.app_type_default == 0 or item.app_type_default == 1)
                 xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1), app_icon)
             end, xmbPrototypeGamesSelection)
@@ -15519,6 +15540,11 @@ local function draw_xmb_prototype()
         end, selection)
     end
 
+    -- Horizontal categories are intentionally drawn after vertical entries:
+    -- every vertical icon, including square installed artwork, must travel
+    -- behind the XMB horizontal row instead of over it.
+    xmb_prototype_draw_categories(display_column, category_anchor_x)
+
     if xmbPrototypeReturningToNestedParent and xmbPrototypeReturnAxisAlpha >= 0.99 then
         xmbPrototypeReturningToNestedParent = false
         xmbPrototypeReturnAxisAlpha = 1
@@ -15565,6 +15591,9 @@ function xmb_prototype_move_direction(direction)
         end
     elseif xmb_prototype_inert_has_parent(xmbPrototypeColumn) and direction == -1 then
         if xmb_prototype_go_back_inert(xmbPrototypeColumn) then xmb_prototype_play_cancel_sound() end
+    elseif xmb_prototype_inert_has_parent(xmbPrototypeColumn) and direction == 1 then
+        xmb_prototype_open_inert_selection(xmbPrototypeColumn)
+        return
     elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil and direction == 1 and xmb_prototype_open_inert_selection(xmbPrototypeColumn) then
         return
     elseif direction == -1 then
@@ -15638,6 +15667,10 @@ end
 function xmb_prototype_activate_inert_selection(column)
     local entry = xmb_prototype_current_inert_list(column)[xmbPrototypeInertSelections[column]]
     if xmb_prototype_open_inert_selection(column) then return true end
+    if entry and entry.action == "theme" and xmbPrototypeThemeColors[entry.theme] then
+        xmbPrototypeTheme = entry.theme
+        return true
+    end
     local system_app = entry and entry.system_app
     if entry and type(entry.system_app_label) == "string" then
         local record = xmb_prototype_system_app_record(entry.system_app_label)
