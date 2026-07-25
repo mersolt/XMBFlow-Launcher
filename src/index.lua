@@ -58,8 +58,7 @@ loading_progress = 0
 loadingImage = Graphics.loadImage("app0:DATA/loading.png")
 
 local xmb_data_root = XMBFLOW_DATA_ROOT or "ux0:/data/RetroFlow/"
-local library_source_root = "ux0:/data/RetroFlow/"
-romsMainDir = (xmbSafeProfile and library_source_root or xmb_data_root) .. "ROMS/"
+romsMainDir = xmb_data_root .. "ROMS/"
 covDir = xmb_data_root .. "COVERS/"
 snapDir = xmb_data_root .. "BACKGROUNDS/"
 iconDir = xmb_data_root .. "ICONS/"
@@ -116,6 +115,12 @@ romDir_Default =
 ["DOS"] = "ux0:/data/RetroFlow/ROMS/DOS",
 ["EasyRPG"] = "ux0:/data/RetroFlow/ROMS/EasyRPG",
 }
+
+if xmbSafeProfile then
+    for system, path in pairs(romDir_Default) do
+        romDir_Default[system] = path:gsub("^ux0:/data/RetroFlow/", xmb_data_root)
+    end
+end
 
 adr_partition_table =
 {
@@ -183,13 +188,13 @@ function importLuaFile(filename, tableToAssign)
 end
 
 -- Save a copy of the default locations to an lua file so it can be customised later
-if not xmbSafeProfile and not System.doesFileExist("ux0:/data/RetroFlow/rom_directories.lua") then
+if not xmbSafeProfile and not System.doesFileExist(cur_dir .. "rom_directories.lua") then
     print_table_rom_dirs(romDir_Default)
 end
 
-if System.doesFileExist("ux0:/data/RetroFlow/rom_directories.lua") then
+if System.doesFileExist(cur_dir .. "rom_directories.lua") then
     -- File exists, import user rom dirs
-    db_romdir = "ux0:/data/RetroFlow/rom_directories.lua"
+    db_romdir = cur_dir .. "rom_directories.lua"
     romUserDir = {}
     romUserDir = dofile(db_romdir)
 
@@ -3587,10 +3592,10 @@ function init_music_if_needed()
         music_initialized = true
 
         -- Music - Legacy Fix - Move music files from old directory to new
-        if System.doesFileExist("ux0:/data/RetroFlow/Music.ogg") then System.rename("ux0:/data/RetroFlow/Music.ogg", "ux0:/data/RetroFlow/MUSIC/Music.ogg") end
+        if not xmbSafeProfile and System.doesFileExist(cur_dir .. "Music.ogg") then System.rename(cur_dir .. "Music.ogg", music_dir .. "Music.ogg") end
 
         -- Music - Scan Music Directory
-        music_dir = System.listDirectory("ux0:/data/RetroFlow/MUSIC/") or {}
+        music_dir = System.listDirectory(music_dir) or {}
 
         -- Music - Add to music tracks if ogg
         music_sequential = {}
@@ -11174,15 +11179,10 @@ end
 -- CHECK IF STARTUP SCAN IS ON
 -- 0 Off, 1 On
 if xmbSafeProfile then
-    -- The safe profile never creates, rebuilds, or repairs a library. It only
-    -- imports an already-complete RetroFlow cache and otherwise starts empty.
-    if System.doesDirExist(db_Cache_Folder) and cache_files_complete() then
-        files_table = import_cached_DB()
-        import_collections()
-    else
-        files_table = {}
-        import_collections()
-    end
+    -- The enabled XMB profile never imports RetroFlow's cache or settings.
+    -- Its private cache is loaded by the XMB inventory path only.
+    files_table = {}
+    import_collections()
 elseif startupScan == 1 then
     -- Startup scan is ON
 
@@ -14990,18 +14990,29 @@ local function xmb_prototype_draw_information_card()
 end
 
 local function xmb_prototype_rescan_private_library()
-    count_loading_tasks()
-    local scan_result = Full_Game_Scan(false)
-    if type(scan_result) ~= "table" or #scan_result == 0 then
+    local scan_result = {}
+    games_table, homebrews_table, sysapps_table = {}, {}, {}
+    for _, app in ipairs(quickScanVita()) do
+        local ok, info = pcall(System.extractSfo, app.path .. "/sce_sys/param.sfo")
+        if ok and info then
+            local title = info.short_title or info.title or app.name
+            local entry = {
+                name = app.name, filename = app.name, titleid = info.titleid or app.name,
+                title = title, apptitle = title, version = info.version or "",
+                game_path = app.path, app_type = string.match(app.name, "^PCS") and 1 or 0,
+                app_type_default = string.match(app.name, "^PCS") and 1 or 0
+            }
+            if entry.app_type == 1 then table.insert(games_table, entry) else table.insert(homebrews_table, entry) end
+            table.insert(scan_result, entry)
+        end
+    end
+    if #scan_result == 0 then
         xmbPrototypeDebugStatus = "Scan kept previous cache: no titles found."
         return false
     end
 
-    print_sfo_cache_vita()
-    print_sfo_cache_adrenaline()
     cache_all_tables()
-    files_table = import_cached_DB()
-    import_collections()
+    files_table = scan_result
     xmb_prototype_reset_navigation()
     xmbPrototypeDebugOpen = true
     xmbPrototypeDebugStatus = "Private library refreshed: " .. tostring(#scan_result) .. " entries."
