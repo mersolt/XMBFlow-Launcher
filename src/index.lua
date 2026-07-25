@@ -11178,10 +11178,24 @@ end
 
 -- CHECK IF STARTUP SCAN IS ON
 -- 0 Off, 1 On
+local function xmb_prototype_load_private_cache()
+    for _, system in pairs(SystemsToScan) do
+        if system.user_db_file and system.table then
+            local cache_path = db_Cache_Folder .. system.user_db_file
+            if System.doesFileExist(cache_path) then
+                local entries = safe_dofile(cache_path)
+                if type(entries) == "table" then
+                    _G[system.table] = entries
+                end
+            end
+        end
+    end
+    files_table = TableConcat(games_table or {}, homebrews_table or {})
+end
+
 if xmbSafeProfile then
-    -- The enabled XMB profile never imports RetroFlow's cache or settings.
-    -- Its private cache is loaded by the XMB inventory path only.
-    files_table = {}
+    -- The enabled XMB profile only loads its own persisted inventory.
+    xmb_prototype_load_private_cache()
     import_collections()
 elseif startupScan == 1 then
     -- Startup scan is ON

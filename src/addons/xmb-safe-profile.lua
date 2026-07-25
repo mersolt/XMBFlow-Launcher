@@ -8,9 +8,6 @@ function XmbSafeProfile.enable()
     local function is_private_path(path)
         return type(path) == "string" and type(private_root) == "string" and path:sub(1, #private_root) == private_root
     end
-    local function is_legacy_data_path(path)
-        return type(path) == "string" and path:sub(1, 20) == "ux0:/data/RetroFlow/"
-    end
 
     local blocked_system_calls = {
         "installVpk", "reboot", "deleteFile", "deleteDirectory", "rename"
@@ -38,18 +35,6 @@ function XmbSafeProfile.enable()
         local copy_file = System.copyFile
         System.copyFile = function(source, destination)
             return is_private_path(destination) and type(source) == "string" and source:sub(1, 13) == "app0:/addons/" and copy_file(source, destination) or false
-        end
-    end
-
-    -- Do not permit the enabled XMB profile to fall back to RetroFlow's
-    -- shared state, even through an unreviewed legacy helper.
-    for _, name in ipairs({"doesFileExist", "doesDirExist", "listDirectory", "openFile"}) do
-        if System[name] then
-            local system_call = System[name]
-            System[name] = function(path, ...)
-                if is_legacy_data_path(path) then return nil end
-                return system_call(path, ...)
-            end
         end
     end
 
