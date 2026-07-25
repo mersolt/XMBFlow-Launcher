@@ -26,6 +26,9 @@ $required = @(
     'local function xmb_prototype_move_read_only_apps_selection(column, direction)',
     'local function xmb_prototype_current_inert_list(column)',
     'local function xmb_prototype_move_inert_selection(column, direction)',
+    'function xmb_prototype_open_inert_selection(column)',
+    'function xmb_prototype_go_back_inert(column)',
+    'function xmb_prototype_inert_has_parent(column)',
     'local function xmb_prototype_read_only_item_icon(column, item)',
     'local function xmb_prototype_focus_legacy_selection(category, selection)',
     'function xmb_prototype_read_direction(pad)',
@@ -63,6 +66,9 @@ $required = @(
     'Graphics.drawScaleImage(panel_x, anchor_y - math.floor(row_height / 2), xmbPrototypeAppOptionsHighlight, 1, 1',
     'xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha +',
     'Sound.setVolume(xmbNavigationClick, 32767)',
+    'Sound.setVolume(xmbNavigationCancel, 32767)',
+    '"app0:/DATA/xmb-cursor-loud.ogg"',
+    '"app0:/DATA/xmb-cancel.ogg"',
     'if Network.isWifiEnabled() then',
     'Graphics.drawScaleImage(806, 35, imgWifi, 1, 1, white)',
     '"app0:/DATA/xmb-system-browser.png"',
@@ -109,7 +115,7 @@ foreach ($removedPreviewFeature in @('xmb_prototype_existing_game_icon', 'xmb_pr
         throw "The XMB renderer must not retain the deferred cover-preview feature: $removedPreviewFeature"
     }
 }
-if (-not $prototypeRenderer.Contains('xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon')) {
+if (-not $prototypeRenderer.Contains('xmb_prototype_item_icon(item, vertical_icon)')) {
     throw 'The XMB Games renderer must use explicit XMB paths or installed app icons, not RetroFlow cover paths.'
 }
 if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {

@@ -1275,9 +1275,12 @@ Network.init()
 -- Sound system already initialized early in file
 local click = Sound.open("app0:/DATA/click2.ogg")
 xmbNavigationClick = nil
+xmbNavigationCancel = nil
 if xmbSafeProfile then
-    xmbNavigationClick = Sound.open("app0:/DATA/xmb-cursor.ogg")
+    xmbNavigationClick = Sound.open("app0:/DATA/xmb-cursor-loud.ogg")
+    xmbNavigationCancel = Sound.open("app0:/DATA/xmb-cancel.ogg")
     Sound.setVolume(xmbNavigationClick, 32767)
+    Sound.setVolume(xmbNavigationCancel, 32767)
 end
 local sndMusic = click--temp
 local imgCoverTmp = Graphics.loadImage("app0:/DATA/noimg.png")
@@ -3103,6 +3106,8 @@ xmbPrototypeSystemAppsVisualSelection = 1
 xmbPrototypeHomebrewAppsVisualSelection = 1
 xmbPrototypeInertSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
 xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
+xmbPrototypeInertNavigation = {}
+xmbPrototypeMotionRate = 0.12
 xmbPrototypeAppOptionsOpen = false
 xmbPrototypeAppOptionsAlpha = 0
 xmbPrototypeAppOptionsSelection = 1
@@ -14395,7 +14400,16 @@ xmb_prototype_inert_columns = {
     },
     [3] = {
         {label = "Music", icon_path = "app0:/DATA/xmb-system-music.png", system_app = "NPXS10009"},
-        {label = "Music Library", icon_path = "app0:/DATA/xmb-icon-music.png"},
+        {label = "Music Library", icon_path = "app0:/DATA/xmb-icon-music.png", children = {
+            {label = "Albums", icon_path = "app0:/DATA/xmb-icon-music.png", children = {
+                {label = "All Albums", icon_path = "app0:/DATA/xmb-icon-music.png"},
+                {label = "Recently Added", icon_path = "app0:/DATA/xmb-icon-music.png"}
+            }},
+            {label = "Artists", icon_path = "app0:/DATA/xmb-icon-music.png", children = {
+                {label = "All Artists", icon_path = "app0:/DATA/xmb-icon-music.png"}
+            }},
+            {label = "Playlists", icon_path = "app0:/DATA/xmb-icon-music.png"}
+        }},
         {label = "Now Playing", icon_path = "app0:/DATA/xmb-icon-music.png"},
         {label = "Internet Radio", icon_path = "app0:/DATA/xmb-icon-music.png"}
     },
@@ -14563,6 +14577,11 @@ function xmb_prototype_installed_app_icon(item)
     return xmb_prototype_object_icon(path)
 end
 
+function xmb_prototype_item_icon(item, fallback)
+    if item == nil then return fallback end
+    return xmb_prototype_object_icon(item.xmb_icon_path or item.icon_path) or xmb_prototype_installed_app_icon(item) or fallback
+end
+
 local function xmb_prototype_read_only_item_icon(column, item)
     if column == 7 then
         local label = string.lower(item.apptitle or item.title or item.name or "")
@@ -14639,6 +14658,7 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeHomebrewAppsVisualSelection = 1
     xmbPrototypeInertSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
     xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1}
+    xmbPrototypeInertNavigation = {}
     xmbPrototypeAppOptionsOpen = false
     xmbPrototypeAppOptionsAlpha = 0
     xmbPrototypeAppOptionsSelection = 1
@@ -14719,13 +14739,70 @@ local function xmb_prototype_move_read_only_apps_selection(column, direction)
 end
 
 local function xmb_prototype_current_inert_list(column)
-    return xmb_prototype_inert_columns[column] or {}
+    local navigation = xmbPrototypeInertNavigation[column]
+    if navigation == nil then
+        navigation = {
+            list = xmb_prototype_inert_columns[column] or {},
+            parents = {}
+        }
+        xmbPrototypeInertNavigation[column] = navigation
+    end
+    return navigation.list
 end
 
 local function xmb_prototype_move_inert_selection(column, direction)
     local list = xmb_prototype_current_inert_list(column)
     if #list > 0 then
         xmbPrototypeInertSelections[column] = XmbNavigation.move(xmbPrototypeInertSelections[column], direction, #list)
+    end
+end
+
+-- Non-game folders share one small navigation stack.  This deliberately uses
+-- the same child-column behaviour for every inert XMB category rather than
+-- teaching Music, Photo, or Settings their own bespoke rules.
+function xmb_prototype_inert_has_parent(column)
+    local navigation = xmbPrototypeInertNavigation[column]
+    return navigation ~= nil and #navigation.parents > 0
+end
+
+function xmb_prototype_inert_parent(column)
+    local navigation = xmbPrototypeInertNavigation[column]
+    if navigation == nil or #navigation.parents == 0 then return nil end
+    return navigation.parents[#navigation.parents]
+end
+
+function xmb_prototype_open_inert_selection(column)
+    local list = xmb_prototype_current_inert_list(column)
+    local selection = xmbPrototypeInertSelections[column] or 1
+    local selected = list[selection]
+    if selected == nil or type(selected.children) ~= "table" then return false end
+    local navigation = xmbPrototypeInertNavigation[column]
+    table.insert(navigation.parents, {list = list, selection = selection})
+    navigation.list = selected.children
+    xmbPrototypeInertSelections[column] = 1
+    xmbPrototypeInertVisualSelections[column] = 1
+    xmbPrototypeChildAxisAlpha = 0
+    return true
+end
+
+function xmb_prototype_go_back_inert(column)
+    local navigation = xmbPrototypeInertNavigation[column]
+    if navigation == nil or #navigation.parents == 0 then return false end
+    local parent = navigation.parents[#navigation.parents]
+    table.remove(navigation.parents)
+    navigation.list = parent.list
+    xmbPrototypeInertSelections[column] = parent.selection
+    xmbPrototypeInertVisualSelections[column] = parent.selection
+    xmbPrototypeChildAxisAlpha = 0
+    xmbPrototypeReturningToNestedParent = true
+    xmbPrototypeReturnAxisAlpha = 0
+    return true
+end
+
+function xmb_prototype_play_cancel_sound()
+    xmbPrototypeCancelTriggered = true
+    if setSounds == 1 and xmbNavigationCancel then
+        Sound.play(xmbNavigationCancel, NO_LOOP)
     end
 end
 
@@ -15324,11 +15401,12 @@ local function draw_xmb_prototype()
     local showing_games = display_column == 5
     local showing_read_only_apps = display_column == 7 or display_column == 8
     local games_list = xmb_prototype_current_games_list()
-    local submenu_target = showing_games and xmbPrototypeGamesParentList ~= nil and 1 or 0
-    xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha + (submenu_target - xmbPrototypeSubmenuAlpha) * 0.14
-    xmbPrototypeChildAxisAlpha = xmbPrototypeChildAxisAlpha + (submenu_target - xmbPrototypeChildAxisAlpha) * 0.14
+    local showing_inert_child = xmb_prototype_inert_has_parent(display_column)
+    local submenu_target = ((showing_games and xmbPrototypeGamesParentList ~= nil) or showing_inert_child) and 1 or 0
+    xmbPrototypeSubmenuAlpha = xmbPrototypeSubmenuAlpha + (submenu_target - xmbPrototypeSubmenuAlpha) * xmbPrototypeMotionRate
+    xmbPrototypeChildAxisAlpha = xmbPrototypeChildAxisAlpha + (submenu_target - xmbPrototypeChildAxisAlpha) * xmbPrototypeMotionRate
     if xmbPrototypeReturningToNestedParent then
-        xmbPrototypeReturnAxisAlpha = xmbPrototypeReturnAxisAlpha + (1 - xmbPrototypeReturnAxisAlpha) * 0.14
+        xmbPrototypeReturnAxisAlpha = xmbPrototypeReturnAxisAlpha + (1 - xmbPrototypeReturnAxisAlpha) * xmbPrototypeMotionRate
     end
 
     -- Original XMB-inspired backdrop and waves.  It deliberately uses no
@@ -15360,7 +15438,7 @@ local function draw_xmb_prototype()
     end)
 
     if showing_games and xmbPrototypeVerticalAlpha > 0.01 then
-        xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, 0.18)
+        xmbPrototypeGamesVisualSelection = XmbNavigation.approach(xmbPrototypeGamesVisualSelection, xmbPrototypeGamesSelection, xmbPrototypeMotionRate)
         local showing_child_axis = xmbPrototypeGamesParentList ~= nil
         local vertical_icon = xmb_prototype_category_icon(display_column)
         local parent_axis_x = category_anchor_x + xmbPrototypeGamesParentStartOffset * (1 - xmbPrototypeChildAxisAlpha)
@@ -15375,8 +15453,9 @@ local function draw_xmb_prototype()
             local parent_list = xmbPrototypeGamesParentList
             local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent_list, xmbPrototypeGamesParentSelection, 296, 66, parent_up_spacing)
             XmbRender.each_vertical(parent_first, parent_last, xmbPrototypeGamesParentSelection, 296, 66, parent_up_spacing, function(parent_index, _, parent_y, parent_focus)
-                xmb_prototype_draw_vertical_object(vertical_icon, parent_axis_x, parent_y, "", parent_focus, xmbPrototypeVerticalAlpha * 0.58)
-            end)
+                local parent_item = parent_list[parent_index]
+                xmb_prototype_draw_vertical_object(xmb_prototype_item_icon(parent_item, vertical_icon), parent_axis_x, parent_y, "", parent_focus, xmbPrototypeVerticalAlpha * 0.58)
+            end, xmbPrototypeGamesParentSelection)
             xmb_prototype_draw_submenu_indicator(parent_axis_x, current_axis_x, 296, xmbPrototypeVerticalAlpha * xmbPrototypeChildAxisAlpha)
         end
         if #games_list == 0 then
@@ -15389,7 +15468,7 @@ local function draw_xmb_prototype()
             XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, game_down_spacing, game_up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
-                local icon = xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon
+                local icon = xmb_prototype_item_icon(item, vertical_icon)
                 local app_icon = xmbPrototypeGamesMode == "entries" and (item.app_type == 0 or item.app_type == 1 or item.app_type_default == 0 or item.app_type_default == 1)
                 xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1), app_icon)
             end, xmbPrototypeGamesSelection)
@@ -15398,14 +15477,14 @@ local function draw_xmb_prototype()
         local apps_list = xmb_prototype_current_read_only_apps_list(display_column)
         local selection = display_column == 7 and xmbPrototypeSystemAppsSelection or xmbPrototypeHomebrewAppsSelection
         local visual_selection = display_column == 7 and xmbPrototypeSystemAppsVisualSelection or xmbPrototypeHomebrewAppsVisualSelection
-        visual_selection = XmbNavigation.approach(visual_selection, selection, 0.18)
+        visual_selection = XmbNavigation.approach(visual_selection, selection, xmbPrototypeMotionRate)
         if display_column == 7 then
             xmbPrototypeSystemAppsVisualSelection = visual_selection
         else
             xmbPrototypeHomebrewAppsVisualSelection = visual_selection
         end
         local apps_down_spacing = display_column == 8 and 82 or 66
-        local apps_up_spacing = display_column == 8 and 82 or 234
+        local apps_up_spacing = 234
         local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, apps_down_spacing, apps_up_spacing)
         XmbRender.each_vertical(first_item, last_item, visual_selection, 296, apps_down_spacing, apps_up_spacing, function(index, _, y, focus)
             local item = apps_list[index]
@@ -15416,13 +15495,28 @@ local function draw_xmb_prototype()
     elseif xmb_prototype_inert_columns[display_column] ~= nil then
         local inert_list = xmb_prototype_current_inert_list(display_column)
         local selection = xmbPrototypeInertSelections[display_column]
-        local visual_selection = XmbNavigation.approach(xmbPrototypeInertVisualSelections[display_column], selection, 0.18)
+        local visual_selection = XmbNavigation.approach(xmbPrototypeInertVisualSelections[display_column], selection, xmbPrototypeMotionRate)
         xmbPrototypeInertVisualSelections[display_column] = visual_selection
-        local first_item, last_item = xmb_prototype_visible_vertical_range(#inert_list, visual_selection, 296, 66, 234)
-        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, _, y, focus)
+        local parent = xmb_prototype_inert_parent(display_column)
+        local parent_axis_x = category_anchor_x
+        local child_axis_x = parent_axis_x + xmbPrototypeChildAxisOffset
+        local current_axis_x = showing_inert_child and child_axis_x or parent_axis_x
+        if xmbPrototypeReturningToNestedParent and showing_inert_child then
+            current_axis_x = parent_axis_x + xmbPrototypeChildAxisOffset * xmbPrototypeReturnAxisAlpha
+        end
+        if parent then
+            local parent_first, parent_last = xmb_prototype_visible_vertical_range(#parent.list, parent.selection, 296, 66, 234)
+            XmbRender.each_vertical(parent_first, parent_last, parent.selection, 296, 66, 234, function(index, _, y, focus)
+                xmb_prototype_draw_vertical_object(xmb_prototype_item_icon(parent.list[index], xmb_prototype_category_icon(display_column)), parent_axis_x, y, "", focus, xmbPrototypeVerticalAlpha * 0.58)
+            end, parent.selection)
+            xmb_prototype_draw_submenu_indicator(parent_axis_x, current_axis_x, 296, xmbPrototypeVerticalAlpha * xmbPrototypeChildAxisAlpha)
+        end
+        local inert_up_spacing = showing_inert_child and 66 or 234
+        local first_item, last_item = xmb_prototype_visible_vertical_range(#inert_list, visual_selection, 296, 66, inert_up_spacing)
+        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, inert_up_spacing, function(index, _, y, focus)
             local item = inert_list[index]
-            xmb_prototype_draw_vertical_object(xmb_prototype_object_icon(item.icon_path), category_anchor_x, y, item.label, focus, xmbPrototypeVerticalAlpha)
-        end)
+            xmb_prototype_draw_vertical_object(xmb_prototype_item_icon(item, xmb_prototype_category_icon(display_column)), current_axis_x, y, item.label, focus, xmbPrototypeVerticalAlpha * (showing_inert_child and xmbPrototypeChildAxisAlpha or 1))
+        end, selection)
     end
 
     if xmbPrototypeReturningToNestedParent and xmbPrototypeReturnAxisAlpha >= 0.99 then
@@ -15463,11 +15557,16 @@ function xmb_prototype_move_direction(direction)
     end
     if xmbPrototypeColumn == 5 and xmbPrototypeGamesParentList ~= nil and direction == -1 then
         xmb_prototype_go_back()
+        xmb_prototype_play_cancel_sound()
     elseif xmbPrototypeColumn == 5 and xmbPrototypeGamesParentList ~= nil and direction == 1 then
         local selected = xmb_prototype_current_games_list()[xmbPrototypeGamesSelection]
         if selected and xmbPrototypeGamesMode ~= "entries" and type(selected.system_app) ~= "string" then
             xmb_prototype_open_games_selection()
         end
+    elseif xmb_prototype_inert_has_parent(xmbPrototypeColumn) and direction == -1 then
+        if xmb_prototype_go_back_inert(xmbPrototypeColumn) then xmb_prototype_play_cancel_sound() end
+    elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil and direction == 1 and xmb_prototype_open_inert_selection(xmbPrototypeColumn) then
+        return
     elseif direction == -1 then
         xmb_prototype_move_column(-1)
     elseif direction == 1 then
@@ -15538,6 +15637,7 @@ end
 
 function xmb_prototype_activate_inert_selection(column)
     local entry = xmb_prototype_current_inert_list(column)[xmbPrototypeInertSelections[column]]
+    if xmb_prototype_open_inert_selection(column) then return true end
     local system_app = entry and entry.system_app
     if entry and type(entry.system_app_label) == "string" then
         local record = xmb_prototype_system_app_record(entry.system_app_label)
@@ -23031,8 +23131,9 @@ while true do
                 xmbPrototypeDirectionIsNew = xmbPrototypeDirection ~= xmbPrototypeHeldDirection
                 xmbPrototypeHeldDirection = xmbPrototypeDirection
                 xmbPrototypeNavigationRepeat = xmbPrototypeDirectionIsNew and 18 or 5
+                xmbPrototypeCancelTriggered = false
                 xmb_prototype_move_direction(xmbPrototypeDirection)
-                if setSounds == 1 and xmbNavigationClick then
+                if not xmbPrototypeCancelTriggered and setSounds == 1 and xmbNavigationClick then
                     Sound.play(xmbNavigationClick, NO_LOOP)
                 end
             else
@@ -23043,16 +23144,12 @@ while true do
                 if Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                     xmbPrototypeInformationOpen = false
                     xmbPrototypeAppOptionsOpen = true
-                    if setSounds == 1 and xmbNavigationClick then
-                        Sound.play(xmbNavigationClick, NO_LOOP)
-                    end
+                    xmb_prototype_play_cancel_sound()
                 end
             elseif xmbPrototypeAppOptionsOpen then
                 if Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                     xmbPrototypeAppOptionsOpen = false
-                    if setSounds == 1 and xmbNavigationClick then
-                        Sound.play(xmbNavigationClick, NO_LOOP)
-                    end
+                    xmb_prototype_play_cancel_sound()
                 elseif Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) and xmbPrototypeAppOptionsSelection == 1 then
                     xmbPrototypeInformationEntry = xmb_prototype_information_entry(xmb_prototype_current_app_option_entry())
                     xmbPrototypeInformationOpen = xmbPrototypeInformationEntry ~= nil
@@ -23080,9 +23177,9 @@ while true do
                 end
             elseif xmbPrototypeColumn == 5 and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
                 xmb_prototype_go_back()
-                if setSounds == 1 and xmbNavigationClick then
-                    Sound.play(xmbNavigationClick, NO_LOOP)
-                end
+                xmb_prototype_play_cancel_sound()
+            elseif xmb_prototype_inert_has_parent(xmbPrototypeColumn) and Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
+                if xmb_prototype_go_back_inert(xmbPrototypeColumn) then xmb_prototype_play_cancel_sound() end
             elseif (xmbPrototypeColumn == 7 or xmbPrototypeColumn == 8) and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 xmb_prototype_activate_app_selection(xmbPrototypeColumn)
             elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
