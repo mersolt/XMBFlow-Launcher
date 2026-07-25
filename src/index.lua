@@ -3087,6 +3087,10 @@ xmbPrototypeGamesGrandparentMode = nil
 xmbPrototypeGamesGrandparentList = nil
 xmbPrototypeGamesGrandparentSelection = 1
 xmbPrototypeGamesGrandparentStartOffset = 0
+xmbPrototypeGamesGreatGrandparentMode = nil
+xmbPrototypeGamesGreatGrandparentList = nil
+xmbPrototypeGamesGreatGrandparentSelection = 1
+xmbPrototypeGamesGreatGrandparentStartOffset = 0
 xmbPrototypeGamesParentStartOffset = 0
 xmbPrototypeChildAxisOffset = 160
 xmbPrototypeChildAxisAlpha = 0
@@ -14567,7 +14571,7 @@ local function xmb_prototype_draw_vertical_object(icon, x, y, label, focus, alph
     else
         XmbRender.icon(icon, x, y, scale, Color.new(255, 255, 255, icon_alpha))
     end
-    Font.print(focus > 0.50 and fnt22 or fnt20, x + (app_icon and 78 or 40), y - 15, label, Color.new(text_brightness, text_brightness, text_brightness, text_alpha))
+    Font.print(focus > 0.50 and fnt22 or fnt20, x + (app_icon and 68 or 40), y - 10, label, Color.new(text_brightness, text_brightness, text_brightness, text_alpha))
 end
 
 local function xmb_prototype_draw_submenu_indicator(parent_x, child_x, y, alpha)
@@ -14605,6 +14609,10 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeGamesGrandparentList = nil
     xmbPrototypeGamesGrandparentSelection = 1
     xmbPrototypeGamesGrandparentStartOffset = 0
+    xmbPrototypeGamesGreatGrandparentMode = nil
+    xmbPrototypeGamesGreatGrandparentList = nil
+    xmbPrototypeGamesGreatGrandparentSelection = 1
+    xmbPrototypeGamesGreatGrandparentStartOffset = 0
     xmbPrototypeGamesParentStartOffset = 0
     xmbPrototypeChildAxisAlpha = 0
     xmbPrototypeReturningToNestedParent = false
@@ -14722,6 +14730,10 @@ local function xmb_prototype_games_folder_detail(folder)
 end
 
 local function xmb_prototype_open_games_submenu(mode, title, category)
+    xmbPrototypeGamesGreatGrandparentMode = xmbPrototypeGamesGrandparentMode
+    xmbPrototypeGamesGreatGrandparentList = xmbPrototypeGamesGrandparentList
+    xmbPrototypeGamesGreatGrandparentSelection = xmbPrototypeGamesGrandparentSelection
+    xmbPrototypeGamesGreatGrandparentStartOffset = xmbPrototypeGamesGrandparentStartOffset
     xmbPrototypeGamesGrandparentMode = xmbPrototypeGamesParentMode
     xmbPrototypeGamesGrandparentList = xmbPrototypeGamesParentList
     xmbPrototypeGamesGrandparentSelection = xmbPrototypeGamesParentSelection
@@ -14780,10 +14792,14 @@ local function xmb_prototype_go_back()
         xmbPrototypeGamesParentList = xmbPrototypeGamesGrandparentList
         xmbPrototypeGamesParentSelection = xmbPrototypeGamesGrandparentSelection
         xmbPrototypeGamesParentStartOffset = xmbPrototypeGamesGrandparentStartOffset
-        xmbPrototypeGamesGrandparentMode = nil
-        xmbPrototypeGamesGrandparentList = nil
-        xmbPrototypeGamesGrandparentSelection = 1
-        xmbPrototypeGamesGrandparentStartOffset = 0
+        xmbPrototypeGamesGrandparentMode = xmbPrototypeGamesGreatGrandparentMode
+        xmbPrototypeGamesGrandparentList = xmbPrototypeGamesGreatGrandparentList
+        xmbPrototypeGamesGrandparentSelection = xmbPrototypeGamesGreatGrandparentSelection
+        xmbPrototypeGamesGrandparentStartOffset = xmbPrototypeGamesGreatGrandparentStartOffset
+        xmbPrototypeGamesGreatGrandparentMode = nil
+        xmbPrototypeGamesGreatGrandparentList = nil
+        xmbPrototypeGamesGreatGrandparentSelection = 1
+        xmbPrototypeGamesGreatGrandparentStartOffset = 0
         xmbPrototypeGamesVisualSelection = xmbPrototypeGamesSelection
         if returning_to_nested_parent then
             xmbPrototypeChildAxisAlpha = 0
@@ -15343,14 +15359,14 @@ local function draw_xmb_prototype()
         if #games_list == 0 then
             Font.print(fnt22, (showing_child_axis and child_axis_x or category_anchor_x + 40), 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeSubmenuAlpha or 1) * 180)))
         else
-            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing)
+            local game_down_spacing = xmbPrototypeGamesMode == "entries" and 82 or 66
+            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, game_down_spacing, child_up_spacing)
 
-            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing, function(index, relative, y, focus)
+            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, game_down_spacing, child_up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
                 local icon = xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon
                 local app_icon = xmbPrototypeGamesMode == "entries" and (item.app_type == 0 or item.app_type == 1 or item.app_type_default == 0 or item.app_type_default == 1)
-                if app_icon then y = y + (relative < 0 and -12 or relative > 0 and 12 or 0) end
                 xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1), app_icon)
             end)
         end
@@ -15364,12 +15380,12 @@ local function draw_xmb_prototype()
         else
             xmbPrototypeHomebrewAppsVisualSelection = visual_selection
         end
-        local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, 66, 234)
-        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, 66, 234, function(index, relative, y, focus)
+        local apps_down_spacing = display_column == 8 and 82 or 66
+        local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, apps_down_spacing, 234)
+        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, apps_down_spacing, 234, function(index, _, y, focus)
             local item = apps_list[index]
             local label = xmb_prototype_read_only_item_label(item)
             local app_icon = display_column == 8
-            if app_icon then y = y + (relative < 0 and -12 or relative > 0 and 12 or 0) end
             xmb_prototype_draw_vertical_object(xmb_prototype_read_only_item_icon(display_column, item), category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha, app_icon)
         end)
     elseif xmb_prototype_inert_columns[display_column] ~= nil then

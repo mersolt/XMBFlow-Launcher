@@ -2,6 +2,7 @@
 -- Callers retain ownership of their image handles and colors.
 XmbRender = {}
 XmbRender.filtered_images = {}
+XmbRender.image_sizes = {}
 
 function XmbRender.icon(image, center_x, center_y, scale, color)
     if image then
@@ -9,7 +10,12 @@ function XmbRender.icon(image, center_x, center_y, scale, color)
             Graphics.setImageFilters(image, FILTER_LINEAR, FILTER_LINEAR)
             XmbRender.filtered_images[image] = true
         end
-        Graphics.drawScaleImage(center_x - 48 * scale, center_y - 48 * scale, image, scale, scale, color)
+        local size = XmbRender.image_sizes[image]
+        if size == nil then
+            size = {Graphics.getImageWidth(image), Graphics.getImageHeight(image)}
+            XmbRender.image_sizes[image] = size
+        end
+        Graphics.drawScaleImage(center_x - size[1] * scale / 2, center_y - size[2] * scale / 2, image, scale, scale, color)
     end
 end
 
