@@ -15009,7 +15009,7 @@ end
 
 local function xmb_prototype_rescan_private_library()
     local scan_result = {}
-    games_table, homebrews_table, sysapps_table = {}, {}, {}
+    local scanned_games, scanned_homebrews, scanned_sysapps = {}, {}, {}
     for _, app in ipairs(quickScanVita()) do
         local ok, info = pcall(System.extractSfo, app.path .. "/sce_sys/param.sfo")
         if ok and info then
@@ -15020,7 +15020,7 @@ local function xmb_prototype_rescan_private_library()
                 game_path = app.path, app_type = string.match(app.name, "^PCS") and 1 or 0,
                 app_type_default = string.match(app.name, "^PCS") and 1 or 0
             }
-            if entry.app_type == 1 then table.insert(games_table, entry) else table.insert(homebrews_table, entry) end
+            if entry.app_type == 1 then table.insert(scanned_games, entry) else table.insert(scanned_homebrews, entry) end
             table.insert(scan_result, entry)
         end
     end
@@ -15028,10 +15028,14 @@ local function xmb_prototype_rescan_private_library()
     -- installed launcher.  Fall back to Vita's read-only shell app database;
     -- this is system metadata, not RetroFlow state.
     if #scan_result == 0 then
-        local database = Database.open("ur0:shell/db/app.db")
-        local rows = database and Database.execQueryExtended(database,
-            "SELECT titleId, title FROM tbl_appinfo_icon") or {}
-        if database then Database.close(database) end
+        local rows = {}
+        local opened, database = pcall(Database.open, "ur0:shell/db/app.db")
+        if opened and database then
+            local queried, result = pcall(Database.execQueryExtended, database,
+                "SELECT titleId, title FROM tbl_appinfo_icon")
+            pcall(Database.close, database)
+            if queried and type(result) == "table" then rows = result end
+        end
         for _, row in pairs(rows) do
             -- Database.execQueryExtended preserves the column spelling used
             -- by app.db.  Accept both forms so this stays compatible with
@@ -15048,21 +15052,22 @@ local function xmb_prototype_rescan_private_library()
                 }
                 if string.match(titleid, "^NPXS") then
                     entry.app_type, entry.app_type_default = 42, 42
-                    table.insert(sysapps_table, entry)
+                    table.insert(scanned_sysapps, entry)
                 elseif entry.app_type == 1 then
-                    table.insert(games_table, entry)
+                    table.insert(scanned_games, entry)
                 else
-                    table.insert(homebrews_table, entry)
+                    table.insert(scanned_homebrews, entry)
                 end
                 table.insert(scan_result, entry)
             end
         end
     end
     if #scan_result == 0 then
-        xmbPrototypeDebugStatus = "Scan kept previous cache: no titles found."
+        xmbPrototypeDebugStatus = "Scan kept the previous library: no titles found."
         return false
     end
 
+    games_table, homebrews_table, sysapps_table = scanned_games, scanned_homebrews, scanned_sysapps
     table.sort(games_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
     table.sort(homebrews_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
     table.sort(sysapps_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
