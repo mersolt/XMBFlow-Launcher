@@ -14974,13 +14974,13 @@ local function xmb_prototype_information_value(value, fallback)
     return fallback
 end
 
-local function xmb_prototype_sfo_u16(data, offset)
+function xmb_prototype_sfo_u16(data, offset)
     if offset < 1 or offset + 1 > #data then return nil end
     local low, high = string.byte(data, offset, offset + 1)
     return low + high * 256
 end
 
-local function xmb_prototype_sfo_u32(data, offset)
+function xmb_prototype_sfo_u32(data, offset)
     if offset < 1 or offset + 3 > #data then return nil end
     local b1, b2, b3, b4 = string.byte(data, offset, offset + 3)
     return b1 + b2 * 256 + b3 * 65536 + b4 * 16777216
@@ -14989,7 +14989,7 @@ end
 -- Read only the SFO fields needed by the Information card. LPP's built-in
 -- extractor intentionally exposes a small subset, while PARENTAL_LEVEL and
 -- PSP2_SYSTEM_VER are useful Vita metadata that remain in the same local SFO.
-local function xmb_prototype_read_sfo_metadata(path)
+function xmb_prototype_read_sfo_metadata(path)
     if type(path) ~= "string" then return {} end
     local ok, data = pcall(readAll, path)
     if not ok or type(data) ~= "string" or #data < 20 or string.sub(data, 1, 4) ~= "\0PSF" then
@@ -15025,7 +15025,7 @@ local function xmb_prototype_read_sfo_metadata(path)
     return values
 end
 
-local function xmb_prototype_information_metadata(entry)
+function xmb_prototype_information_metadata(entry)
     local paths = {}
     if entry and type(entry.game_path) == "string" then
         table.insert(paths, entry.game_path .. "/sce_sys/param.sfo")
@@ -15042,13 +15042,13 @@ local function xmb_prototype_information_metadata(entry)
     return {}
 end
 
-local function xmb_prototype_information_category(value)
+function xmb_prototype_information_category(value)
     local labels = {gd = "Game", gp = "Game patch", mg = "Application", gda = "Application"}
     if type(value) ~= "string" or value == "" then return "Not reported" end
     return labels[string.lower(value)] or value
 end
 
-local function xmb_prototype_information_parental_level(value)
+function xmb_prototype_information_parental_level(value)
     if type(value) ~= "number" then return "Not reported" end
     return "Level " .. tostring(value)
 end

@@ -75,7 +75,7 @@ $required = @(
     'system_app = "NPXS10010"',
     '"NPXS10094"',
     '"Online Manual"',
-    'local function xmb_prototype_read_sfo_metadata(path)',
+    'function xmb_prototype_read_sfo_metadata(path)',
     'PARENTAL_LEVEL = true',
     'PSP2_SYSTEM_VER = true',
     '"Parental level"',
