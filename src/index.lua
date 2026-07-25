@@ -15024,11 +15024,48 @@ local function xmb_prototype_rescan_private_library()
             table.insert(scan_result, entry)
         end
     end
+    -- Some Lua Player Plus builds do not enumerate ux0:/app for a separately
+    -- installed launcher.  Fall back to Vita's read-only shell app database;
+    -- this is system metadata, not RetroFlow state.
+    if #scan_result == 0 then
+        local database = Database.open("ur0:shell/db/app.db")
+        local rows = database and Database.execQueryExtended(database,
+            "SELECT titleId, title FROM tbl_appinfo_icon") or {}
+        if database then Database.close(database) end
+        for _, row in pairs(rows) do
+            -- Database.execQueryExtended preserves the column spelling used
+            -- by app.db.  Accept both forms so this stays compatible with
+            -- older Lua Player Plus database bindings.
+            local titleid = row.titleId or row.titleid
+            if type(titleid) == "string" and string.len(titleid) == 9 and not string.match(titleid, "^XMBF") then
+                local title = row.title or titleid
+                local entry = {
+                    name = titleid, filename = titleid, titleid = titleid,
+                    title = title, apptitle = title, version = "",
+                    game_path = "ux0:/app/" .. titleid,
+                    app_type = string.match(titleid, "^PCS") and 1 or 0,
+                    app_type_default = string.match(titleid, "^PCS") and 1 or 0
+                }
+                if string.match(titleid, "^NPXS") then
+                    entry.app_type, entry.app_type_default = 42, 42
+                    table.insert(sysapps_table, entry)
+                elseif entry.app_type == 1 then
+                    table.insert(games_table, entry)
+                else
+                    table.insert(homebrews_table, entry)
+                end
+                table.insert(scan_result, entry)
+            end
+        end
+    end
     if #scan_result == 0 then
         xmbPrototypeDebugStatus = "Scan kept previous cache: no titles found."
         return false
     end
 
+    table.sort(games_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
+    table.sort(homebrews_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
+    table.sort(sysapps_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
     cache_all_tables()
     files_table = scan_result
     xmb_prototype_reset_navigation()
