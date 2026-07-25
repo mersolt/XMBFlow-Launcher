@@ -7,6 +7,7 @@ local oneLoopTimer = Timer.new()
 -- chunk is already near that limit, so XMB profile state deliberately lives
 -- in the application global table instead of adding locals to this chunk.
 xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true
+XMBFLOW_DATA_ROOT = xmbSafeProfile and "ux0:/data/XMBFlow/" or nil
 
 -- Reading LiveArea boot parameters is an unsafe-mode API.  The safe profile
 -- deliberately has no recovery-entry path, so avoid calling it entirely.
@@ -56,10 +57,12 @@ loading_progress = 0
 
 loadingImage = Graphics.loadImage("app0:DATA/loading.png")
 
-romsMainDir = "ux0:/data/RetroFlow/ROMS/"
-covDir = "ux0:/data/RetroFlow/COVERS/"
-snapDir = "ux0:/data/RetroFlow/BACKGROUNDS/"
-iconDir = "ux0:/data/RetroFlow/ICONS/"
+local xmb_data_root = XMBFLOW_DATA_ROOT or "ux0:/data/RetroFlow/"
+local library_source_root = "ux0:/data/RetroFlow/"
+romsMainDir = (xmbSafeProfile and library_source_root or xmb_data_root) .. "ROMS/"
+covDir = xmb_data_root .. "COVERS/"
+snapDir = xmb_data_root .. "BACKGROUNDS/"
+iconDir = xmb_data_root .. "ICONS/"
 
 local lang_lines = {}
 
@@ -124,13 +127,16 @@ adr_partition_table =
 }
 
 -- Create directory: Main
-local cur_dir = "ux0:/data/RetroFlow/"
-System.createDirectory("ux0:/data/RetroFlow/")
+local cur_dir = xmb_data_root
+System.createDirectory(cur_dir)
 
 print_table_loaded = false
 function ensure_print_table_loaded()
     if print_table_loaded == false then
         dofile("app0:addons/printTable.lua")
+        if xmbSafeProfile then
+            dofile("app0:addons/xmb-private-cache.lua")
+        end
         print_table_loaded = true
     end
 end
@@ -1215,7 +1221,7 @@ count_of_get_snaps = syscount - 6 -- Minus psm and vita too
     end
 
     -- Collections: Create directory
-        local collections_dir = "ux0:/data/RetroFlow/COLLECTIONS/"
+        local collections_dir = xmb_data_root .. "COLLECTIONS/"
         System.createDirectory(collections_dir)
 
     -- List directory and insert into collection_files table
@@ -1439,11 +1445,11 @@ Graphics.setImageFilters(imgFloor, FILTER_LINEAR, FILTER_LINEAR)
 -- CREATE DIRECTORIES
 
 -- Create directory: Backgrounds
-local background_dir = "ux0:/data/RetroFlow/WALLPAPER/"
+local background_dir = xmb_data_root .. "WALLPAPER/"
 System.createDirectory(background_dir)
 
 -- Create directory: Music
-local music_dir = "ux0:/data/RetroFlow/MUSIC/"
+local music_dir = xmb_data_root .. "MUSIC/"
 System.createDirectory(music_dir)
 
 -- Create directory: Cover Folders
@@ -1471,11 +1477,11 @@ for k, v in pairs(SystemsToScan) do
 end
 
 -- Create directory: User Database
-local user_DB_Folder = "ux0:/data/RetroFlow/TITLES/"
+local user_DB_Folder = xmb_data_root .. "TITLES/"
 System.createDirectory(user_DB_Folder)
 
 -- Create directory: Databases
-local db_Folder = "ux0:/data/RetroFlow/DATABASES/"
+local db_Folder = xmb_data_root .. "DATABASES/"
 System.createDirectory(db_Folder)
 
 -- Copy databases from app to data
@@ -1500,7 +1506,7 @@ end
 
 
 -- Table Cache
-local db_Cache_Folder = "ux0:/data/RetroFlow/CACHE/"
+local db_Cache_Folder = xmb_data_root .. "CACHE/"
 System.createDirectory(db_Cache_Folder)
 
 function cache_files_complete()
@@ -7190,7 +7196,7 @@ function update_loading_screen_complete()
 end
 
 
-function Full_Game_Scan()
+function Full_Game_Scan(persist_results)
     -- Import cached titles only when actually scanning
     import_cached_titles()
     
@@ -10581,8 +10587,12 @@ function Full_Game_Scan()
     update_loading_screen_complete()
 
     -- CACHE ALL TABLES - PRINT AND SAVE
-    print_sfo_cache_vita()
-    print_sfo_cache_adrenaline()
+    -- XMBFlow first validates an in-memory scan before persisting its own
+    -- private cache. Legacy RetroFlow retains its existing default behaviour.
+    if persist_results ~= false then
+        print_sfo_cache_vita()
+        print_sfo_cache_adrenaline()
+    end
 
     -- CLEANUP TABLES BEFORE CACHING
         local cleansed_table_count = 1
@@ -10605,7 +10615,9 @@ function Full_Game_Scan()
         end
 
 
-    cache_all_tables()
+    if persist_results ~= false then
+        cache_all_tables()
+    end
 
 end
 
@@ -14551,6 +14563,9 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeInformationAlpha = 0
     xmbPrototypeInformationEntry = nil
     xmbPrototypeInformationSize = "Not reported"
+    xmbPrototypeDebugOpen = false
+    xmbPrototypeDebugSelection = 1
+    xmbPrototypeDebugStatus = ""
     xmbPrototypeGlowPhase = 0
     xmbPrototypeSubmenuAlpha = 0
     xmbPrototypeHeldDirection = 0
@@ -14974,6 +14989,41 @@ local function xmb_prototype_draw_information_card()
     Font.print(fnt20, 454, 488, "O  Back", Color.new(235, 245, 255, text_alpha))
 end
 
+local function xmb_prototype_rescan_private_library()
+    count_loading_tasks()
+    local scan_result = Full_Game_Scan(false)
+    if type(scan_result) ~= "table" or #scan_result == 0 then
+        xmbPrototypeDebugStatus = "Scan kept previous cache: no titles found."
+        return false
+    end
+
+    print_sfo_cache_vita()
+    print_sfo_cache_adrenaline()
+    cache_all_tables()
+    files_table = import_cached_DB()
+    import_collections()
+    xmb_prototype_reset_navigation()
+    xmbPrototypeDebugOpen = true
+    xmbPrototypeDebugStatus = "Private library refreshed: " .. tostring(#scan_result) .. " entries."
+    return true
+end
+
+local function xmb_prototype_draw_debug_menu()
+    if xmbPrototypeDebugOpen == false then return end
+    Graphics.fillRect(92, 868, 96, 448, Color.new(4, 10, 28, 236))
+    Font.print(fnt25, 122, 128, "XMBFlow Debug", Color.new(245, 250, 255, 255))
+    Font.print(fnt20, 122, 168, "Private XMBFlow library only", Color.new(195, 215, 238, 230))
+    local options = {"Rescan title library", "Close"}
+    for index, label in ipairs(options) do
+        local y = 230 + (index - 1) * 52
+        local focus = index == xmbPrototypeDebugSelection
+        if focus then Graphics.fillRect(112, 846, y - 5, y + 37, Color.new(106, 202, 255, 190)) end
+        Font.print(focus and fnt22 or fnt20, 132, y, label, focus and white or Color.new(190, 210, 232, 225))
+    end
+    Font.print(fnt20, 122, 350, xmbPrototypeDebugStatus or "", Color.new(220, 235, 250, 235))
+    Font.print(fnt20, 122, 396, "X  Select     O  Back", Color.new(215, 230, 245, 235))
+end
+
 local function draw_xmb_prototype()
     xmb_prototype_update_transition()
     xmbPrototypeGlowPhase = xmbPrototypeGlowPhase + 1
@@ -15084,6 +15134,7 @@ local function draw_xmb_prototype()
     xmb_prototype_draw_app_options()
     xmb_prototype_draw_information_card()
     xmb_prototype_draw_status()
+    xmb_prototype_draw_debug_menu()
 end
 
 function xmb_prototype_read_direction(pad)
@@ -22659,6 +22710,20 @@ while true do
         end
 
         if xmbPrototypeEnabled and not xmbPrototypeToggleChanged then
+            if xmbPrototypeDebugOpen then
+                if Controls.check(pad, SCE_CTRL_UP) and not Controls.check(oldpad, SCE_CTRL_UP) then
+                    xmbPrototypeDebugSelection = 1
+                elseif Controls.check(pad, SCE_CTRL_DOWN) and not Controls.check(oldpad, SCE_CTRL_DOWN) then
+                    xmbPrototypeDebugSelection = 2
+                elseif Controls.check(pad, SCE_CTRL_CIRCLE_MAP) and not Controls.check(oldpad, SCE_CTRL_CIRCLE_MAP) then
+                    xmbPrototypeDebugOpen = false
+                elseif Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
+                    if xmbPrototypeDebugSelection == 1 then xmb_prototype_rescan_private_library() else xmbPrototypeDebugOpen = false end
+                end
+            elseif Controls.check(pad, SCE_CTRL_SELECT) and not Controls.check(oldpad, SCE_CTRL_SELECT) then
+                xmbPrototypeDebugOpen = true
+                xmbPrototypeDebugSelection = 1
+            else
             xmbPrototypeDirection = xmb_prototype_read_direction(pad)
             if xmbPrototypeDirection == 0 then
                 xmbPrototypeHeldDirection = 0
@@ -22722,6 +22787,7 @@ while true do
                 xmb_prototype_activate_app_selection(xmbPrototypeColumn)
             elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil and Controls.check(pad, SCE_CTRL_CROSS_MAP) and not Controls.check(oldpad, SCE_CTRL_CROSS_MAP) then
                 xmb_prototype_activate_inert_selection(xmbPrototypeColumn)
+            end
             end
         end
 
