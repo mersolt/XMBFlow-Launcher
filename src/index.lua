@@ -3109,7 +3109,7 @@ xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1
 xmbPrototypeInertNavigation = {}
 xmbPrototypeMotionRate = 0.12
 xmbPrototypeTheme = "Blue"
-xmbPrototypeWavesEnabled = true
+xmbPrototypeWavesEnabled = false
 xmbPrototypeCategoryRowsCache = {}
 xmbPrototypeReadOnlyData = nil
 xmbPrototypeThemeColors = {
@@ -14425,15 +14425,15 @@ xmb_prototype_inert_columns = {
     },
     [3] = {
         {label = "Music", icon_path = "app0:/DATA/xmb-system-music.png", system_app = "NPXS10009"},
-        {label = "Music Library", icon_path = "app0:/DATA/xmb-icon-music.png", children = {
-            {label = "Albums", icon_path = "app0:/DATA/xmb-icon-music.png", children = {
+        {label = "Music Library", icon_path = "app0:/DATA/folder.png", children = {
+            {label = "Albums", icon_path = "app0:/DATA/folder.png", children = {
                 {label = "All Albums", icon_path = "app0:/DATA/xmb-icon-music.png"},
                 {label = "Recently Added", icon_path = "app0:/DATA/xmb-icon-music.png"}
             }},
-            {label = "Artists", icon_path = "app0:/DATA/xmb-icon-music.png", children = {
+            {label = "Artists", icon_path = "app0:/DATA/folder.png", children = {
                 {label = "All Artists", icon_path = "app0:/DATA/xmb-icon-music.png"}
             }},
-            {label = "Playlists", icon_path = "app0:/DATA/xmb-icon-music.png"}
+            {label = "Playlists", icon_path = "app0:/DATA/folder.png"}
         }},
         {label = "Now Playing", icon_path = "app0:/DATA/xmb-icon-music.png"},
         {label = "Internet Radio", icon_path = "app0:/DATA/xmb-icon-music.png"}
@@ -14458,17 +14458,17 @@ xmb_prototype_games_folders = {
     {label = "Trophies", system_app = "NPXS10008", xmb_icon_path = "app0:/DATA/xmb-system-trophy.png"}
 }
 xmb_prototype_library_folders = {
-    {label = "Collections", kind = "collections"},
-    {label = "Retro Systems", kind = "retro"}
+    {label = "Collections", kind = "collections", xmb_icon_path = "app0:/DATA/folder.png"},
+    {label = "Retro Systems", kind = "retro", xmb_icon_path = "app0:/DATA/folder.png"}
 }
 xmb_prototype_library_categories = {
-    {label = "All Games", category = 0},
-    {label = "PS Vita", category = 1},
-    {label = "PSP", category = 3},
-    {label = "PlayStation", category = 4},
-    {label = "PlayStation Mobile", category = 39},
-    {label = "Favourites", category = 47},
-    {label = "Recently Played", category = 48}
+    {label = "All Games", category = 0, xmb_icon_path = "app0:/DATA/folder.png"},
+    {label = "PS Vita", category = 1, xmb_icon_path = "app0:/DATA/folder.png"},
+    {label = "PSP", category = 3, xmb_icon_path = "app0:/DATA/folder.png"},
+    {label = "PlayStation", category = 4, xmb_icon_path = "app0:/DATA/folder.png"},
+    {label = "PlayStation Mobile", category = 39, xmb_icon_path = "app0:/DATA/folder.png"},
+    {label = "Favourites", category = 47, xmb_icon_path = "app0:/DATA/folder.png"},
+    {label = "Recently Played", category = 48, xmb_icon_path = "app0:/DATA/folder.png"}
 }
 
 -- System and Homebrew Apps reuse RetroFlow's cached category rows.  They do
@@ -14609,7 +14609,17 @@ end
 
 function xmb_prototype_item_icon(item, fallback)
     if item == nil then return fallback end
-    return xmb_prototype_object_icon(item.xmb_icon_path or item.icon_path) or xmb_prototype_installed_app_icon(item) or fallback
+    local icon = xmb_prototype_object_icon(item.xmb_icon_path or item.icon_path)
+    if icon then return icon end
+    if item.children or item.kind == "library" or item.kind == "collections" or item.kind == "retro" then
+        return xmb_prototype_object_icon("app0:/DATA/folder.png") or fallback
+    end
+    return xmb_prototype_installed_app_icon(item) or fallback
+end
+
+function xmb_prototype_theme_asset_path(kind)
+    if xmbPrototypeTheme == "Blue" then return "app0:/DATA/xmb-app-options-" .. kind .. ".png" end
+    return "app0:/DATA/xmb-app-options-" .. kind .. "-" .. string.lower(xmbPrototypeTheme) .. ".png"
 end
 
 local function xmb_prototype_read_only_item_icon(column, item)
@@ -15121,15 +15131,9 @@ local function xmb_prototype_draw_app_options()
     local theme = xmbPrototypeThemeColors[xmbPrototypeTheme] or xmbPrototypeThemeColors["Blue"]
     xmbPrototypeAppOptionsVisualSelection = XmbNavigation.approach(xmbPrototypeAppOptionsVisualSelection, xmbPrototypeAppOptionsSelection, 0.20)
     Graphics.fillRect(0, 960, 0, 544, Color.new(0, 0, 0, math.floor(96 * alpha)))
-    if xmbPrototypeAppOptionsPanel == nil then
-        local ok, texture = pcall(Graphics.loadImage, "app0:/DATA/xmb-app-options-panel.png")
-        xmbPrototypeAppOptionsPanel = ok and texture or false
-        if xmbPrototypeAppOptionsPanel then
-            Graphics.setImageFilters(xmbPrototypeAppOptionsPanel, FILTER_LINEAR, FILTER_LINEAR)
-        end
-    end
-    if xmbPrototypeAppOptionsPanel and xmbPrototypeTheme == "Blue" then
-        Graphics.drawScaleImage(panel_x, 0, xmbPrototypeAppOptionsPanel, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
+    local panel_texture = xmb_prototype_object_icon(xmb_prototype_theme_asset_path("panel"))
+    if panel_texture then
+        Graphics.drawScaleImage(panel_x, 0, panel_texture, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
     else
         for step = 0, 15 do
             local left = panel_x + math.floor(step * (960 - panel_x) / 16)
@@ -15137,15 +15141,9 @@ local function xmb_prototype_draw_app_options()
             Graphics.fillRect(left, right, 0, 544, Color.new(theme.panel[1], theme.panel[2], theme.panel[3], math.floor((228 - step * 11) * alpha)))
         end
     end
-    if xmbPrototypeAppOptionsHighlight == nil then
-        local ok, texture = pcall(Graphics.loadImage, "app0:/DATA/xmb-app-options-highlight.png")
-        xmbPrototypeAppOptionsHighlight = ok and texture or false
-        if xmbPrototypeAppOptionsHighlight then
-            Graphics.setImageFilters(xmbPrototypeAppOptionsHighlight, FILTER_LINEAR, FILTER_LINEAR)
-        end
-    end
-    if xmbPrototypeAppOptionsHighlight and xmbPrototypeTheme == "Blue" then
-        Graphics.drawScaleImage(panel_x, anchor_y - math.floor(row_height / 2), xmbPrototypeAppOptionsHighlight, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
+    local highlight_texture = xmb_prototype_object_icon(xmb_prototype_theme_asset_path("highlight"))
+    if highlight_texture then
+        Graphics.drawScaleImage(panel_x, anchor_y - math.floor(row_height / 2), highlight_texture, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
     else
         for step = 0, 15 do
             local left = panel_x + math.floor(step * (960 - panel_x) / 16)
