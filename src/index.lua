@@ -14460,13 +14460,28 @@ end
 -- legacy library state.  Keeping it as a read-only provider gives a future
 -- safe package entry a small, explicit contract: folders, collections, and
 -- category rows.  It must not scan, save, launch, or mutate legacy tables.
+function xmb_prototype_category_rows(category)
+    local rows = xCatLookup(category) or {}
+    if category ~= 1 then return rows end
+    local games = {}
+    for index, item in ipairs(rows) do
+        if item.app_type == 1 or item.app_type_default == 1 or string.match(item.titleid or item.name or "", "^PCS") then
+            local copy = {}
+            for key, value in pairs(item) do copy[key] = value end
+            copy.xmb_source_selection = index
+            table.insert(games, copy)
+        end
+    end
+    return games
+end
+
 local function xmb_prototype_read_only_data()
     return XmbReadOnlyData.create({
         folders = xmb_prototype_games_folders,
         retro_systems = xmb_prototype_retro_systems,
         collections = collection_files or {},
         category_rows = function(category)
-            return xCatLookup(category) or {}
+            return xmb_prototype_category_rows(category)
         end
     })
 end
@@ -14835,7 +14850,7 @@ local function xmb_prototype_focus_legacy_selection(category, selection)
         return false
     end
 
-    local entries = category == 0 and xmb_prototype_all_games() or xCatLookup(category) or {}
+    local entries = category == 0 and xmb_prototype_all_games() or xmb_prototype_category_rows(category)
     if entries[selection] == nil then
         return false
     end
@@ -14868,6 +14883,13 @@ local function xmb_prototype_read_only_item_label(item)
 end
 
 local xmb_prototype_app_options = {"Information", "Change category", "Delete"}
+
+function xmb_prototype_app_options_for(entry)
+    if entry and (entry.system_app ~= nil or entry.system_app_label ~= nil or entry.app_type == 42 or entry.app_type_default == 42) then
+        return {"Information", "Change category"}
+    end
+    return xmb_prototype_app_options
+end
 
 local function xmb_prototype_current_selected_entry()
     if xmbPrototypeColumn == 5 then
@@ -15015,7 +15037,8 @@ local function xmb_prototype_draw_app_options()
     else
         Graphics.fillRect(panel_x, 960, anchor_y - math.floor(row_height / 2), anchor_y + math.ceil(row_height / 2), Color.new(118, 211, 255, math.floor(188 * alpha)))
     end
-    for index, label in ipairs(xmb_prototype_app_options) do
+    local options = xmb_prototype_app_options_for(xmb_prototype_current_app_option_entry())
+    for index, label in ipairs(options) do
         local y = math.floor(anchor_y + (index - xmbPrototypeAppOptionsVisualSelection) * row_height - 11)
         local focus = math.max(0, 1 - math.abs(index - xmbPrototypeAppOptionsVisualSelection))
         local text_x = panel_x + 14
@@ -15360,15 +15383,16 @@ local function draw_xmb_prototype()
             Font.print(fnt22, (showing_child_axis and child_axis_x or category_anchor_x + 40), 286, "No items in this folder", Color.new(210, 222, 240, math.floor(xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeSubmenuAlpha or 1) * 180)))
         else
             local game_down_spacing = xmbPrototypeGamesMode == "entries" and 82 or 66
-            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, game_down_spacing, child_up_spacing)
+            local game_up_spacing = xmbPrototypeGamesMode == "entries" and 82 or child_up_spacing
+            local first_item, last_item = xmb_prototype_visible_vertical_range(#games_list, xmbPrototypeGamesVisualSelection, 296, game_down_spacing, game_up_spacing)
 
-            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, game_down_spacing, child_up_spacing, function(index, _, y, focus)
+            XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, game_down_spacing, game_up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
                 local icon = xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon
                 local app_icon = xmbPrototypeGamesMode == "entries" and (item.app_type == 0 or item.app_type == 1 or item.app_type_default == 0 or item.app_type_default == 1)
                 xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1), app_icon)
-            end)
+            end, xmbPrototypeGamesSelection)
         end
     elseif showing_read_only_apps then
         local apps_list = xmb_prototype_current_read_only_apps_list(display_column)
@@ -15381,13 +15405,14 @@ local function draw_xmb_prototype()
             xmbPrototypeHomebrewAppsVisualSelection = visual_selection
         end
         local apps_down_spacing = display_column == 8 and 82 or 66
-        local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, apps_down_spacing, 234)
-        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, apps_down_spacing, 234, function(index, _, y, focus)
+        local apps_up_spacing = display_column == 8 and 82 or 234
+        local first_item, last_item = xmb_prototype_visible_vertical_range(#apps_list, visual_selection, 296, apps_down_spacing, apps_up_spacing)
+        XmbRender.each_vertical(first_item, last_item, visual_selection, 296, apps_down_spacing, apps_up_spacing, function(index, _, y, focus)
             local item = apps_list[index]
             local label = xmb_prototype_read_only_item_label(item)
             local app_icon = display_column == 8
             xmb_prototype_draw_vertical_object(xmb_prototype_read_only_item_icon(display_column, item), category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha, app_icon)
-        end)
+        end, selection)
     elseif xmb_prototype_inert_columns[display_column] ~= nil then
         local inert_list = xmb_prototype_current_inert_list(display_column)
         local selection = xmbPrototypeInertSelections[display_column]
@@ -15432,7 +15457,7 @@ function xmb_prototype_move_direction(direction)
         return
     elseif xmbPrototypeAppOptionsOpen then
         if direction == -2 or direction == 2 then
-            xmbPrototypeAppOptionsSelection = XmbNavigation.move(xmbPrototypeAppOptionsSelection, direction / 2, #xmb_prototype_app_options)
+            xmbPrototypeAppOptionsSelection = XmbNavigation.move(xmbPrototypeAppOptionsSelection, direction / 2, #xmb_prototype_app_options_for(xmb_prototype_current_app_option_entry()))
         end
         return
     end

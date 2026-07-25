@@ -15,7 +15,8 @@ function XmbRender.icon(image, center_x, center_y, scale, color)
             size = {Graphics.getImageWidth(image), Graphics.getImageHeight(image)}
             XmbRender.image_sizes[image] = size
         end
-        Graphics.drawScaleImage(center_x - size[1] * scale / 2, center_y - size[2] * scale / 2, image, scale, scale, color)
+        local fitted_scale = scale * 96 / math.max(size[1], size[2])
+        Graphics.drawScaleImage(center_x - size[1] * fitted_scale / 2, center_y - size[2] * fitted_scale / 2, image, fitted_scale, fitted_scale, color)
     end
 end
 
@@ -32,12 +33,17 @@ function XmbRender.each_category(columns, visual_index, anchor_x, spacing, draw_
     end
 end
 
-function XmbRender.each_vertical(first_index, last_index, visual_index, anchor_y, down_spacing, up_spacing, draw_item)
-    -- Draw from bottom to top so an item's square artwork stays in front of
-    -- the next object below it instead of being covered by that object.
+function XmbRender.each_vertical(first_index, last_index, visual_index, anchor_y, down_spacing, up_spacing, draw_item, foreground_index)
     for index = last_index, first_index, -1 do
-        local relative = XmbLayout.relative(index, visual_index)
-        local y = XmbLayout.vertical_y(anchor_y, index, visual_index, down_spacing, up_spacing)
-        draw_item(index, relative, y, XmbLayout.focus(relative))
+        if index ~= foreground_index then
+            local relative = XmbLayout.relative(index, visual_index)
+            local y = XmbLayout.vertical_y(anchor_y, index, visual_index, down_spacing, up_spacing)
+            draw_item(index, relative, y, XmbLayout.focus(relative))
+        end
+    end
+    if foreground_index and foreground_index >= first_index and foreground_index <= last_index then
+        local relative = XmbLayout.relative(foreground_index, visual_index)
+        local y = XmbLayout.vertical_y(anchor_y, foreground_index, visual_index, down_spacing, up_spacing)
+        draw_item(foreground_index, relative, y, XmbLayout.focus(relative))
     end
 end

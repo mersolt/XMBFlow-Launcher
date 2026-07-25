@@ -101,7 +101,7 @@ $prototypeRenderer = $text.Substring($prototypeStart, $prototypeEnd - $prototype
 foreach ($forbidden in @('launch_', 'System.installVpk', 'System.reboot', 'System.copyFile', 'System.deleteFile', 'System.deleteDirectory')) {
     if ($prototypeRenderer.Contains($forbidden)) { throw "Read-only XMB renderer must not contain: $forbidden" }
 }
-if ($prototypeRenderer -notmatch 'category_rows = function\(category\)' -or $prototypeRenderer -notmatch 'return xCatLookup\(category\) or \{\}') {
+if ($prototypeRenderer -notmatch 'category_rows = function\(category\)' -or -not $text.Contains('return xmb_prototype_category_rows(category)') -or -not $text.Contains('local rows = xCatLookup(category) or {}')) {
     throw 'The XMB read-only data provider must expose category rows without a fallback scan.'
 }
 foreach ($removedPreviewFeature in @('xmb_prototype_existing_game_icon', 'xmb_prototype_games_item_detail', 'Graphics.drawScaleImage(810, 242')) {
