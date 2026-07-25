@@ -3109,6 +3109,7 @@ xmbPrototypeInformationOpen = false
 xmbPrototypeInformationAlpha = 0
 xmbPrototypeInformationEntry = nil
 xmbPrototypeInformationSize = "Not reported"
+xmbPrototypeInformationMetadata = {}
 xmbPrototypeGlowPhase = 0
 xmbPrototypeSubmenuAlpha = 0
 xmbPrototypeHeldDirection = 0
@@ -14581,6 +14582,7 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeInformationAlpha = 0
     xmbPrototypeInformationEntry = nil
     xmbPrototypeInformationSize = "Not reported"
+    xmbPrototypeInformationMetadata = {}
     xmbPrototypeDebugOpen = false
     xmbPrototypeDebugSelection = 1
     xmbPrototypeDebugStatus = ""
@@ -14972,6 +14974,85 @@ local function xmb_prototype_information_value(value, fallback)
     return fallback
 end
 
+local function xmb_prototype_sfo_u16(data, offset)
+    if offset < 1 or offset + 1 > #data then return nil end
+    local low, high = string.byte(data, offset, offset + 1)
+    return low + high * 256
+end
+
+local function xmb_prototype_sfo_u32(data, offset)
+    if offset < 1 or offset + 3 > #data then return nil end
+    local b1, b2, b3, b4 = string.byte(data, offset, offset + 3)
+    return b1 + b2 * 256 + b3 * 65536 + b4 * 16777216
+end
+
+-- Read only the SFO fields needed by the Information card. LPP's built-in
+-- extractor intentionally exposes a small subset, while PARENTAL_LEVEL and
+-- PSP2_SYSTEM_VER are useful Vita metadata that remain in the same local SFO.
+local function xmb_prototype_read_sfo_metadata(path)
+    if type(path) ~= "string" then return {} end
+    local ok, data = pcall(readAll, path)
+    if not ok or type(data) ~= "string" or #data < 20 or string.sub(data, 1, 4) ~= "\0PSF" then
+        return {}
+    end
+    local key_table = xmb_prototype_sfo_u32(data, 9)
+    local value_table = xmb_prototype_sfo_u32(data, 13)
+    local count = xmb_prototype_sfo_u32(data, 17)
+    if not key_table or not value_table or not count or count > 128 then return {} end
+
+    local wanted = {APP_VER = true, CATEGORY = true, PARENTAL_LEVEL = true, PSP2_SYSTEM_VER = true}
+    local values = {}
+    for index = 0, count - 1 do
+        local entry = 21 + index * 16
+        local key_offset = xmb_prototype_sfo_u16(data, entry)
+        local value_length = xmb_prototype_sfo_u32(data, entry + 4)
+        local value_offset = xmb_prototype_sfo_u32(data, entry + 12)
+        if key_offset and value_length and value_offset and value_length <= 256 then
+            local key_start = key_table + key_offset + 1
+            local key_end = string.find(data, "\0", key_start, true)
+            local key = key_end and string.sub(data, key_start, key_end - 1) or nil
+            if key and wanted[key] then
+                local value_start = value_table + value_offset + 1
+                if key == "PARENTAL_LEVEL" then
+                    values[key] = xmb_prototype_sfo_u32(data, value_start)
+                else
+                    local raw = string.sub(data, value_start, value_start + value_length - 1)
+                    values[key] = (raw:gsub("\0.*", ""))
+                end
+            end
+        end
+    end
+    return values
+end
+
+local function xmb_prototype_information_metadata(entry)
+    local paths = {}
+    if entry and type(entry.game_path) == "string" then
+        table.insert(paths, entry.game_path .. "/sce_sys/param.sfo")
+    end
+    local titleid = entry and (entry.titleid or entry.name)
+    if type(titleid) == "string" and string.len(titleid) == 9 then
+        table.insert(paths, "ux0:/app/" .. titleid .. "/sce_sys/param.sfo")
+        table.insert(paths, "vs0:/app/" .. titleid .. "/sce_sys/param.sfo")
+    end
+    for _, path in ipairs(paths) do
+        local metadata = xmb_prototype_read_sfo_metadata(path)
+        if next(metadata) ~= nil then return metadata end
+    end
+    return {}
+end
+
+local function xmb_prototype_information_category(value)
+    local labels = {gd = "Game", gp = "Game patch", mg = "Application", gda = "Application"}
+    if type(value) ~= "string" or value == "" then return "Not reported" end
+    return labels[string.lower(value)] or value
+end
+
+local function xmb_prototype_information_parental_level(value)
+    if type(value) ~= "number" then return "Not reported" end
+    return "Level " .. tostring(value)
+end
+
 local function xmb_prototype_draw_information_card()
     local target = xmbPrototypeInformationOpen and 1 or 0
     xmbPrototypeInformationAlpha = xmbPrototypeInformationAlpha + (target - xmbPrototypeInformationAlpha) * 0.16
@@ -14982,7 +15063,8 @@ local function xmb_prototype_draw_information_card()
     local source = entry
     local title = entry.label or xmb_prototype_read_only_item_label(source)
     local title_id = xmb_prototype_information_value(source.titleid or source.name or entry.system_app, "Unavailable")
-    local version = xmb_prototype_information_value(source.version, "Not reported")
+    local metadata = xmbPrototypeInformationMetadata or {}
+    local version = xmb_prototype_information_value(metadata.APP_VER or source.version, "Not reported")
     local category = xmb_prototype_columns[xmbPrototypeColumn] or "Apps"
     local kind = xmb_prototype_information_type(entry, source)
     local text_alpha = math.floor(255 * alpha)
@@ -14993,17 +15075,22 @@ local function xmb_prototype_draw_information_card()
     Graphics.fillRect(0, 960, 90, 92, Color.new(218, 232, 255, math.floor(145 * alpha)))
     Graphics.fillRect(0, 960, 456, 458, Color.new(218, 232, 255, math.floor(145 * alpha)))
     Font.print(fnt20, 56, 58, "Information", Color.new(235, 245, 255, text_alpha))
-    Font.print(fnt22, 166, 184, title, Color.new(255, 255, 255, text_alpha))
-    Font.print(fnt20, 166, 242, "Title ID", Color.new(178, 202, 235, text_alpha))
-    Font.print(fnt20, 330, 242, title_id, Color.new(242, 247, 255, text_alpha))
-    Font.print(fnt20, 166, 282, "Category", Color.new(178, 202, 235, text_alpha))
-    Font.print(fnt20, 330, 282, category, Color.new(242, 247, 255, text_alpha))
-    Font.print(fnt20, 166, 322, "Type", Color.new(178, 202, 235, text_alpha))
-    Font.print(fnt20, 330, 322, kind, Color.new(242, 247, 255, text_alpha))
-    Font.print(fnt20, 166, 362, "Version", Color.new(178, 202, 235, text_alpha))
-    Font.print(fnt20, 330, 362, version, Color.new(242, 247, 255, text_alpha))
-    Font.print(fnt20, 166, 402, "Size", Color.new(178, 202, 235, text_alpha))
-    Font.print(fnt20, 330, 402, xmbPrototypeInformationSize, Color.new(242, 247, 255, text_alpha))
+    Font.print(fnt22, 166, 154, title, Color.new(255, 255, 255, text_alpha))
+    local fields = {
+        {"Title ID", title_id},
+        {"Category", category},
+        {"Type", kind},
+        {"Version", version},
+        {"Size", xmbPrototypeInformationSize},
+        {"Parental level", xmb_prototype_information_parental_level(metadata.PARENTAL_LEVEL)},
+        {"Content category", xmb_prototype_information_category(metadata.CATEGORY)},
+        {"Required firmware", xmb_prototype_information_value(metadata.PSP2_SYSTEM_VER, "Not reported")}
+    }
+    for index, field in ipairs(fields) do
+        local y = 204 + (index - 1) * 31
+        Font.print(fnt20, 166, y, field[1], Color.new(178, 202, 235, text_alpha))
+        Font.print(fnt20, 396, y, field[2], Color.new(242, 247, 255, text_alpha))
+    end
     Font.print(fnt20, 454, 488, "O  Back", Color.new(235, 245, 255, text_alpha))
 end
 
@@ -22880,6 +22967,7 @@ while true do
                     xmbPrototypeInformationEntry = xmb_prototype_information_entry(xmb_prototype_current_app_option_entry())
                     xmbPrototypeInformationOpen = xmbPrototypeInformationEntry ~= nil
                     xmbPrototypeInformationSize = xmb_prototype_information_size(xmbPrototypeInformationEntry)
+                    xmbPrototypeInformationMetadata = xmb_prototype_information_metadata(xmbPrototypeInformationEntry)
                     xmbPrototypeAppOptionsOpen = false
                     if setSounds == 1 and xmbNavigationClick then
                         Sound.play(xmbNavigationClick, NO_LOOP)
