@@ -15621,8 +15621,6 @@ function xmb_prototype_move_direction(direction)
     elseif xmb_prototype_inert_has_parent(xmbPrototypeColumn) and direction == 1 then
         xmb_prototype_open_inert_selection(xmbPrototypeColumn)
         return
-    elseif xmb_prototype_inert_columns[xmbPrototypeColumn] ~= nil and direction == 1 and xmb_prototype_open_inert_selection(xmbPrototypeColumn) then
-        return
     elseif direction == -1 then
         xmb_prototype_move_column(-1)
     elseif direction == 1 then
