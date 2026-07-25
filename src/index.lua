@@ -14769,7 +14769,7 @@ local function xmb_prototype_read_only_item_label(item)
     return item.apptitle or item.title or item.name or "Untitled"
 end
 
-local xmb_prototype_app_options = {"Information", "Change category"}
+local xmb_prototype_app_options = {"Information", "Change category", "Delete"}
 
 local function xmb_prototype_current_selected_entry()
     if xmbPrototypeColumn == 5 then
@@ -14832,6 +14832,7 @@ local function xmb_prototype_information_directory_size(dir)
         end
     end
     visit(dir)
+    if total <= 0 then return nil end
     return formatSize(total)
 end
 
@@ -14842,7 +14843,10 @@ local function xmb_prototype_information_size(entry)
     if type(entry.path) == "string" then table.insert(paths, entry.path) end
     for _, path in ipairs(paths) do
         if type(path) == "string" and path ~= "" then
-            if System.doesDirExist(path) then return xmb_prototype_information_directory_size(path) end
+            if System.doesDirExist(path) then
+                local size = xmb_prototype_information_directory_size(path)
+                if size then return size end
+            end
             if System.doesFileExist(path) then
                 local file = System.openFile(path, FREAD)
                 if file then
@@ -14860,10 +14864,11 @@ local function xmb_prototype_information_size(entry)
     if type(entry.titleid) == "string" then table.insert(titleids, entry.titleid) end
     for _, titleid in ipairs(titleids) do
         if type(titleid) == "string" and string.len(titleid) == 9 then
-            return xmb_prototype_information_directory_size("ux0:/app/" .. titleid)
+            local size = xmb_prototype_information_directory_size("ux0:/app/" .. titleid)
+            if size then return size end
         end
     end
-    return "Not reported"
+    return "Unavailable"
 end
 
 local function xmb_prototype_information_type(entry, source)
@@ -15152,7 +15157,10 @@ function xmb_prototype_draw_status()
     local hour, minute = System.getTime()
     local _, day, month, year = System.getDate()
     local battery = System.getBatteryPercentage()
-    Font.print(fnt20, 696, 34, string.format("%02d/%02d  %02d:%02d", day, month, hour, minute), white)
+    Font.print(fnt20, 680, 34, string.format("%02d/%02d  %02d:%02d", day, month, hour, minute), white)
+    if Network.isWifiEnabled() then
+        Graphics.drawScaleImage(806, 35, imgWifi, 1, 1, white)
+    end
     Font.print(fnt20, 840, 34, battery .. "%", white)
     if System.isBatteryCharging() then
         Graphics.drawImage(888, 39, imgBatteryCharging)
