@@ -3109,6 +3109,9 @@ xmbPrototypeInertVisualSelections = {[1] = 1, [2] = 1, [3] = 1, [4] = 1, [6] = 1
 xmbPrototypeInertNavigation = {}
 xmbPrototypeMotionRate = 0.12
 xmbPrototypeTheme = "Blue"
+xmbPrototypeWavesEnabled = true
+xmbPrototypeCategoryRowsCache = {}
+xmbPrototypeReadOnlyData = nil
 xmbPrototypeThemeColors = {
     ["Blue"] = {background = {6, 16, 44}, wave1 = {44, 104, 185}, wave2 = {25, 70, 145}, wave3 = {15, 48, 112}, panel = {18, 42, 86}, highlight = {118, 211, 255}},
     ["Crimson"] = {background = {48, 7, 18}, wave1 = {205, 54, 83}, wave2 = {144, 28, 55}, wave3 = {94, 18, 41}, panel = {90, 22, 39}, highlight = {255, 126, 151}},
@@ -14406,6 +14409,10 @@ xmb_prototype_inert_columns = {
                 {label = "Violet", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Violet"},
                 {label = "Amber", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Amber"},
                 {label = "Slate", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "theme", theme = "Slate"}
+            }},
+            {label = "Waves", icon_path = "app0:/DATA/xmb-setting-theme.png", children = {
+                {label = "On", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "waves", waves = true},
+                {label = "Off", icon_path = "app0:/DATA/xmb-setting-theme.png", action = "waves", waves = false}
             }}
         }},
         {label = "Parental Controls", icon_path = "app0:/DATA/xmb-setting-parental-controls.png", system_app = "NPXS10094"},
@@ -14495,6 +14502,7 @@ end
 function xmb_prototype_category_rows(category)
     local rows = xCatLookup(category) or {}
     if category ~= 1 then return rows end
+    if xmbPrototypeCategoryRowsCache[category] then return xmbPrototypeCategoryRowsCache[category] end
     local games = {}
     for index, item in ipairs(rows) do
         if item.app_type == 1 or item.app_type_default == 1 or string.match(item.titleid or item.name or "", "^PCS") then
@@ -14504,18 +14512,22 @@ function xmb_prototype_category_rows(category)
             table.insert(games, copy)
         end
     end
+    xmbPrototypeCategoryRowsCache[category] = games
     return games
 end
 
 local function xmb_prototype_read_only_data()
-    return XmbReadOnlyData.create({
-        folders = xmb_prototype_games_folders,
-        retro_systems = xmb_prototype_retro_systems,
-        collections = collection_files or {},
-        category_rows = function(category)
-            return xmb_prototype_category_rows(category)
-        end
-    })
+    if xmbPrototypeReadOnlyData == nil then
+        xmbPrototypeReadOnlyData = XmbReadOnlyData.create({
+            folders = xmb_prototype_games_folders,
+            retro_systems = xmb_prototype_retro_systems,
+            collections = collection_files or {},
+            category_rows = function(category)
+                return xmb_prototype_category_rows(category)
+            end
+        })
+    end
+    return xmbPrototypeReadOnlyData
 end
 
 local function xmb_prototype_combined_collections()
@@ -15119,7 +15131,11 @@ local function xmb_prototype_draw_app_options()
     if xmbPrototypeAppOptionsPanel and xmbPrototypeTheme == "Blue" then
         Graphics.drawScaleImage(panel_x, 0, xmbPrototypeAppOptionsPanel, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
     else
-        Graphics.fillRect(panel_x, 960, 0, 544, Color.new(theme.panel[1], theme.panel[2], theme.panel[3], math.floor(224 * alpha)))
+        for step = 0, 15 do
+            local left = panel_x + math.floor(step * (960 - panel_x) / 16)
+            local right = panel_x + math.floor((step + 1) * (960 - panel_x) / 16)
+            Graphics.fillRect(left, right, 0, 544, Color.new(theme.panel[1], theme.panel[2], theme.panel[3], math.floor((228 - step * 11) * alpha)))
+        end
     end
     if xmbPrototypeAppOptionsHighlight == nil then
         local ok, texture = pcall(Graphics.loadImage, "app0:/DATA/xmb-app-options-highlight.png")
@@ -15131,7 +15147,13 @@ local function xmb_prototype_draw_app_options()
     if xmbPrototypeAppOptionsHighlight and xmbPrototypeTheme == "Blue" then
         Graphics.drawScaleImage(panel_x, anchor_y - math.floor(row_height / 2), xmbPrototypeAppOptionsHighlight, 1, 1, Color.new(255, 255, 255, math.floor(255 * alpha)))
     else
-        Graphics.fillRect(panel_x, 960, anchor_y - math.floor(row_height / 2), anchor_y + math.ceil(row_height / 2), Color.new(theme.highlight[1], theme.highlight[2], theme.highlight[3], math.floor(188 * alpha)))
+        for step = 0, 15 do
+            local left = panel_x + math.floor(step * (960 - panel_x) / 16)
+            local right = panel_x + math.floor((step + 1) * (960 - panel_x) / 16)
+            Graphics.fillRect(left, right, anchor_y - math.floor(row_height / 2), anchor_y + math.ceil(row_height / 2), Color.new(theme.highlight[1], theme.highlight[2], theme.highlight[3], math.floor((212 - step * 13) * alpha)))
+        end
+        Graphics.fillRect(panel_x, 960, anchor_y - math.floor(row_height / 2), anchor_y - math.floor(row_height / 2) + 1, Color.new(255, 255, 255, math.floor(132 * alpha)))
+        Graphics.fillRect(panel_x, 960, anchor_y + math.ceil(row_height / 2) - 1, anchor_y + math.ceil(row_height / 2), Color.new(255, 255, 255, math.floor(96 * alpha)))
     end
     local options = xmb_prototype_app_options_for(xmb_prototype_current_app_option_entry())
     for index, label in ipairs(options) do
@@ -15247,6 +15269,7 @@ local function xmb_prototype_draw_information_card()
     local category = xmb_prototype_columns[xmbPrototypeColumn] or "Apps"
     local kind = xmb_prototype_information_type(entry, source)
     local text_alpha = math.floor(255 * alpha)
+    local theme = xmbPrototypeThemeColors[xmbPrototypeTheme] or xmbPrototypeThemeColors["Blue"]
 
     -- The card is presentation-only. It reads the already selected RetroFlow
     -- record and does not scan, cache, write, or invoke legacy menus.
@@ -15267,7 +15290,7 @@ local function xmb_prototype_draw_information_card()
     }
     for index, field in ipairs(fields) do
         local y = 204 + (index - 1) * 31
-        Font.print(fnt20, 166, y, field[1], Color.new(178, 202, 235, text_alpha))
+        Font.print(fnt20, 166, y, field[1], Color.new(theme.highlight[1], theme.highlight[2], theme.highlight[3], text_alpha))
         Font.print(fnt20, 396, y, field[2], Color.new(242, 247, 255, text_alpha))
     end
     Font.print(fnt20, 454, 488, "O  Back", Color.new(235, 245, 255, text_alpha))
@@ -15386,6 +15409,8 @@ local function xmb_prototype_rescan_private_library()
 
     games_table, homebrews_table, sysapps_table = scanned_games, scanned_homebrews, scanned_sysapps
     xmbPrototypeAllGames = nil
+    xmbPrototypeCategoryRowsCache = {}
+    xmbPrototypeReadOnlyData = nil
     table.sort(games_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
     table.sort(homebrews_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
     table.sort(sysapps_table, function(a, b) return a.apptitle:lower() < b.apptitle:lower() end)
@@ -15450,9 +15475,11 @@ local function draw_xmb_prototype()
     -- Sony-derived art or extracted theme data.
     local theme = xmbPrototypeThemeColors[xmbPrototypeTheme] or xmbPrototypeThemeColors["Blue"]
     Graphics.fillRect(0, 960, 0, 544, Color.new(theme.background[1], theme.background[2], theme.background[3], 255))
-    xmb_prototype_draw_wave(346, xmbPrototypeGlowPhase / 38, Color.new(theme.wave1[1], theme.wave1[2], theme.wave1[3], 115))
-    xmb_prototype_draw_wave(390, xmbPrototypeGlowPhase / 48 + 1.6, Color.new(theme.wave2[1], theme.wave2[2], theme.wave2[3], 80))
-    xmb_prototype_draw_wave(438, xmbPrototypeGlowPhase / 58 + 3.1, Color.new(theme.wave3[1], theme.wave3[2], theme.wave3[3], 65))
+    if xmbPrototypeWavesEnabled then
+        xmb_prototype_draw_wave(346, xmbPrototypeGlowPhase / 38, Color.new(theme.wave1[1], theme.wave1[2], theme.wave1[3], 115))
+        xmb_prototype_draw_wave(390, xmbPrototypeGlowPhase / 48 + 1.6, Color.new(theme.wave2[1], theme.wave2[2], theme.wave2[3], 80))
+        xmb_prototype_draw_wave(438, xmbPrototypeGlowPhase / 58 + 3.1, Color.new(theme.wave3[1], theme.wave3[2], theme.wave3[3], 65))
+    end
 
     -- The active category remains fixed while the complete horizontal axis
     -- moves behind it. This state is presentation-only; it never changes
@@ -15669,6 +15696,10 @@ function xmb_prototype_activate_inert_selection(column)
     if xmb_prototype_open_inert_selection(column) then return true end
     if entry and entry.action == "theme" and xmbPrototypeThemeColors[entry.theme] then
         xmbPrototypeTheme = entry.theme
+        return true
+    end
+    if entry and entry.action == "waves" then
+        xmbPrototypeWavesEnabled = entry.waves == true
         return true
     end
     local system_app = entry and entry.system_app
