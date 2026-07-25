@@ -14386,14 +14386,14 @@ xmb_prototype_inert_columns = {
         {label = "Panoramic Camera", icon_path = "app0:/DATA/xmb-object-panorama.png"}
     },
     [3] = {
-        {label = "Music", icon_path = "app0:/DATA/xmb-system-music.png", system_app_label = "music"},
+        {label = "Music", icon_path = "app0:/DATA/xmb-system-music.png", system_app = "NPXS10009"},
         {label = "Music Library", icon_path = "app0:/DATA/xmb-icon-music.png"},
         {label = "Now Playing", icon_path = "app0:/DATA/xmb-icon-music.png"},
         {label = "Internet Radio", icon_path = "app0:/DATA/xmb-icon-music.png"}
     },
     [4] = {
         {label = "Video Library", icon_path = "app0:/DATA/xmb-icon-video.png"},
-        {label = "Videos", icon_path = "app0:/DATA/xmb-system-video.png", system_app_label = "videos"},
+        {label = "Videos", icon_path = "app0:/DATA/xmb-system-video.png", system_app = "NPXS10010"},
         {label = "Video Settings", icon_path = "app0:/DATA/xmb-icon-video.png"}
     },
     [6] = {
@@ -15010,6 +15010,7 @@ end
 local function xmb_prototype_rescan_private_library()
     local scan_result = {}
     local scanned_games, scanned_homebrews, scanned_sysapps = {}, {}, {}
+    local scanned_titleids = {}
 
     local function make_scanned_entry(titleid, title, game_path, app_type, system_index, version)
         local system = SystemsToScan[system_index]
@@ -15028,6 +15029,13 @@ local function xmb_prototype_rescan_private_library()
         }
     end
 
+    local function add_scanned_entry(entry, destination)
+        if scanned_titleids[entry.titleid] then return end
+        scanned_titleids[entry.titleid] = true
+        table.insert(destination, entry)
+        table.insert(scan_result, entry)
+    end
+
     for _, app in ipairs(quickScanVita()) do
         local ok, info = pcall(System.extractSfo, app.path .. "/sce_sys/param.sfo")
         if ok and info then
@@ -15040,10 +15048,9 @@ local function xmb_prototype_rescan_private_library()
                 app_type, system_index = 1, 1
             end
             local entry = make_scanned_entry(titleid, title, app.path, app_type, system_index, info.version)
-            if app_type == 42 then table.insert(scanned_sysapps, entry)
-            elseif app_type == 1 then table.insert(scanned_games, entry)
-            else table.insert(scanned_homebrews, entry) end
-            table.insert(scan_result, entry)
+            if app_type == 42 then add_scanned_entry(entry, scanned_sysapps)
+            elseif app_type == 1 then add_scanned_entry(entry, scanned_games)
+            else add_scanned_entry(entry, scanned_homebrews) end
         end
     end
     -- Some Lua Player Plus builds do not enumerate ux0:/app for a separately
@@ -15073,14 +15080,37 @@ local function xmb_prototype_rescan_private_library()
                 end
                 local entry = make_scanned_entry(titleid, title, "ux0:/app/" .. titleid, app_type, system_index)
                 if app_type == 42 then
-                    table.insert(scanned_sysapps, entry)
+                    add_scanned_entry(entry, scanned_sysapps)
                 elseif app_type == 1 then
-                    table.insert(scanned_games, entry)
+                    add_scanned_entry(entry, scanned_games)
                 else
-                    table.insert(scanned_homebrews, entry)
+                    add_scanned_entry(entry, scanned_homebrews)
                 end
-                table.insert(scan_result, entry)
             end
+        end
+    end
+
+    -- Built-in applications are stored under vs0 rather than ux0, and are
+    -- absent from app.db on some Vita firmwares. Discover the same bounded
+    -- set RetroFlow supports, but read their SFOs directly and keep the
+    -- result exclusively in XMBFlow's private cache.
+    local system_titleids = {
+        "NPXS10000", "NPXS10001", "NPXS10002", "NPXS10003", "NPXS10004",
+        "NPXS10006", "NPXS10008", "NPXS10009", "NPXS10010", "NPXS10012",
+        "NPXS10013", "NPXS10014", "NPXS10015", "NPXS10026", "NPXS10072",
+        "NPXS10078", "NPXS10091", "NPXS10094", "NPXS10098"
+    }
+    for _, titleid in ipairs(system_titleids) do
+        local app_path = "vs0:/app/" .. titleid
+        if System.doesDirExist(app_path) then
+            local title = titleid
+            local version = ""
+            local ok, info = pcall(System.extractSfo, app_path .. "/sce_sys/param.sfo")
+            if ok and type(info) == "table" then
+                title = info.short_title or info.title or title
+                version = info.version or version
+            end
+            add_scanned_entry(make_scanned_entry(titleid, title, app_path, 42, 42, version), scanned_sysapps)
         end
     end
     if #scan_result == 0 then
