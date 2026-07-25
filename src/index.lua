@@ -11184,6 +11184,7 @@ end
 local function xmb_prototype_load_private_cache()
     for _, system in pairs(SystemsToScan) do
         if system.user_db_file and system.table then
+            _G[system.table] = {}
             local cache_path = db_Cache_Folder .. system.user_db_file
             if System.doesFileExist(cache_path) then
                 local entries = safe_dofile(cache_path)
