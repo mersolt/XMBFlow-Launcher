@@ -4,7 +4,7 @@ $text = Get-Content -Raw $Source
 $required = @(
     'xmbSafeProfile = rawget(_G, "XMBFLOW_SAFE_PROFILE") == true',
     'xmbPrototypeEnabled = xmbSafeProfile',
-    '{label = "PLAYSTATION MOBILE", category = 39}',
+    '{label = "PlayStation Mobile", category = 39}',
     '"Settings", "Photo", "Music", "Video", "Games", "Network", "System Apps", "Homebrew"',
     'xmb_prototype_system_apps_category = 46',
     'xmb_prototype_homebrew_apps_category = 2',
@@ -30,6 +30,12 @@ $required = @(
     'Controls.readLeftAnalog()',
     'function xmb_prototype_move_direction(direction)',
     'xmbPrototypeGamesGrandparentList = nil',
+    'xmb_prototype_library_folders = {',
+    'local function xmb_prototype_combined_collections()',
+    '{label = "Memory Stick", kind = "library"}',
+    '{label = "Collections", kind = "collections"}',
+    '{label = "Retro Systems", kind = "retro"}',
+    '{label = "All Games", category = 0}',
     'xmbPrototypeGamesParentStartOffset = 0',
     'xmbPrototypeChildAxisAlpha = xmbPrototypeChildAxisAlpha +',
     'xmbPrototypeReturningToNestedParent = true',
@@ -149,5 +155,8 @@ foreach ($legacyListSelection in @('Graphics.fillRect(list_x - 20', 'Graphics.fi
     if ($prototypeRenderer.Contains($legacyListSelection)) { throw "The XMB renderer must not retain the left-aligned list selection: $legacyListSelection" }
 }
 if ($text.Contains('draw_xmb_prototype_placeholder_column') -or $text.Contains('xmb_prototype_placeholder_columns')) { throw 'Prototype must not render obsolete category cards.' }
+foreach ($obsoleteGamesLabel in @('"USER COLLECTIONS"', '"COLLECTIONS", kind = "categories"', '"RETRO SYSTEMS", kind = "retro"')) {
+    if ($text.Contains($obsoleteGamesLabel)) { throw "Games root must not retain obsolete folder: $obsoleteGamesLabel" }
+}
 
 Write-Host 'XMB prototype structural checks passed.'

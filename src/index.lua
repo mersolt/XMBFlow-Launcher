@@ -3078,7 +3078,7 @@ xmbPrototypeChildAxisOffset = 160
 xmbPrototypeChildAxisAlpha = 0
 xmbPrototypeReturningToNestedParent = false
 xmbPrototypeReturnAxisAlpha = 1
-xmbPrototypeGamesTitle = "GAMES"
+xmbPrototypeGamesTitle = "Games"
 xmbPrototypeSystemAppsSelection = 1
 xmbPrototypeHomebrewAppsSelection = 1
 xmbPrototypeSystemAppsVisualSelection = 1
@@ -14372,23 +14372,24 @@ xmb_prototype_inert_columns = {
 -- These folder records are read-only pointers to existing RetroFlow data.
 -- They do not create a second library or save any new configuration.
 xmb_prototype_games_folders = {
-    {label = "Memory Stick"},
+    {label = "Memory Stick", kind = "library"},
     {label = "Saved Data Utility", xmb_icon_path = "app0:/DATA/xmb-object-saved-data.png"},
     {label = "Game Settings"},
-    {label = "COLLECTIONS", kind = "categories"},
-    {label = "RETRO SYSTEMS", kind = "retro"},
-    {label = "USER COLLECTIONS", kind = "collections"},
     {label = "Trophies", system_app = "NPXS10008", xmb_icon_path = "app0:/DATA/xmb-system-trophy.png"}
 }
+xmb_prototype_library_folders = {
+    {label = "Collections", kind = "collections"},
+    {label = "Retro Systems", kind = "retro"}
+}
 xmb_prototype_library_categories = {
-    {label = "ALL GAMES", category = 0},
-    {label = "PS VITA", category = 1},
-    {label = "HOMEBREW", category = 2},
+    {label = "All Games", category = 0},
+    {label = "PS Vita", category = 1},
+    {label = "Homebrew", category = 2},
     {label = "PSP", category = 3},
-    {label = "PLAYSTATION", category = 4},
-    {label = "PLAYSTATION MOBILE", category = 39},
-    {label = "FAVOURITES", category = 47},
-    {label = "RECENTLY PLAYED", category = 48}
+    {label = "PlayStation", category = 4},
+    {label = "PlayStation Mobile", category = 39},
+    {label = "Favourites", category = 47},
+    {label = "Recently Played", category = 48}
 }
 
 -- System and Homebrew Apps reuse RetroFlow's cached category rows.  They do
@@ -14428,6 +14429,20 @@ local function xmb_prototype_read_only_data()
             return xCatLookup(category) or {}
         end
     })
+end
+
+local function xmb_prototype_combined_collections()
+    local entries = {}
+    for _, category in ipairs(xmb_prototype_library_categories) do
+        table.insert(entries, {label = category.label, category = category.category})
+    end
+    for index, collection in ipairs(collection_files or {}) do
+        table.insert(entries, {
+            label = collection.display_name or collection.table_name or "Collection",
+            category = 49 + index
+        })
+    end
+    return entries
 end
 
 local function xmb_prototype_active_column()
@@ -14518,7 +14533,7 @@ local function xmb_prototype_reset_navigation()
     xmbPrototypeChildAxisAlpha = 0
     xmbPrototypeReturningToNestedParent = false
     xmbPrototypeReturnAxisAlpha = 1
-    xmbPrototypeGamesTitle = "GAMES"
+    xmbPrototypeGamesTitle = "Games"
     xmbPrototypeSystemAppsSelection = 1
     xmbPrototypeHomebrewAppsSelection = 1
     xmbPrototypeSystemAppsVisualSelection = 1
@@ -14543,12 +14558,12 @@ local function xmb_prototype_current_games_list()
     local data = xmb_prototype_read_only_data()
     if xmbPrototypeGamesMode == "folders" then
         return data.folders
-    elseif xmbPrototypeGamesMode == "categories" then
-        return xmb_prototype_library_categories
+    elseif xmbPrototypeGamesMode == "library" then
+        return xmb_prototype_library_folders
     elseif xmbPrototypeGamesMode == "retro_systems" then
         return data.retro_systems
     elseif xmbPrototypeGamesMode == "collections" then
-        return data.collections
+        return xmb_prototype_combined_collections()
     elseif xmbPrototypeGamesMode == "entries" then
         return data.category_rows(xmbPrototypeGamesCategory)
     end
@@ -14660,17 +14675,17 @@ local function xmb_prototype_open_games_selection()
     end
 
     if xmbPrototypeGamesMode == "folders" then
-        if selected.kind == "categories" then
-            xmb_prototype_open_games_submenu("categories", "COLLECTIONS")
-        elseif selected.kind == "retro" then
-            xmb_prototype_open_games_submenu("retro_systems", "RETRO SYSTEMS")
-        elseif selected.kind == "collections" then
-            xmb_prototype_open_games_submenu("collections", "COLLECTIONS")
+        if selected.kind == "library" then
+            xmb_prototype_open_games_submenu("library", "Memory Stick")
         end
-    elseif xmbPrototypeGamesMode == "categories" or xmbPrototypeGamesMode == "retro_systems" then
+    elseif xmbPrototypeGamesMode == "library" then
+        if selected.kind == "collections" then
+            xmb_prototype_open_games_submenu("collections", "Collections")
+        elseif selected.kind == "retro" then
+            xmb_prototype_open_games_submenu("retro_systems", "Retro Systems")
+        end
+    elseif xmbPrototypeGamesMode == "collections" or xmbPrototypeGamesMode == "retro_systems" then
         xmb_prototype_open_entries(selected.category, selected.label)
-    elseif xmbPrototypeGamesMode == "collections" then
-        xmb_prototype_open_entries(49 + xmbPrototypeGamesSelection, selected.display_name or selected.table_name or "COLLECTION")
     end
 end
 
@@ -14696,15 +14711,17 @@ local function xmb_prototype_go_back()
         end
 
         if xmbPrototypeGamesMode == "folders" then
-            xmbPrototypeGamesTitle = "GAMES"
+            xmbPrototypeGamesTitle = "Games"
         elseif xmbPrototypeGamesMode == "retro_systems" then
-            xmbPrototypeGamesTitle = "RETRO SYSTEMS"
+            xmbPrototypeGamesTitle = "Retro Systems"
+        elseif xmbPrototypeGamesMode == "library" then
+            xmbPrototypeGamesTitle = "Memory Stick"
         else
-            xmbPrototypeGamesTitle = "COLLECTIONS"
+            xmbPrototypeGamesTitle = "Collections"
         end
-    elseif xmbPrototypeGamesMode == "categories" or xmbPrototypeGamesMode == "retro_systems" or xmbPrototypeGamesMode == "collections" then
+    elseif xmbPrototypeGamesMode == "library" or xmbPrototypeGamesMode == "retro_systems" or xmbPrototypeGamesMode == "collections" then
         xmbPrototypeGamesMode = "folders"
-        xmbPrototypeGamesTitle = "GAMES"
+        xmbPrototypeGamesTitle = "Games"
         xmbPrototypeGamesSelection = 1
         xmbPrototypeGamesVisualSelection = 1
         xmbPrototypeGamesParentStartOffset = 0
@@ -14738,7 +14755,7 @@ local function xmb_prototype_games_item_label(item)
     if xmbPrototypeGamesMode == "entries" then
         return item.apptitle or item.title or item.name or item.label or item.display_name or "Untitled"
     elseif xmbPrototypeGamesMode == "collections" then
-        return item.display_name or item.table_name or "Collection"
+        return item.label or item.display_name or item.table_name or "Collection"
     end
 
     return item.label or "Untitled"
