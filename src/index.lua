@@ -15010,17 +15010,39 @@ end
 local function xmb_prototype_rescan_private_library()
     local scan_result = {}
     local scanned_games, scanned_homebrews, scanned_sysapps = {}, {}, {}
+
+    local function make_scanned_entry(titleid, title, game_path, app_type, system_index, version)
+        local system = SystemsToScan[system_index]
+        return {
+            name = titleid, filename = titleid, titleid = titleid,
+            title = title, apptitle = title, version = version or "",
+            game_path = game_path, app_type = app_type, app_type_default = app_type,
+            -- Legacy helpers can still ask an XMB-selected entry for artwork
+            -- paths. Keep those fields complete even though the XMB renderer
+            -- deliberately does not draw RetroFlow cover previews.
+            cover_path_local = system.localCoverPath or "",
+            cover_path_online = system.onlineCoverPathSystem or "",
+            snap_path_local = system.localSnapPath or "",
+            snap_path_online = system.onlineSnapPathSystem or "",
+            icon_path = "app0:/DATA/" .. (system.Missing_Cover or "noimg.png")
+        }
+    end
+
     for _, app in ipairs(quickScanVita()) do
         local ok, info = pcall(System.extractSfo, app.path .. "/sce_sys/param.sfo")
         if ok and info then
             local title = info.short_title or info.title or app.name
-            local entry = {
-                name = app.name, filename = app.name, titleid = info.titleid or app.name,
-                title = title, apptitle = title, version = info.version or "",
-                game_path = app.path, app_type = string.match(app.name, "^PCS") and 1 or 0,
-                app_type_default = string.match(app.name, "^PCS") and 1 or 0
-            }
-            if entry.app_type == 1 then table.insert(scanned_games, entry) else table.insert(scanned_homebrews, entry) end
+            local titleid = info.titleid or app.name
+            local app_type, system_index = 0, 2
+            if string.match(titleid, "^NPXS") then
+                app_type, system_index = 42, 42
+            elseif string.match(titleid, "^PCS") then
+                app_type, system_index = 1, 1
+            end
+            local entry = make_scanned_entry(titleid, title, app.path, app_type, system_index, info.version)
+            if app_type == 42 then table.insert(scanned_sysapps, entry)
+            elseif app_type == 1 then table.insert(scanned_games, entry)
+            else table.insert(scanned_homebrews, entry) end
             table.insert(scan_result, entry)
         end
     end
@@ -15043,17 +15065,16 @@ local function xmb_prototype_rescan_private_library()
             local titleid = row.titleId or row.titleid
             if type(titleid) == "string" and string.len(titleid) == 9 and not string.match(titleid, "^XMBF") then
                 local title = row.title or titleid
-                local entry = {
-                    name = titleid, filename = titleid, titleid = titleid,
-                    title = title, apptitle = title, version = "",
-                    game_path = "ux0:/app/" .. titleid,
-                    app_type = string.match(titleid, "^PCS") and 1 or 0,
-                    app_type_default = string.match(titleid, "^PCS") and 1 or 0
-                }
+                local app_type, system_index = 0, 2
                 if string.match(titleid, "^NPXS") then
-                    entry.app_type, entry.app_type_default = 42, 42
+                    app_type, system_index = 42, 42
+                elseif string.match(titleid, "^PCS") then
+                    app_type, system_index = 1, 1
+                end
+                local entry = make_scanned_entry(titleid, title, "ux0:/app/" .. titleid, app_type, system_index)
+                if app_type == 42 then
                     table.insert(scanned_sysapps, entry)
-                elseif entry.app_type == 1 then
+                elseif app_type == 1 then
                     table.insert(scanned_games, entry)
                 else
                     table.insert(scanned_homebrews, entry)
