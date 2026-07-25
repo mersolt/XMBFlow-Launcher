@@ -1489,23 +1489,24 @@ System.createDirectory(user_DB_Folder)
 local db_Folder = xmb_data_root .. "DATABASES/"
 System.createDirectory(db_Folder)
 
--- Copy databases from app to data
-if not System.doesFileExist(db_Folder .. "/mame_2000.db") then
+-- The independent XMB inventory does not use RetroFlow's database scanners.
+-- Keep their legacy setup out of safe-profile startup.
+if not xmbSafeProfile and not System.doesFileExist(db_Folder .. "/mame_2000.db") then
     System.copyFile("app0:/addons/mame_2000.db", db_Folder .. "/mame_2000.db")
 end
-if not System.doesFileExist(db_Folder .. "/mame_2003_plus.db") then
+if not xmbSafeProfile and not System.doesFileExist(db_Folder .. "/mame_2003_plus.db") then
     System.copyFile("app0:/addons/mame_2003_plus.db", db_Folder .. "/mame_2003_plus.db")
 end
-if not System.doesFileExist(db_Folder .. "/neogeo.db") then
+if not xmbSafeProfile and not System.doesFileExist(db_Folder .. "/neogeo.db") then
     System.copyFile("app0:/addons/neogeo.db", db_Folder .. "/neogeo.db")
 end
-if not System.doesFileExist(db_Folder .. "/fba_2012.db") then
+if not xmbSafeProfile and not System.doesFileExist(db_Folder .. "/fba_2012.db") then
     System.copyFile("app0:/addons/fba_2012.db", db_Folder .. "/fba_2012.db")
 end
-if not System.doesFileExist(db_Folder .. "/scummvm_2026_03.db") then
+if not xmbSafeProfile and not System.doesFileExist(db_Folder .. "/scummvm_2026_03.db") then
     System.copyFile("app0:/addons/scummvm_2026_03.db", db_Folder .. "/scummvm_2026_03.db")
 end
-if not System.doesFileExist(db_Folder .. "/amiga.db") then
+if not xmbSafeProfile and not System.doesFileExist(db_Folder .. "/amiga.db") then
     System.copyFile("app0:/addons/amiga.db", db_Folder .. "/amiga.db")
 end
 
@@ -1533,11 +1534,13 @@ function cache_files_complete()
 end
 
 -- Copy default backgrounds to wallpaper folder
-if not System.doesFileExist(background_dir .. "Aurora.png") then System.copyFile("app0:/DATA/Aurora.png", background_dir .. "Aurora.png") end
-if not System.doesFileExist(background_dir .. "Blur 1.jpg") then System.copyFile("app0:/DATA/Blur 1.jpg", background_dir .. "Blur 1.jpg") end
-if not System.doesFileExist(background_dir .. "Blur 2.jpg") then System.copyFile("app0:/DATA/Blur 2.jpg", background_dir .. "Blur 2.jpg") end
-if not System.doesFileExist(background_dir .. "Blur 3.jpg") then System.copyFile("app0:/DATA/Blur 3.jpg", background_dir .. "Blur 3.jpg") end
-if not System.doesFileExist(background_dir .. "Grey.png") then System.copyFile("app0:/DATA/Grey.png", background_dir .. "Grey.png") end
+if not xmbSafeProfile then
+    if not System.doesFileExist(background_dir .. "Aurora.png") then System.copyFile("app0:/DATA/Aurora.png", background_dir .. "Aurora.png") end
+    if not System.doesFileExist(background_dir .. "Blur 1.jpg") then System.copyFile("app0:/DATA/Blur 1.jpg", background_dir .. "Blur 1.jpg") end
+    if not System.doesFileExist(background_dir .. "Blur 2.jpg") then System.copyFile("app0:/DATA/Blur 2.jpg", background_dir .. "Blur 2.jpg") end
+    if not System.doesFileExist(background_dir .. "Blur 3.jpg") then System.copyFile("app0:/DATA/Blur 3.jpg", background_dir .. "Blur 3.jpg") end
+    if not System.doesFileExist(background_dir .. "Grey.png") then System.copyFile("app0:/DATA/Grey.png", background_dir .. "Grey.png") end
+end
 
 
 -- EMULATOR CORE MANAGEMENT
