@@ -14361,6 +14361,7 @@ xmb_prototype_icon_paths = {
 }
 xmb_prototype_icons = {}
 xmb_prototype_object_icons = {}
+xmbPrototypeInstalledIconPaths = {}
 xmb_prototype_system_app_icon_paths = {
     ["browser"] = "app0:/DATA/xmb-system-browser.png",
     ["friends"] = "app0:/DATA/xmb-system-friends.png",
@@ -14406,9 +14407,9 @@ xmb_prototype_inert_columns = {
 -- These folder records are read-only pointers to existing RetroFlow data.
 -- They do not create a second library or save any new configuration.
 xmb_prototype_games_folders = {
-    {label = "Memory Stick", kind = "library"},
-    {label = "Saved Data Utility", xmb_icon_path = "app0:/DATA/xmb-object-saved-data.png"},
-    {label = "Game Settings"},
+    {label = "Game Data", kind = "library", xmb_icon_path = "app0:/DATA/xmb-object-game-data.png"},
+    {label = "Save Data", xmb_icon_path = "app0:/DATA/xmb-object-saved-data.png"},
+    {label = "Game Settings", xmb_icon_path = "app0:/DATA/xmb-object-game-settings.png"},
     {label = "Trophies", system_app = "NPXS10008", xmb_icon_path = "app0:/DATA/xmb-system-trophy.png"}
 }
 xmb_prototype_library_folders = {
@@ -14502,12 +14503,26 @@ local function xmb_prototype_object_icon(path)
     return xmb_prototype_object_icons[path] or nil
 end
 
+-- Installed title artwork is provided by Vita's app metadata database.  It is
+-- read directly for the current session and is never copied into XMBFlow.
+function xmb_prototype_installed_app_icon(item)
+    local titleid = item and (item.titleid or item.name)
+    if type(titleid) ~= "string" or string.len(titleid) ~= 9 then return nil end
+    if xmbPrototypeInstalledIconPaths[titleid] == nil then
+        local path = "ur0:/appmeta/" .. titleid .. "/icon0.png"
+        xmbPrototypeInstalledIconPaths[titleid] = System.doesFileExist(path) and path or false
+    end
+    local path = xmbPrototypeInstalledIconPaths[titleid]
+    if not path then return nil end
+    return xmb_prototype_object_icon(path)
+end
+
 local function xmb_prototype_read_only_item_icon(column, item)
     if column == 7 then
         local label = string.lower(item.apptitle or item.title or item.name or "")
-        return xmb_prototype_object_icon(xmb_prototype_system_app_icon_paths[label]) or xmb_prototype_category_icon(column)
+        return xmb_prototype_object_icon(xmb_prototype_system_app_icon_paths[label]) or xmb_prototype_installed_app_icon(item) or xmb_prototype_category_icon(column)
     end
-    return xmb_prototype_category_icon(column)
+    return xmb_prototype_installed_app_icon(item) or xmb_prototype_category_icon(column)
 end
 
 -- Draw one object on the XMB vertical axis. The active object is positioned
@@ -14626,7 +14641,7 @@ local function xmb_prototype_current_read_only_apps_list(column)
         local entries = {}
         for _, entry in ipairs(data.category_rows(xmb_prototype_system_apps_category)) do
             local label = string.lower(entry.apptitle or entry.title or entry.name or "")
-            if label ~= "trophies" and label ~= "trophy collection" and label ~= "photos" and label ~= "browser" and label ~= "internet browser" and label ~= "settings" and label ~= "parental controls" and label ~= "music" and label ~= "videos" then
+            if entry.name ~= "NPXS10098" and label ~= "trophies" and label ~= "trophy collection" and label ~= "photos" and label ~= "browser" and label ~= "internet browser" and label ~= "settings" and label ~= "parental controls" and label ~= "music" and label ~= "videos" then
                 table.insert(entries, entry)
             end
         end
@@ -14714,7 +14729,7 @@ local function xmb_prototype_open_games_selection()
 
     if xmbPrototypeGamesMode == "folders" then
         if selected.kind == "library" then
-            xmb_prototype_open_games_submenu("library", "Memory Stick")
+            xmb_prototype_open_games_submenu("library", "Game Data")
         end
     elseif xmbPrototypeGamesMode == "library" then
         if selected.kind == "collections" then
@@ -14753,7 +14768,7 @@ local function xmb_prototype_go_back()
         elseif xmbPrototypeGamesMode == "retro_systems" then
             xmbPrototypeGamesTitle = "Retro Systems"
         elseif xmbPrototypeGamesMode == "library" then
-            xmbPrototypeGamesTitle = "Memory Stick"
+            xmbPrototypeGamesTitle = "Game Data"
         else
             xmbPrototypeGamesTitle = "Collections"
         end
@@ -15043,7 +15058,7 @@ function xmb_prototype_information_metadata(entry)
 end
 
 function xmb_prototype_information_category(value)
-    local labels = {gd = "Game", gp = "Game patch", mg = "Application", gda = "Application"}
+    local labels = {gd = "Game content (gd)", gp = "Game patch (gp)", mg = "Application (mg)", gda = "Application data (gda)"}
     if type(value) ~= "string" or value == "" then return "Not reported" end
     return labels[string.lower(value)] or value
 end
@@ -15185,7 +15200,7 @@ local function xmb_prototype_rescan_private_library()
         "NPXS10000", "NPXS10001", "NPXS10002", "NPXS10003", "NPXS10004",
         "NPXS10006", "NPXS10008", "NPXS10009", "NPXS10010", "NPXS10012",
         "NPXS10013", "NPXS10014", "NPXS10015", "NPXS10026", "NPXS10072",
-        "NPXS10078", "NPXS10091", "NPXS10094", "NPXS10098"
+        "NPXS10078", "NPXS10091", "NPXS10094"
     }
     for _, titleid in ipairs(system_titleids) do
         local app_path = "vs0:/app/" .. titleid
@@ -15212,7 +15227,6 @@ local function xmb_prototype_rescan_private_library()
     cache_all_tables()
     files_table = scan_result
     xmb_prototype_reset_navigation()
-    xmbPrototypeDebugOpen = true
     xmbPrototypeDebugStatus = "Private library refreshed: " .. tostring(#scan_result) .. " entries."
     return true
 end
@@ -15303,7 +15317,7 @@ local function draw_xmb_prototype()
             XmbRender.each_vertical(first_item, last_item, xmbPrototypeGamesVisualSelection, 296, 66, child_up_spacing, function(index, _, y, focus)
                 local item = games_list[index]
                 local label = xmb_prototype_games_item_label(item)
-                local icon = xmb_prototype_object_icon(item.xmb_icon_path) or vertical_icon
+                local icon = xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon
                 xmb_prototype_draw_vertical_object(icon, showing_child_axis and current_axis_x or category_anchor_x, y, label, focus, xmbPrototypeVerticalAlpha * (showing_child_axis and xmbPrototypeChildAxisAlpha or 1))
             end)
         end

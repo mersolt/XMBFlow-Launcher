@@ -32,7 +32,9 @@ $required = @(
     'xmbPrototypeGamesGrandparentList = nil',
     'xmb_prototype_library_folders = {',
     'local function xmb_prototype_combined_collections()',
-    '{label = "Memory Stick", kind = "library"}',
+    '{label = "Game Data", kind = "library", xmb_icon_path = "app0:/DATA/xmb-object-game-data.png"}',
+    '{label = "Game Settings", xmb_icon_path = "app0:/DATA/xmb-object-game-settings.png"}',
+    'function xmb_prototype_installed_app_icon(item)',
     '{label = "Collections", kind = "collections"}',
     '{label = "Retro Systems", kind = "retro"}',
     '{label = "All Games", category = 0}',
@@ -105,8 +107,8 @@ foreach ($removedPreviewFeature in @('xmb_prototype_existing_game_icon', 'xmb_pr
         throw "The XMB renderer must not retain the deferred cover-preview feature: $removedPreviewFeature"
     }
 }
-if (-not $prototypeRenderer.Contains('xmb_prototype_object_icon(item.xmb_icon_path) or vertical_icon')) {
-    throw 'The XMB Games renderer must use explicit XMB icon paths instead of RetroFlow cover paths.'
+if (-not $prototypeRenderer.Contains('xmb_prototype_object_icon(item.xmb_icon_path) or xmb_prototype_installed_app_icon(item) or vertical_icon')) {
+    throw 'The XMB Games renderer must use explicit XMB paths or installed app icons, not RetroFlow cover paths.'
 }
 if ($text -match 'Settings\.write\(.*xmbPrototype' -or $text -match 'WriteConfig.*xmbPrototype') {
     throw 'XMB prototype selection must remain session-only.'
