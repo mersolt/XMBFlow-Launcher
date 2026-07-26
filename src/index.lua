@@ -14445,7 +14445,7 @@ xmb_prototype_inert_columns = {
     },
     [6] = {
         {label = "Browser", icon_path = "app0:/DATA/xmb-system-browser.png", system_app = "NPXS10003"},
-        {label = "Online Manual", icon_path = "app0:/DATA/xmb-icon-network.png"}
+        {label = "Online Manual", icon_path = "app0:/DATA/xmb-icon-network.png", browser_uri = "https://manuals.playstation.net/document/es/psvita/index.html"}
     }
 }
 
@@ -15698,6 +15698,10 @@ end
 function xmb_prototype_activate_inert_selection(column)
     local entry = xmb_prototype_current_inert_list(column)[xmbPrototypeInertSelections[column]]
     if xmb_prototype_open_inert_selection(column) then return true end
+    if entry and type(entry.browser_uri) == "string" and string.match(entry.browser_uri, "^https://") then
+        System.executeUri(entry.browser_uri)
+        return true
+    end
     if entry and entry.action == "theme" and xmbPrototypeThemeColors[entry.theme] then
         xmbPrototypeTheme = entry.theme
         return true

@@ -86,6 +86,8 @@ $required = @(
     'system_app = "NPXS10010"',
     '"NPXS10094"',
     '"Online Manual"',
+    'browser_uri = "https://manuals.playstation.net/document/es/psvita/index.html"',
+    'string.match(entry.browser_uri, "^https://")',
     'function xmb_prototype_read_sfo_metadata(path)',
     'PARENTAL_LEVEL = true',
     'PSP2_SYSTEM_VER = true',
