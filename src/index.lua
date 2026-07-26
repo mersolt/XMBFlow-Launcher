@@ -14439,9 +14439,9 @@ xmb_prototype_inert_columns = {
         {label = "Internet Radio", icon_path = "app0:/DATA/xmb-icon-music.png"}
     },
     [4] = {
-        {label = "Video Library", icon_path = "app0:/DATA/xmb-icon-video.png"},
+        {label = "Video Library", icon_path = "app0:/DATA/xmb-object-video-library.png"},
         {label = "Videos", icon_path = "app0:/DATA/xmb-system-video.png", system_app = "NPXS10010"},
-        {label = "Video Settings", icon_path = "app0:/DATA/xmb-icon-video.png"}
+        {label = "Video Settings", icon_path = "app0:/DATA/xmb-object-video-settings.png"}
     },
     [6] = {
         {label = "Browser", icon_path = "app0:/DATA/xmb-system-browser.png", system_app = "NPXS10003"},
@@ -15011,7 +15011,9 @@ local xmb_prototype_app_options = {"Information", "Change category", "Delete"}
 
 function xmb_prototype_app_options_for(entry)
     if entry and (entry.system_app ~= nil or entry.system_app_label ~= nil or entry.app_type == 42 or entry.app_type_default == 42) then
-        return {"Information", "Change category"}
+        return {"Information"}
+    elseif entry and entry.browser_uri ~= nil then
+        return {"Information", "Delete"}
     end
     return xmb_prototype_app_options
 end
@@ -15030,7 +15032,7 @@ local function xmb_prototype_current_selected_entry()
 end
 
 local function xmb_prototype_is_app_entry(entry)
-    return entry ~= nil and (entry.system_app ~= nil or entry.system_app_label ~= nil or entry.name ~= nil or entry.titleid ~= nil or entry.game_path ~= nil)
+    return entry ~= nil and (entry.system_app ~= nil or entry.system_app_label ~= nil or entry.browser_uri ~= nil or entry.name ~= nil or entry.titleid ~= nil or entry.game_path ~= nil)
 end
 
 local function xmb_prototype_current_app_option_entry()
@@ -15272,7 +15274,6 @@ local function xmb_prototype_draw_information_card()
     local title_id = xmb_prototype_information_value(source.titleid or source.name or entry.system_app, "Unavailable")
     local metadata = xmbPrototypeInformationMetadata or {}
     local version = xmb_prototype_information_value(metadata.APP_VER or source.version, "Not reported")
-    local category = xmb_prototype_columns[xmbPrototypeColumn] or "Apps"
     local kind = xmb_prototype_information_type(entry, source)
     local text_alpha = math.floor(255 * alpha)
     local theme = xmbPrototypeThemeColors[xmbPrototypeTheme] or xmbPrototypeThemeColors["Blue"]
@@ -15286,7 +15287,6 @@ local function xmb_prototype_draw_information_card()
     Font.print(fnt22, 166, 154, title, Color.new(255, 255, 255, text_alpha))
     local fields = {
         {"Title ID", title_id},
-        {"Category", category},
         {"Type", kind},
         {"Version", version},
         {"Size", xmbPrototypeInformationSize},
@@ -15554,7 +15554,7 @@ local function draw_xmb_prototype()
         local parent = xmb_prototype_inert_parent(display_column)
         local parent_axis_x = category_anchor_x
         local child_axis_x = parent_axis_x + xmbPrototypeChildAxisOffset
-        local current_axis_x = showing_inert_child and child_axis_x or parent_axis_x
+        local current_axis_x = showing_inert_child and (parent_axis_x + xmbPrototypeChildAxisOffset * xmbPrototypeChildAxisAlpha) or parent_axis_x
         if xmbPrototypeReturningToNestedParent and showing_inert_child then
             current_axis_x = parent_axis_x + xmbPrototypeChildAxisOffset * xmbPrototypeReturnAxisAlpha
         end

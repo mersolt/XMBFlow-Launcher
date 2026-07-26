@@ -20,3 +20,5 @@ licence record as `LicenseRef-XMBFlow-Original`.
 | `DATA/xmb-system-settings.png` | `9d865ce9ba7fcd1d571f2b4efa8794d5257ea9dc41740bdb46342a7f8f75b609` | Owner-supplied `icon-settings.png`, unchanged. |
 | `DATA/xmb-system-trophy.png` | `1e7c1626b9bd43bed3b90ef04ffced148c8040641500639364d4829583c9de3f` | Owner-supplied `trophy.png`, unchanged. |
 | `DATA/xmb-system-video.png` | `a2f2569c5c10ee48b3ffb230b81a9b867f387b76a343f8ffc9c53c731b423098` | Owner-supplied `icon-video.png`, unchanged. |
+| `DATA/xmb-object-video-library.png` | `1c9df58b7a8ca36775bdfe7b5123304c91deadd6d1b8fb29cece3be7242243df` | Owner-supplied `videolibrary.png`, centered aspect-fit on a 96×96 transparent canvas. |
+| `DATA/xmb-object-video-settings.png` | `29920241e3043d8b21172055c5233d48fde9c3f1fef1e9ce1b93dcc9aa7438de` | Owner-supplied `videosettings.png`, centered aspect-fit on a 96×96 transparent canvas. |
