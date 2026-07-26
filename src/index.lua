@@ -6045,10 +6045,15 @@ function launch_vita_sysapp(def_titleid)
 
     -- Safe-profile entries come from RetroFlow's existing cache, but its
     -- filesystem preflight cannot inspect system app locations.  Preserve the
-    -- legacy URI routes and use the normal title launcher only as a fallback.
+    -- legacy URI routes, then consult the target app's own declared URI. Use
+    -- the normal title launcher only as a final fallback.
     if xmbSafeProfile then
-        if uri[def_titleid] then
-            System.executeUri(uri[def_titleid])
+        local target_uri = uri[def_titleid]
+        if target_uri == nil and xmb_prototype_system_app_uri then
+            target_uri = xmb_prototype_system_app_uri(def_titleid)
+        end
+        if target_uri then
+            System.executeUri(target_uri)
             return true
         elseif type(def_titleid) == "string" and string.match(def_titleid, "^[A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9][A-Z0-9]$") then
             System.launchApp(def_titleid)
@@ -15209,7 +15214,7 @@ function xmb_prototype_read_sfo_metadata(path)
     local count = xmb_prototype_sfo_u32(data, 17)
     if not key_table or not value_table or not count or count > 128 then return {} end
 
-    local wanted = {APP_VER = true, CATEGORY = true, PARENTAL_LEVEL = true, PSP2_SYSTEM_VER = true}
+    local wanted = {APP_VER = true, CATEGORY = true, PARENTAL_LEVEL = true, PSP2_SYSTEM_VER = true, SUPPORT_URI = true}
     local values = {}
     for index = 0, count - 1 do
         local entry = 21 + index * 16
@@ -15232,6 +15237,27 @@ function xmb_prototype_read_sfo_metadata(path)
         end
     end
     return values
+end
+
+-- System apps declare their supported URI scheme in their own param.sfo.
+-- Reading that installed metadata lets the XMB launcher use a first-party
+-- route for any available system app instead of treating each title as an
+-- exceptional case. The result is read-only and cached for this session.
+xmbPrototypeSystemAppUriCache = {}
+function xmb_prototype_system_app_uri(titleid)
+    if type(titleid) ~= "string" or string.len(titleid) ~= 9 then return nil end
+    if xmbPrototypeSystemAppUriCache[titleid] ~= nil then
+        return xmbPrototypeSystemAppUriCache[titleid] or nil
+    end
+    local metadata = xmb_prototype_read_sfo_metadata("vs0:/app/" .. titleid .. "/sce_sys/param.sfo")
+    local support_uri = metadata.SUPPORT_URI
+    local uri = type(support_uri) == "string" and string.match(support_uri, "<([^>]+)>") or nil
+    if uri == nil and type(support_uri) == "string" and string.match(support_uri, "^[%a][%w+.-]*:") then
+        uri = support_uri
+    end
+    if uri ~= nil and not string.match(uri, "^[%a][%w+.-]*:") then uri = nil end
+    xmbPrototypeSystemAppUriCache[titleid] = uri or false
+    return uri
 end
 
 function xmb_prototype_information_metadata(entry)
